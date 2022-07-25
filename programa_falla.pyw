@@ -1,11 +1,11 @@
 from tkinter import * #importem les llibreries gràfiques
 from tkinter import messagebox #importem el sistema de missatges emergents
-from gestionar import *
-from introduir import *
-from assignar import *
-from moviment import *
-from informe import *
-from historial import *
+#from gestionar import *
+#from introduir import *
+#from assignar import *
+#from moviment import *
+#from informe import *
+#from historial import *
 
 #import pickle
 
@@ -19,7 +19,7 @@ class Aplicacio():
 		self.root.state('zoomed') #s'obri maximitzada
 		self.root.resizable(0,0) #no es pot redimensionar
 		self.root.title("Falla Sants Patrons")
-		self.root.iconbitmap("escut.ico")
+		#self.root.iconbitmap("escut.ico")
 
 		barraMenu=Menu(self.root) #guardem el menú en una variable
 		self.root.config(menu=barraMenu) #construïm el menú
@@ -36,7 +36,6 @@ class Aplicacio():
 		rifaMenu.add_command(label="Assignar", command=self.AssignarRifa)
 		historialMenu=Menu(barraMenu, tearoff=0)
 		historialMenu.add_command(label="Modificar", command=self.ModificarHistorial)
-		#historialMenu.add_command(label="Modificar", command=self.prova)
 		llistatsMenu=Menu(barraMenu, tearoff=0)
 		llistatsMenu.add_command(label="Moviments", command=self.MovimentsDia)
 		llistatsMenu.add_command(label="General", command=self.LlistatGeneral)
@@ -69,7 +68,8 @@ class Aplicacio():
 
 	def Gestionar(self):
 
-		FinestraGestionar(self.root)
+		#FinestraGestionar(self.root)
+		pass
 	
 
 	def EventIntroduir(self, event): #funció per al bindeig
@@ -79,112 +79,76 @@ class Aplicacio():
 	
 	def Introduir(self):
 
-		FinestraIntroduir(self.root)
+		#FinestraIntroduir(self.root)
+		pass
 
 
 	def Assignar(self):
 
-		FinestraAssignar(self.root)
+		#FinestraAssignar(self.root)
+		pass
 
 
 	def AssignarRifa(self):
 
-		valor=messagebox.askquestion("Assignar rifa","Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
-		if valor=="yes":
-			elFaller=Faller()
-			#res=elFaller.BuscarFallerPerCategoria(1) #busquem tots els fallers de categoria 1
-			res=elFaller.BuscarFallerAmbRifa()
-			elMoviment=Moviment()
-			elMoviment.ExerciciActual() 
-			for val in res:
-				elMoviment.InsertarAsignacio(15, 3, elMoviment.exercici, val[0], "rifa") #els assignem la rifa
-			#res2=elFaller.BuscarFallerPerCategoria(2) #busquem tots els fallers de categoria 2
-			#for val in res2:
+		pass
+		#valor=messagebox.askquestion("Assignar rifa","Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
+		#if valor=="yes":
+			#elFaller=Faller()
+			#res=elFaller.BuscarFallerAmbRifa()
+			#elMoviment=Moviment()
+			#elMoviment.ExerciciActual() 
+			#for val in res:
 				#elMoviment.InsertarAsignacio(15, 3, elMoviment.exercici, val[0], "rifa") #els assignem la rifa
-			messagebox.showinfo("Assignar rifa","La rifa s'ha assignat correctament")
+			#messagebox.showinfo("Assignar rifa","La rifa s'ha assignat correctament")
 
 
 	def ModificarHistorial(self):
 
-		FinestraHistorial(self.root)
-
-		
-	def prova(self):
-
-		
-		try:
-			os.mkdir("historials")
-		except OSError as e:
-			if e.errno!=errno.EEXIST:
-				raise
-
-		elMoviment=Moviment()
-		elMoviment.ExerciciActual()
-		anyactual=elMoviment.exercici
-		elFaller=Faller()
-		res=elFaller.LlistatFallers()
-		for val in res:
-			naixement=val[3]
-			primer=elFaller.PrimerExercici(naixement)
-			anyexer=int(primer)
-			historial={}
-			while anyexer < anyactual:
-				historial[anyexer]=["baixa", ""]
-				anyexer=anyexer+1
-			alta=val[8]
-			if alta==1:
-				historial[anyactual]=["vocal", "Sants Patrons"]
-			else:
-				historial[anyactual]=["baixa", ""]
-			fallerid=val[0]
-			arxiu="historials"+"/"+str(fallerid)
-			fitxer=open(arxiu,"wb")
-			pickle.dump(historial, fitxer)
-			fitxer.close()
-			del(fitxer)
-
-		fitxer=open(arxiu,"rb")
-		diccionari=pickle.load(fitxer)
-		fitxer.close()
-		del(fitxer)
-
-		print(diccionari)
+		#FinestraHistorial(self.root)
+		pass
 
 
 	def MovimentsDia(self):
 
-		elInforme=Informe()
-		elInforme.MovimentsDia()
+		#elInforme=Informe()
+		#elInforme.MovimentsDia()
+		pass
 
 
 	def LlistatGeneral(self):
 
-		elInforme=Informe()
-		elInforme.LlistatGeneral()
+		#elInforme=Informe()
+		#elInforme.LlistatGeneral()
+		pass
 
 
 	def LlistatFallers(self):
 
-		elInforme=Informe()
-		elInforme.LlistatFallers()
+		#elInforme=Informe()
+		#elInforme.LlistatFallers()
+		pass
 
 
 	def LlistatAltesBaixes(self):
 
-		elInforme=Informe()
-		elInforme.LlistatAltesBaixes()
+		#elInforme=Informe()
+		#elInforme.LlistatAltesBaixes()
+		pass
 
 
 	def LlistatRifes(self):
 
-		elInforme=Informe()
-		elInforme.FallersAmbRifa()
+		#elInforme=Informe()
+		#elInforme.FallersAmbRifa()
+		pass
 		
 
 	def NouExercici(self):
 
-		elMoviment=Moviment()
-		elMoviment.NouExercici()
+		#elMoviment=Moviment()
+		#elMoviment.NouExercici()
+		pass
 
 	
 	def Eixir(self):
