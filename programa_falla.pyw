@@ -1,4 +1,4 @@
-from tkinter import * #importem les llibreries gràfiques
+import tkinter as tk #importem les llibreries gràfiques
 from tkinter import messagebox #importem el sistema de missatges emergents
 #from gestionar import *
 #from introduir import *
@@ -10,55 +10,52 @@ from tkinter import messagebox #importem el sistema de missatges emergents
 #import pickle
 
 
-class Aplicacio():
+class Aplicacio(tk.Frame):
 
 		
-	def __init__(self): #el constructor construeix la finestra d'aplicació
+	def __init__(self, master=None): #el constructor construeix la finestra d'aplicació
 
-		self.root=Tk()
-		self.root.state('zoomed') #s'obri maximitzada
-		self.root.resizable(0,0) #no es pot redimensionar
-		self.root.title("Falla Sants Patrons")
-		#self.root.iconbitmap("escut.ico")
+		super().__init__(master)
+		self.master=master
+		self.master.state('zoomed')
+		self.master.title("Falla Sants Patrons")
+		self.master.iconbitmap("escut.ico")
+		
 
-		barraMenu=Menu(self.root) #guardem el menú en una variable
-		self.root.config(menu=barraMenu) #construïm el menú
-		arxiuMenu=Menu(barraMenu, tearoff=0) #creem els diferents elements i subelements
-		arxiuMenu.add_command(label="Eixir", command=self.Eixir)
-		fallerMenu=Menu(barraMenu, tearoff=0)
-		fallerMenu.add_command(label="Gestionar", command=self.Gestionar, accelerator="Ctrl+G")
-		self.root.bind_all("<Control-g>", self.EventGestionar) #bindegem el submenú Buscar
-		fallerMenu.add_command(label="Introduir", command=self.Introduir, accelerator="Ctrl+I")
-		self.root.bind_all("<Control-i>", self.EventIntroduir)
-		loteriaMenu=Menu(barraMenu, tearoff=0)
-		loteriaMenu.add_command(label="Assignar", command=self.Assignar)
-		rifaMenu=Menu(barraMenu, tearoff=0)
-		rifaMenu.add_command(label="Assignar", command=self.AssignarRifa)
-		historialMenu=Menu(barraMenu, tearoff=0)
-		historialMenu.add_command(label="Modificar", command=self.ModificarHistorial)
-		llistatsMenu=Menu(barraMenu, tearoff=0)
-		llistatsMenu.add_command(label="Moviments", command=self.MovimentsDia)
-		llistatsMenu.add_command(label="General", command=self.LlistatGeneral)
-		llistatsMenu.add_command(label="Fallers", command=self.LlistatFallers)
-		llistatsMenu.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
-		llistatsMenu.add_command(label="Rifes", command=self.LlistatRifes)
-		exerciciMenu=Menu(barraMenu, tearoff=0)
-		exerciciMenu.add_command(label="Nou", command=self.NouExercici)
-		ajudaMenu=Menu(barraMenu, tearoff=0)
-		ajudaMenu.add_command(label="Info", command=self.Info)
-		barraMenu.add_cascade(label="Arxiu", menu=arxiuMenu) #els afegim a la barra
-		barraMenu.add_cascade(label="Faller", menu=fallerMenu)
-		barraMenu.add_cascade(label="Loteria", menu=loteriaMenu)
-		barraMenu.add_cascade(label="Rifa", menu=rifaMenu)
-		barraMenu.add_cascade(label="Historial", menu=historialMenu)
-		barraMenu.add_cascade(label="Llistats", menu=llistatsMenu)
-		barraMenu.add_cascade(label="Exercici", menu=exerciciMenu)
-		barraMenu.add_cascade(label="Ajuda", menu=ajudaMenu)
-			
-		framePrincipal=Frame()
-		framePrincipal.pack()
-
-		self.root.mainloop()
+		self.barraMenu=tk.Menu()
+		#barraMenu=Menu(self.root) #guardem el menú en una variable
+		self.master.config(menu=self.barraMenu) #construïm el menú
+		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) #creem els diferents elements i subelements
+		self.arxiuMenu.add_command(label="Eixir", command=self.Eixir)
+		self.fallerMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.fallerMenu.add_command(label="Gestionar", command=self.Gestionar, accelerator="Ctrl+G")
+		self.master.bind_all("<Control-g>", self.EventGestionar) #bindegem el submenú Buscar
+		self.fallerMenu.add_command(label="Introduir", command=self.Introduir, accelerator="Ctrl+I")
+		self.master.bind_all("<Control-i>", self.EventIntroduir)
+		self.loteriaMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.loteriaMenu.add_command(label="Assignar", command=self.Assignar)
+		self.rifaMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.rifaMenu.add_command(label="Assignar", command=self.AssignarRifa)
+		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.historialMenu.add_command(label="Modificar", command=self.ModificarHistorial)
+		self.llistatsMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.llistatsMenu.add_command(label="Moviments", command=self.MovimentsDia)
+		self.llistatsMenu.add_command(label="General", command=self.LlistatGeneral)
+		self.llistatsMenu.add_command(label="Fallers", command=self.LlistatFallers)
+		self.llistatsMenu.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
+		self.llistatsMenu.add_command(label="Rifes", command=self.LlistatRifes)
+		self.exerciciMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.exerciciMenu.add_command(label="Nou", command=self.NouExercici)
+		self.ajudaMenu=tk.Menu(self.barraMenu, tearoff=0)
+		self.ajudaMenu.add_command(label="Info", command=self.Info)
+		self.barraMenu.add_cascade(label="Arxiu", menu=self.arxiuMenu) #els afegim a la barra
+		self.barraMenu.add_cascade(label="Faller", menu=self.fallerMenu)
+		self.barraMenu.add_cascade(label="Loteria", menu=self.loteriaMenu)
+		self.barraMenu.add_cascade(label="Rifa", menu=self.rifaMenu)
+		self.barraMenu.add_cascade(label="Historial", menu=self.historialMenu)
+		self.barraMenu.add_cascade(label="Llistats", menu=self.llistatsMenu)
+		self.barraMenu.add_cascade(label="Exercici", menu=self.exerciciMenu)
+		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
 
 
 	def EventGestionar(self, event): #funció per al bindeig
@@ -155,7 +152,7 @@ class Aplicacio():
 
 		valor=messagebox.askquestion("Eixir","Vols eixir de l'aplicació?")
 		if valor=="yes":
-			self.root.destroy()
+			self.master.destroy()
 
 
 	def Info(self):
@@ -163,9 +160,13 @@ class Aplicacio():
 		messagebox.showinfo("Informació","Aplicació creada per Ivan Mas")
 
 
-def main(): #funció principal que llança l'aplicació
-	app=Aplicacio()
-	return(0)
+#def main(): #funció principal que llança l'aplicació
+	#app=Aplicacio()
+	#return(0)
 
-if __name__=='__main__': #comprova si es un módul importat o l'arxiu principal
-	main()
+#if __name__=='__main__': #comprova si es un módul importat o l'arxiu principal
+	#main()
+
+root=tk.Tk()
+app=Aplicacio(root)
+app.mainloop()
