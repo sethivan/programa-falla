@@ -16,7 +16,7 @@ class Moviment():
 		self.loteriapagada=0
 		self.rifaasignada=0
 		self.rifapagada=0
-		self.exercici=0
+		self.exercici=0 #usada
 
 
 	def NouExercici(self):
@@ -71,7 +71,7 @@ class Moviment():
 			anyexercici=anyactual
 		if mesactual==3 and diaactual>19:
 			anyexercici=anyactual+1
-		if mesactual==3 and diactual<=19:
+		if mesactual==3 and diaactual<=19:
 			anyexercici=anyactual
 		llista.append(anyexercici)
 		pickle.dump(llista, fitxer)
@@ -105,7 +105,7 @@ class Moviment():
 				elMoviment.InsertarAsignacio(val[9], 1, elMoviment.exercici, val[0], "any anterior", 0)
 
 
-	def ExerciciActual(self):
+	def ExerciciActual(self): #funció que torna en la variable self.exercici el valor de l'exercici actual
 
 		fitxer=open("exercici","rb")
 		llista=pickle.load(fitxer) #recuperem el valor de l'exercici guardat
@@ -153,7 +153,7 @@ class Moviment():
 		laConexio.close()
 
 
-	def InsertarAsignacio(self, quantitat, concepte, exercici, idfaller, descripcio):
+	def InsertarMoviment(self, quantitat, tipo, concepte, exercici, idfaller, descripcio): #funció que inserta en la base de dades el moviment passat per paràmetres
 
 		laConexio=sqlite3.connect("falla.db")
 		elCursor=laConexio.cursor()
@@ -162,7 +162,7 @@ class Moviment():
 		mesactual=datetime.strftime(data, '%m')
 		diaactual=datetime.strftime(data, '%d')
 		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		dades=datafinal, quantitat, 1, concepte, exercici, idfaller, descripcio, 0
+		dades=datafinal, quantitat, tipo, concepte, exercici, idfaller, descripcio, 0
 		elCursor.execute("INSERT INTO moviment VALUES (null,?,?,?,?,?,?,?,?)",(dades))
 		laConexio.commit()
 		laConexio.close()
