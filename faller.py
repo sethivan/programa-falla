@@ -230,7 +230,7 @@ class Faller():
 		return(resultat)
 
 
-	def BuscarFallerAmbRifa(self):
+	def BuscarFallerAmbRifa(self): #funció que torna una llista amb tots els fallers donats d'alta i majors de 13 anys
 
 		laConexio=sqlite3.connect("falla.db")
 		elCursor=laConexio.cursor()

@@ -111,7 +111,7 @@ class Moviment():
 		llista=pickle.load(fitxer) #recuperem el valor de l'exercici guardat
 		fitxer.close()
 		del(fitxer)
-		self.exercici=int(llista[0]) #l'associem a una variable que es cridarà des de fora
+		self.exercici=int(llista[0]) #l'associem a la variable de la classe
 
 
 	def BuscarMoviments(self, num, exer):
