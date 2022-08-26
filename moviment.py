@@ -2,8 +2,9 @@ import sqlite3
 from datetime import date
 from datetime import datetime
 import pickle
-from faller import *
-from familia import *
+
+from faller import Faller
+from familia import Familia
 
 
 class Moviment():

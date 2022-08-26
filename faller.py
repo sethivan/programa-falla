@@ -1,5 +1,8 @@
 import sqlite3
 from datetime import datetime, timedelta
+from tkinter import messagebox
+
+from moviment import Moviment
 
 
 class Faller():
@@ -234,8 +237,29 @@ class Faller():
 
 		laConexio=sqlite3.connect("falla.db")
 		elCursor=laConexio.cursor()
-		elCursor.execute("SELECT * FROM faller WHERE alta=1 and (idcategoria=1 or idcategoria=2) ORDER BY cognoms")
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
+		try:
+			elCursor.execute("SELECT * FROM faller WHERE alta=1 and (idcategoria=1 or idcategoria=2) ORDER BY cognoms")
+		except sqlite3.OperationalError:
+			messagebox.showwarning("Error", "Hi ha un problema amb la base de dades")
+		else:
+			resultat=elCursor.fetchall()
+			return(resultat)
+		finally:
+			laConexio.close()
+
+
+	def AssignarRifa(self): #funció per a assignar la rifa corresponent als fallers
+
+		valor=messagebox.askquestion("Assignar rifa","Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
+		if valor=="yes":
+			elFaller=Faller()
+			res=elFaller.BuscarFallerAmbRifa()
+			elMoviment=Moviment()
+			elMoviment.ExerciciActual()			
+			try:
+				for val in res:
+					elMoviment.InsertarMoviment(15, 1, 3, elMoviment.exercici, val[0], "rifa") #els assignem la rifa
+			except TypeError: #el contingut de la variable "res" es "None" si no torna res la funció "BuscarFallerAmbRifa"
+				messagebox.showinfo("Assignar rifa","La rifa no s'ha pogut assignar correctament")
+			else:
+				messagebox.showinfo("Assignar rifa","La rifa s'ha assignat correctament")

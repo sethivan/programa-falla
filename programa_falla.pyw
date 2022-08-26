@@ -9,8 +9,9 @@
 
 import tkinter as tk #importem les llibreries gràfiques
 from tkinter import messagebox #importem el sistema de missatges emergents
-from faller import *
-from moviment import *
+
+from faller import Faller
+#from moviment import *
 #from gestionar import *
 #from introduir import *
 #from assignar import *
@@ -116,15 +117,8 @@ class Aplicacio(tk.Frame):
 
 	def AssignarRifa(self): #funció per a assignar la rifa corresponent als fallers
 
-		valor=messagebox.askquestion("Assignar rifa","Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
-		if valor=="yes":
-			elFaller=Faller()
-			res=elFaller.BuscarFallerAmbRifa()
-			elMoviment=Moviment()
-			elMoviment.ExerciciActual() 
-			for val in res:
-				elMoviment.InsertarMoviment(15, 1, 3, elMoviment.exercici, val[0], "rifa") #els assignem la rifa
-			messagebox.showinfo("Assignar rifa","La rifa s'ha assignat correctament")
+		elFaller=Faller()
+		elFaller.AssignarRifa()
 
 
 	def ModificarHistorial(self): #funció que obre la finestra "Modificar" del menú "Historial"
