@@ -1,24 +1,126 @@
-import sqlite3
-from datetime import date
-from datetime import datetime
-import pickle
-
-from faller import Faller
-from familia import Familia
-
-
 class Moviment():
 
-	def __init__(self):
+	def __init__(self, id, data, quantitat, tipo, concepte, exercici, descripcio, rebut, faller=None):
 
-		self.quotaasignada=0
-		self.quotapagada=0
-		self.loteriaasignada=0
-		self.loteriapagada=0
-		self.rifaasignada=0
-		self.rifapagada=0
-		self.exercici=0 #usada
+		self.id=id
+		self.data=data
+		self.quantitat=quantitat
+		self.tipo=tipo
+		self.concepte=concepte
+		self.exercici=exercici
+		self.descripcio=descripcio
+		self.rebut=rebut
+		self.faller=faller
 
+
+	@property
+	def id(self):
+
+		return self._id
+	
+
+	@id.setter
+	def id(self, value):
+		
+		self._id=value
+
+
+	@property
+	def data(self):
+
+		return self._data
+	
+
+	@data.setter
+	def data(self, value):
+		
+		self._data=value
+	
+
+	@property
+	def quantitat(self):
+
+		return self._quantitat
+	
+
+	@quantitat.setter
+	def quantitat(self, value):
+		
+		self._quantitat=value
+
+
+	@property
+	def tipo(self):
+
+		return self._tipo
+	
+
+	@tipo.setter
+	def tipo(self, value):
+		
+		self._tipo=value
+
+
+	@property
+	def concepte(self):
+
+		return self._concepte
+	
+
+	@concepte.setter
+	def concepte(self, value):
+		
+		self._concepte=value
+
+
+	@property
+	def exercici(self):
+
+		return self._exercici
+	
+
+	@exercici.setter
+	def exercici(self, value):
+		
+		self._exercici=value
+
+
+	@property
+	def descripcio(self):
+
+		return self._descripcio
+	
+
+	@descripcio.setter
+	def descripcio(self, value):
+		
+		self._descripcio=value
+
+
+	@property
+	def rebut(self):
+
+		return self._rebut
+	
+
+	@rebut.setter
+	def rebut(self, value):
+		
+		self._rebut=value
+
+
+	@property
+	def faller(self):
+
+		return self._faller
+	
+
+	@faller.setter
+	def faller(self, value):
+		
+		self._faller=value
+
+		'''
 
 	def NouExercici(self):
 
@@ -106,15 +208,6 @@ class Moviment():
 				elMoviment.InsertarAsignacio(val[9], 1, elMoviment.exercici, val[0], "any anterior", 0)
 
 
-	def ExerciciActual(self): #funció que torna en la variable self.exercici el valor de l'exercici actual
-
-		fitxer=open("exercici","rb")
-		llista=pickle.load(fitxer) #recuperem el valor de l'exercici guardat
-		fitxer.close()
-		del(fitxer)
-		self.exercici=int(llista[0]) #l'associem a la variable de la classe
-
-
 	def BuscarMoviments(self, num, exer):
 
 		laConexio=sqlite3.connect("falla.db")
@@ -135,36 +228,6 @@ class Moviment():
 				self.rifaasignada=self.rifaasignada+valors[2]
 			elif valors[3]==2 and valors[4]==3:
 				self.rifapagada=self.rifapagada+valors[2]
-		laConexio.commit()
-		laConexio.close()
-
-
-	def InsertarPagament(self, quantitat, concepte, exercici, idfaller, descripcio, rebut):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		data=datetime.now()
-		anyactual=datetime.strftime(data,'%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		dades=datafinal, quantitat, 2, concepte, exercici, idfaller, descripcio, rebut
-		elCursor.execute("INSERT INTO moviment VALUES (null,?,?,?,?,?,?,?,?)",(dades))
-		laConexio.commit()
-		laConexio.close()
-
-
-	def InsertarMoviment(self, quantitat, tipo, concepte, exercici, idfaller, descripcio): #funció que inserta en la base de dades el moviment passat per paràmetres
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		data=datetime.now()
-		anyactual=datetime.strftime(data,'%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		dades=datafinal, quantitat, tipo, concepte, exercici, idfaller, descripcio, 0
-		elCursor.execute("INSERT INTO moviment VALUES (null,?,?,?,?,?,?,?,?)",(dades))
 		laConexio.commit()
 		laConexio.close()
 
@@ -196,3 +259,4 @@ class Moviment():
 		laConexio.commit()
 		laConexio.close()
 		return(resultat)
+		'''

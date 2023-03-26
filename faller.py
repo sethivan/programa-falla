@@ -1,83 +1,185 @@
-import sqlite3
-from datetime import datetime, timedelta
-from tkinter import messagebox
-
-from moviment import Moviment
-
+from datetime import datetime
 
 class Faller():
 
-	def __init__(self):
+	def __init__(self, id, nom, cognoms, naixement, sexe, dni, adresa, telefon, alta, correu, familia=None, categoria=None):
 
-		self.nom=""
-		self.cognoms=""
-		self.naixement=""
-		self.sexe=0
-		self.dni=""
-		self.adresa=""
-		self.telefon=""
-		self.alta=0
-		self.familia=0
-		self.correu=""
-		self.quota=0
+		self.id=id
+		self.nom=nom
+		self.cognoms=cognoms
+		self.naixement=naixement
+		self.sexe=sexe
+		self.dni=dni
+		self.adresa=adresa
+		self.telefon=telefon
+		self.alta=alta
+		self.correu=correu
+		self.familia=familia
+		self.categoria=categoria
 
+
+	@property
+	def id(self):
+
+		return self._id
 	
-	def LlistatFallers(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		elCursor.execute("SELECT * FROM faller")
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
+	@id.setter
+	def id(self, value):
+		
+		self._id=value
 
 
-	def BuscarFallerPerId(self, num):
+	@property
+	def nom(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM faller WHERE id=?", query_params)
-		resultat=elCursor.fetchall()
-		for valors in resultat:
-			self.nom=valors[1]
-			self.cognoms=valors[2]
-			self.naixement=valors[3]
-			self.sexe=valors[4]
-			self.dni=valors[5]
-			self.adresa=valors[6]
-			self.telefon=valors[7]
-			self.alta=valors[8]
-			self.familia=valors[9]
-			self.correu=valors[11]
-		laConexio.commit()
-		laConexio.close()
+		return self._nom
+	
+
+	@nom.setter
+	def nom(self, value):
+		
+		self._nom=value
 
 
-	def BuscarFallerPerNom(self, nom):
+	@property
+	def cognoms(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		valor="%" + nom + "%" #afegim els % com a caràcters desconeguts
-		query_params=(valor,) #convertim el string en una tupla per al execute
-		elCursor.execute("SELECT * FROM faller WHERE cognoms LIKE ?",query_params)
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
+		return self._cognoms
+	
+
+	@cognoms.setter
+	def cognoms(self, value):
+		
+		self._cognoms=value
 
 
-	def BuscarFallerPerIdfamilia(self, num):
+	@property
+	def naixement(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM faller WHERE idfamilia=?", query_params)
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
+		return self._naixement
+	
+
+	@naixement.setter
+	def naixement(self, value):
+		
+		self._naixement=value
+
+
+	@property
+	def sexe(self):
+
+		return self._sexe
+	
+
+	@sexe.setter
+	def sexe(self, value):
+		
+		self._sexe=value
+
+
+	@property
+	def dni(self):
+
+		return self._dni
+	
+
+	@dni.setter
+	def dni(self, value):
+		
+		self._dni=value
+
+
+	@property
+	def adresa(self):
+
+		return self._adresa
+	
+
+	@adresa.setter
+	def adresa(self, value):
+		
+		self._adresa=value
+
+
+	@property
+	def telefon(self):
+
+		return self._telefon
+	
+
+	@telefon.setter
+	def telefon(self, value):
+		
+		self._telefon=value
+
+
+	@property
+	def alta(self):
+
+		return self._alta
+	
+
+	@alta.setter
+	def alta(self, value):
+		
+		self._alta=value
+
+
+	@property
+	def correu(self):
+
+		return self._correu
+	
+
+	@correu.setter
+	def correu(self, value):
+		
+		self._correu=value
+
+
+	@property
+	def familia(self):
+
+		return self._familia
+	
+
+	@familia.setter
+	def familia(self, value):
+		
+		self._familia=value
+
+
+	@property
+	def categoria(self):
+
+		return self._categoria
+	
+
+	@categoria.setter
+	def categoria(self, value):
+		
+		self._categoria=value
+
+
+	def calcular_edat(self, naixement, exercici):
+        
+		naixement_faller=datetime.strptime(naixement, '%d-%m-%Y')
+		anyfaller=datetime.strftime(naixement_faller, '%Y')
+		mesfaller=datetime.strftime(naixement_faller, '%m')
+		diafaller=datetime.strftime(naixement_faller, '%d')
+		dataexercici=datetime.strptime(str(exercici), '%Y')
+		anyexercici=datetime.strftime(dataexercici, '%Y')
+		if int(mesfaller)>3 or (int(mesfaller)==3 and int(diafaller)>19):
+			edat=int(anyexercici)-int(anyfaller)-1
+		else:
+			edat=int(anyexercici)-int(anyfaller)
+		return(edat)
+
+     
+
+'''
+
 
 
 	def BuscarQuotaFaller(self, num):
@@ -125,16 +227,6 @@ class Faller():
 		laConexio.close()
 
 
-	def IntroduirFaller(self, nom, cognoms, naixement, sexe, dni, adresa, telefon, fam, categ, correu):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		dades=nom, cognoms, naixement, sexe, dni, adresa, telefon, 1, fam, categ, correu
-		elCursor.execute("INSERT INTO faller VALUES (null,?,?,?,?,?,?,?,?,?,?,?)",(dades))
-		laConexio.commit()
-		laConexio.close()
-
-
 	def ModificarFaller(self, num, nom, cognoms, naixement, sexe, dni, adresa, telefon, categ, correu):
 
 		laConexio=sqlite3.connect("falla.db")
@@ -165,21 +257,6 @@ class Faller():
 		laConexio.close()
 
 
-	def EdatFaller(self, cadena, exercici):
-
-		dataFaller=datetime.strptime(cadena, '%d-%m-%Y')
-		lanyfaller=datetime.strftime(dataFaller,'%Y')
-		mesfaller=datetime.strftime(dataFaller, '%m')
-		diafaller=datetime.strftime(dataFaller, '%d')
-		dataexercici=datetime.strptime(str(exercici), '%Y')
-		lanyexercici=datetime.strftime(dataexercici, '%Y')
-		if int(mesfaller)>3 or (int(mesfaller)==3 and int(diafaller)>19):
-			edat=int(lanyexercici)-int(lanyfaller)-1
-		else:
-			edat=int(lanyexercici)-int(lanyfaller)
-		return(edat)
-
-
 	def PrimerExercici(self, cadena):
 
 		dataFaller=datetime.strptime(cadena, '%d-%m-%Y')
@@ -191,21 +268,6 @@ class Faller():
 		else:
 			exercici=int(lanyfaller)
 		return(exercici)
-
-
-	def AsignarCategoria(self, edat):
-
-		if edat<5:
-			categoria=5
-		elif 5<=edat<=9:
-			categoria=4
-		elif 10<=edat<=14:
-			categoria=3
-		elif 15<=edat<=17:
-			categoria=2
-		else:
-			categoria=1
-		return(categoria)
 
 
 	def RecuperarUltimFaller(self):
@@ -232,34 +294,4 @@ class Faller():
 		laConexio.close()
 		return(resultat)
 
-
-	def BuscarFallerAmbRifa(self): #funció que torna una llista amb tots els fallers donats d'alta i majors de 13 anys
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		try:
-			elCursor.execute("SELECT * FROM faller WHERE alta=1 and (idcategoria=1 or idcategoria=2) ORDER BY cognoms")
-		except sqlite3.OperationalError:
-			messagebox.showwarning("Error", "Hi ha un problema amb la base de dades")
-		else:
-			resultat=elCursor.fetchall()
-			return(resultat)
-		finally:
-			laConexio.close()
-
-
-	def AssignarRifa(self): #funció per a assignar la rifa corresponent als fallers
-
-		valor=messagebox.askquestion("Assignar rifa","Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
-		if valor=="yes":
-			elFaller=Faller()
-			res=elFaller.BuscarFallerAmbRifa()
-			elMoviment=Moviment()
-			elMoviment.ExerciciActual()			
-			try:
-				for val in res:
-					elMoviment.InsertarMoviment(15, 1, 3, elMoviment.exercici, val[0], "rifa") #els assignem la rifa
-			except TypeError: #el contingut de la variable "res" es "None" si no torna res la funció "BuscarFallerAmbRifa"
-				messagebox.showinfo("Assignar rifa","La rifa no s'ha pogut assignar correctament")
-			else:
-				messagebox.showinfo("Assignar rifa","La rifa s'ha assignat correctament")
+'''

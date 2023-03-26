@@ -1,63 +1,60 @@
-import sqlite3
-
-
 class Familia():
 
-	def __init__(self):
+	def __init__(self, id, descompte, domiciliacio):
 
-		self.id=0
-		self.descompte=0
-
-
-	def BuscarDescompteFamilia(self, num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM familia INNER JOIN faller ON familia.id=faller.idfamilia WHERE faller.id=?", query_params)
-		resultat=elCursor.fetchall()
-		for valors in resultat:
-			self.descompte=valors[1]
-		laConexio.commit()
-		laConexio.close()
+		self.id=id
+		self.descompte=descompte
+		self.domiciliacio=domiciliacio
 
 
-	def AsignarDescompteFamilia(self, num, desc):
+	@property
+	def id(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(desc,num)
-		elCursor.execute("UPDATE familia SET descompte=? WHERE id=?", query_params)
-		laConexio.commit()
-		laConexio.close()
+		return self._id
+	
 
-
-	def RecuperarUltimaFamilia(self):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		elCursor.execute("SELECT * FROM familia ORDER BY id DESC LIMIT 1")
-		resultat=elCursor.fetchall()
-		for valors in resultat:
-			self.id=valors[0]
-		laConexio.commit()
-		laConexio.close()
+	@id.setter
+	def id(self, value):
+		
+		self._id=value
 
 
-	def InsertarFamilia(self):
+	@property
+	def descompte(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		elCursor.execute("INSERT INTO familia VALUES (null,0,0)")
-		laConexio.commit()
-		laConexio.close()
+		return self._descompte
+	
+
+	@descompte.setter
+	def descompte(self, value):
+		
+		self._descompte=value
 
 
-	def BorrarFamilia(self, num):
+	@property
+	def domiciliacio(self):
 
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("DELETE FROM familia WHERE id=?", query_params)
-		laConexio.commit()
-		laConexio.close()
+		return self._domiciliacio
+	
+
+	@domiciliacio.setter
+	def domiciliacio(self, value):
+		
+		self._domiciliacio=value
+
+	
+	def calcular_descompte(self, llistat_fallers):
+
+		membres=0
+		maxima=False
+		for faller in llistat_fallers:
+			if faller.alta==1:
+				membres=membres+1
+				if faller.categoria.id==1:
+					maxima=True
+		if maxima==True and membres==3:
+			self.descompte=5
+		elif maxima==True and membres>=4:
+			self.descompte=10
+		else:
+			self.descompte=0

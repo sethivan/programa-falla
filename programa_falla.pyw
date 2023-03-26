@@ -1,30 +1,42 @@
-################################
-# PROGRAMA FALLA SANTS PATRONS #
-################################
+'''
 
-# Programa per a la gestió de la oficina de la Falla Sants Patrons d'Alzira.
-# Control de fallers, families, edats, quotes, pagaments, rifes, loteries, historials, etc.
-# Desenvolupat per Ivan Mas Presentación 2020
+PROGRAMA FALLA SANTS PATRONS
 
+Programa per a la gestió de la oficina de la Falla Sants Patrons d'Alzira.
+Control de fallers, families, edats, quotes, pagaments, rifes, loteries, historials, etc.
 
-import tkinter as tk #importem les llibreries gràfiques
-from tkinter import messagebox #importem el sistema de missatges emergents
+Desenvolupat per Ivan Mas Presentación 2020
 
-from faller import Faller
-#from moviment import *
-#from gestionar import *
-#from introduir import *
-#from assignar import *
-#from informe import *
-#from historial import *
-#import pickle
+'''
+
+import tkinter as tk
+from tkinter import messagebox
+
+from finestra_introduir import FinestraIntroduir
+
+from falla import Falla
 
 
 class Aplicacio(tk.Frame):
+	"""
+    Aquesta classe representa l'aplicació principal de la interfície gràfica d'usuari.
 
+    Atributs:
+    ----------
+    master : tk.Tk
+        La instància principal de l'aplicació.
+    """
 		
-	def __init__(self, master=None): #el constructor construeix la finestra d'aplicació
+	def __init__(self, master=None):
+		"""
+        Inicialitza una nova instància de la classe Aplicacio.
 
+        Paràmetres:
+        ----------
+        master : tk.Tk, opcional
+            La instància principal de l'aplicació. Si no es proporciona,
+            es crearà una nova instància de tk.Tk().
+        """
 		super().__init__(master) #heretem de la classe Frame
 		self.master=master
 		self.master.state('zoomed') #la finestra s'obri maximitzada
@@ -32,8 +44,7 @@ class Aplicacio(tk.Frame):
 		self.master.iconbitmap("escut.ico")
 		self.pack()
 		
-		# MENÚ #
-
+		#barra de menú
 		self.barraMenu=tk.Menu() #guardem el menú en una variable
 		self.master.config(menu=self.barraMenu) #construïm el menú
 
@@ -100,8 +111,7 @@ class Aplicacio(tk.Frame):
 
 	def Introduir(self): #funció que obre la finestra "Introduir" del menú "Faller"
 
-		#FinestraIntroduir(self.root)
-		pass
+		FinestraIntroduir(self.master)
 
 	
 	def EventIntroduir(self, event): #funció per al bindeig del submenú "Introduir"
@@ -117,13 +127,13 @@ class Aplicacio(tk.Frame):
 
 	def AssignarRifa(self): #funció per a assignar la rifa corresponent als fallers
 
-		elFaller=Faller()
-		elFaller.AssignarRifa()
+		falla=Falla()
+		falla.assignar_rifa_auto()
 
 
 	def ModificarHistorial(self): #funció que obre la finestra "Modificar" del menú "Historial"
 
-		#FinestraHistorial(self.root)
+		#FinestraHistorial(self.master)
 		pass
 
 
