@@ -1,4 +1,7 @@
 import pickle
+import os
+import errno
+import os.path as path
 
 
 class Arxiu():
@@ -15,3 +18,16 @@ class Arxiu():
         fitxer.close
         del(fitxer)
         return(int(llista[0]))
+    
+
+    def crear_historial(self, historial):
+        
+        try:
+            os.mkdir("historials")
+        except OSError as e:
+            if e.errno!=errno.EEXIST:
+                raise
+        fitxer=open(self.nom_arxiu,"wb")
+        pickle.dump(historial, fitxer)
+        fitxer.close()
+        del(fitxer)

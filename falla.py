@@ -55,3 +55,32 @@ class Falla():
         for moviment in llistat_moviments:
             bd.crear_moviment(moviment)
         bd.tancar_conexio()
+
+
+    def calcular_assignacions_pagaments(self, id, exercici):
+
+        bd=BaseDeDades("falla.db")
+        quota_assignada=0
+        quota_pagada=0
+        loteria_assignada=0
+        loteria_pagada=0
+        rifa_assignada=0
+        rifa_pagada=0
+        self.llistat_moviments=bd.llegir_moviments(id, exercici)
+        for moviment in self.llistat_moviments:
+            if moviment.tipo==1 and moviment.concepte==1:
+                quota_assignada=quota_assignada+moviment.quantitat
+            elif moviment.tipo==2 and moviment.concepte==1:
+                quota_pagada=quota_pagada+moviment.quantitat
+            elif moviment.tipo==1 and moviment.concepte==2:
+                loteria_assignada=loteria_assignada+moviment.quantitat
+            elif moviment.tipo==2 and moviment.concepte==2:
+                loteria_pagada=loteria_pagada+moviment.quantitat
+            elif moviment.tipo==1 and moviment.concepte==3:
+                rifa_assignada=rifa_assignada+moviment.quantitat
+            elif moviment.tipo==2 and moviment.concepte==3:
+                rifa_pagada=rifa_pagada+moviment.quantitat
+        bd.tancar_conexio()
+        llista_assignacions_pagaments=[]
+        llista_assignacions_pagaments.extend([quota_assignada, quota_pagada, loteria_assignada, loteria_pagada, rifa_assignada, rifa_pagada])
+        return llista_assignacions_pagaments

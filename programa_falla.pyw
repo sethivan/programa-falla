@@ -2,10 +2,10 @@
 
 PROGRAMA FALLA SANTS PATRONS
 
-Programa per a la gestió de la oficina de la Falla Sants Patrons d'Alzira.
-Control de fallers, families, edats, quotes, pagaments, rifes, loteries, historials, etc.
+Programa de gestió de l'oficina de la Falla Sants Patrons d'Alzira.
+Control de fallers, families, quotes, pagaments, rifes, loteries, historials, etc.
 
-Desenvolupat per Ivan Mas Presentación 2020
+Desenvolupat per Ivan Mas Presentación 2020.
 
 '''
 
@@ -13,6 +13,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from finestra_introduir import FinestraIntroduir
+from finestra_gestionar import FinestraGestionar
 
 from falla import Falla
 
@@ -22,7 +23,7 @@ class Aplicacio(tk.Frame):
     Aquesta classe representa l'aplicació principal de la interfície gràfica d'usuari.
 
     Atributs:
-    ----------
+    ---------
     master : tk.Tk
         La instància principal de l'aplicació.
     """
@@ -32,46 +33,47 @@ class Aplicacio(tk.Frame):
         Inicialitza una nova instància de la classe Aplicacio.
 
         Paràmetres:
-        ----------
+        -----------
         master : tk.Tk, opcional
             La instància principal de l'aplicació. Si no es proporciona,
-            es crearà una nova instància de tk.Tk().
+			es crearà una nova instància de tk.Tk().
         """
-		super().__init__(master) #heretem de la classe Frame
+		super().__init__(master) # Heretem de la classe Frame.
 		self.master=master
-		self.master.state('zoomed') #la finestra s'obri maximitzada
+		self.master.state('zoomed') # La finestra s'obri maximitzada.
 		self.master.title("Falla Sants Patrons")
 		self.master.iconbitmap("escut.ico")
 		self.pack()
 		
-		#barra de menú
-		self.barraMenu=tk.Menu() #guardem el menú en una variable
-		self.master.config(menu=self.barraMenu) #construïm el menú
+		# Barra de menú.
+		self.barraMenu=tk.Menu() # Guardem el menú en una variable.
+		self.master.config(menu=self.barraMenu) # Construïm el menú.
 
-		#submenú arxiu
-		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) #creem els diferents elements i subelements
+		# Submenú Arxiu.
+		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
 		self.arxiuMenu.add_command(label="Eixir", command=self.Eixir)
 
-		#submenú faller
+		# Submenú Faller.
 		self.fallerMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.fallerMenu.add_command(label="Gestionar", command=self.Gestionar, accelerator="Ctrl+G")
-		self.master.bind_all("<Control-g>", self.EventGestionar) #bindegem el submenú "Gestionar"
-		self.fallerMenu.add_command(label="Introduir", command=self.Introduir, accelerator="Ctrl+I")
-		self.master.bind_all("<Control-i>", self.EventIntroduir) #bindegem el submenú "Introduir"
+		self.fallerMenu.add_command(label="Gestionar", command=self.gestionar, accelerator="Ctrl+G")
+		# Bindegem el submenú "Gestionar".
+		self.master.bind_all("<Control-g>", self.EventGestionar)
+		self.fallerMenu.add_command(label="Introduir", command=self.introduir, accelerator="Ctrl+I")
+		self.master.bind_all("<Control-i>", self.event_introduir) # Bindegem el submenú "Introduir".
 
-		#submenú loteria
+		# Submenú Loteria.
 		self.loteriaMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.loteriaMenu.add_command(label="Assignar", command=self.AssignarLoteria)
 
-		#submenú rifa
+		# Submenú Rifa.
 		self.rifaMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.rifaMenu.add_command(label="Assignar", command=self.AssignarRifa)
 
-		#submenú historial
+		# Submenú Historial.
 		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.historialMenu.add_command(label="Modificar", command=self.ModificarHistorial)
 
-		#submenú llistats
+		# Submenú Llistats.
 		self.llistatsMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.llistatsMenu.add_command(label="Moviments", command=self.MovimentsDia)
 		self.llistatsMenu.add_command(label="General", command=self.LlistatGeneral)
@@ -79,15 +81,15 @@ class Aplicacio(tk.Frame):
 		self.llistatsMenu.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
 		self.llistatsMenu.add_command(label="Rifes", command=self.LlistatRifes)
 
-		#submenú exercici
+		# Submenú Exercici.
 		self.exerciciMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.exerciciMenu.add_command(label="Nou", command=self.NouExercici)
 
-		#submenú ajuda
+		# Submenú Ajuda.
 		self.ajudaMenu=tk.Menu(self.barraMenu, tearoff=0)
 		self.ajudaMenu.add_command(label="Info", command=self.Info)
 
-		#afegim tots els submenús a la barra
+		# Afegim tots els submenús a la barra.
 		self.barraMenu.add_cascade(label="Arxiu", menu=self.arxiuMenu)
 		self.barraMenu.add_cascade(label="Faller", menu=self.fallerMenu)
 		self.barraMenu.add_cascade(label="Loteria", menu=self.loteriaMenu)
@@ -98,25 +100,31 @@ class Aplicacio(tk.Frame):
 		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
 	
 	
-	def Gestionar(self): #funció que obre la finestra "Gestionar" del menú "Faller"
+	def gestionar(self): #funció que obre la finestra "Gestionar" del menú "Faller"
 
-		#FinestraGestionar(self.root)
-		pass
+		gestionar=FinestraGestionar(self)
+		gestionar.iniciar()
 
 
 	def EventGestionar(self, event): #funció per al bindeig del submenú "Gestionar"
 
-		self.Gestionar()
+		self.gestionar()
 	
 
-	def Introduir(self): #funció que obre la finestra "Introduir" del menú "Faller"
-
-		FinestraIntroduir(self.master)
+	def introduir(self):
+		''' 
+		Crea una nova instància de la classe FinestraIntroduir
+		que obri la finestra "Introduir" del menú "Faller".
+		'''
+		introduir = FinestraIntroduir(self)
+		introduir.iniciar()
 
 	
-	def EventIntroduir(self, event): #funció per al bindeig del submenú "Introduir"
-
-		self.Introduir()
+	def event_introduir(self, event):
+		'''
+		Bindeig del submenú "Introduir".
+		'''
+		self.introduir()
 
 
 	def AssignarLoteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
@@ -125,8 +133,10 @@ class Aplicacio(tk.Frame):
 		pass
 
 
-	def AssignarRifa(self): #funció per a assignar la rifa corresponent als fallers
-
+	def AssignarRifa(self):
+		'''
+		Crea una nova instància de la classe Falla per que assigne la rifa corresponent als fallers.
+		'''
 		falla=Falla()
 		falla.assignar_rifa_auto()
 
@@ -179,20 +189,26 @@ class Aplicacio(tk.Frame):
 		pass
 
 	
-	def Eixir(self): #funció per a tancar el programa
-
+	def Eixir(self):
+		'''
+		Tanca la finestra principal de l'aplicació.
+		'''
 		valor=messagebox.askquestion("Eixir","Vols eixir de l'aplicació?")
 		if valor=="yes":
 			self.master.destroy()
 
 
-	def Info(self): #funció que mostra una finestra amb informació del programa
-
+	def Info(self):
+		'''
+		Mostra una finestra emergent amb informació del programa.
+		'''
 		messagebox.showinfo("Informació","Aplicació creada per Ivan Mas")
 
 
 if __name__=='__main__':
-	
+	'''
+	Inicia l'aplicació.
+	'''
 	root=tk.Tk()
 	app=Aplicacio(root)
 	app.mainloop()

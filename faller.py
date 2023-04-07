@@ -165,16 +165,29 @@ class Faller():
 	def calcular_edat(self, naixement, exercici):
         
 		naixement_faller=datetime.strptime(naixement, '%d-%m-%Y')
-		anyfaller=datetime.strftime(naixement_faller, '%Y')
-		mesfaller=datetime.strftime(naixement_faller, '%m')
-		diafaller=datetime.strftime(naixement_faller, '%d')
-		dataexercici=datetime.strptime(str(exercici), '%Y')
-		anyexercici=datetime.strftime(dataexercici, '%Y')
-		if int(mesfaller)>3 or (int(mesfaller)==3 and int(diafaller)>19):
-			edat=int(anyexercici)-int(anyfaller)-1
+		any_naixement=datetime.strftime(naixement_faller, '%Y')
+		mes_naixement=datetime.strftime(naixement_faller, '%m')
+		dia_naixement=datetime.strftime(naixement_faller, '%d')
+		data_exercici=datetime.strptime(str(exercici), '%Y')
+		any_exercici=datetime.strftime(data_exercici, '%Y')
+		if int(mes_naixement)>3 or (int(mes_naixement)==3 and int(dia_naixement)>19):
+			edat=int(any_exercici)-int(any_naixement)-1
 		else:
-			edat=int(anyexercici)-int(anyfaller)
+			edat=int(any_exercici)-int(any_naixement)
 		return(edat)
+	
+
+	def calcular_primer_exercici(self, naixement):
+
+		naixement_faller=datetime.strptime(naixement, '%d-%m-%Y')
+		any_naixement=datetime.strftime(naixement_faller,'%Y')
+		mes_naixement=datetime.strftime(naixement_faller, '%m')
+		dia_naixement=datetime.strftime(naixement_faller, '%d')
+		if int(mes_naixement)>3 or (int(mes_naixement)==3 and int(dia_naixement)>19):
+			exercici=int(any_naixement)+1
+		else:
+			exercici=int(any_naixement)
+		return(exercici)
 
      
 
@@ -255,19 +268,6 @@ class Faller():
 		elCursor.execute("UPDATE faller SET idcategoria=? WHERE id=?",(dades))
 		laConexio.commit()
 		laConexio.close()
-
-
-	def PrimerExercici(self, cadena):
-
-		dataFaller=datetime.strptime(cadena, '%d-%m-%Y')
-		lanyfaller=datetime.strftime(dataFaller,'%Y')
-		mesfaller=datetime.strftime(dataFaller, '%m')
-		diafaller=datetime.strftime(dataFaller, '%d')
-		if int(mesfaller)>3 or (int(mesfaller)==3 and int(diafaller)>19):
-			exercici=int(lanyfaller)+1
-		else:
-			exercici=int(lanyfaller)
-		return(exercici)
 
 
 	def RecuperarUltimFaller(self):

@@ -1,5 +1,23 @@
+'''
+Proporciona la classe "Categoria".
+'''
 class Categoria():
+	'''
+	Aquesta classe controla els atributs de la taula "categoria" de la base de dades.
 
+	Atributs:
+	---------
+	id : int
+		El identificador a la taula "categoria" de la base de dades.
+	quota : float
+		Quantitat a pagar corresponent a dita categoria.
+	nom : string
+		Forma amb la que es nombra dita categoria.
+	descripcio : string
+		Informació curta sobre les edats a les quals correspon la categoria
+	'''
+
+	
 	def __init__(self, id, quota, nom, descripcio):
 
 		self.id=id

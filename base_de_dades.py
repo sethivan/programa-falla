@@ -3,6 +3,7 @@ from tkinter import messagebox
 
 from faller import Faller
 from familia import Familia
+from moviment import Moviment
 from categoria import Categoria
 
 class BaseDeDades:
@@ -72,27 +73,39 @@ class BaseDeDades:
 
 
 
-    def leer_socio(self, id_socio):
+    def llegir_faller(self, id):
         try:
-            self.cursor.execute("SELECT * FROM socio WHERE id=?", (id_socio,))
-            resultado = self.cursor.fetchone()
-            if resultado is not None:
-                # Crear objeto Socio a partir de la fila obtenida de la base de datos
-                socio = Faller(resultado[1], resultado[2], resultado[3], resultado[4], resultado[5], resultado[6])
-                socio.id = resultado[0]  # Asignar el ID del socio
-                return socio
+            self.cursor.execute("SELECT * FROM faller WHERE id=?", (id,))
+            resultat = self.cursor.fetchone()
+            if resultat is not None:
+                # Crear objecte Faller a partir de la fila obtinguda a la base de dades
+                familia=self.llegir_familia(resultat[9])
+                categoria=self.llegir_categoria(resultat[10])
+                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
+                return faller
             else:
                 return None
         except (sqlite3.Error, TypeError, ValueError) as e:
             print("Error al leer el socio de la base de datos:", e)
             return None
+        
 
+    def llegir_ultim_faller(self):
 
-    def leer_socios(self):
-        self.cursor.execute("SELECT * FROM Socio")
-        return self.cursor.fetchall()
-    
-
+        try:
+            self.cursor.execute("SELECT * FROM faller ORDER BY id DESC LIMIT 1")
+            resultat = self.cursor.fetchone()
+            if resultat is not None:
+                # Crear objecte Faller a partir de la fila obtinguda a la base de dades
+                familia=self.llegir_familia(resultat[9])
+                categoria=self.llegir_categoria(resultat[10])
+                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
+                return faller
+            else:
+                return None
+        except (sqlite3.Error, TypeError, ValueError) as e:
+            print("Error al leer el socio de la base de datos:", e)
+            return None
 
 
     def llegir_fallers_adults(self):
@@ -158,13 +171,27 @@ class BaseDeDades:
             return None
         
 
+    def llegir_quota_faller(self, id):
+
+        query_params=(id,)
+        self.cursor.execute("SELECT * FROM categoria INNER JOIN faller ON categoria.id=faller.idcategoria WHERE faller.id=?", query_params)
+        resultat=self.cursor.fetchall()
+        for valors in resultat:
+            return valors[1]
 
 
-    def actualizar_socio(self, id, nombre, apellido, fecha_nacimiento, dni, alta, id_familia, id_categoria):
-        self.cursor.execute("UPDATE Socio SET nombre=?, apellido=?, fecha_nacimiento=?, dni=?, alta=?, id_familia=?, id_categoria=? WHERE id=?",
-                            (nombre, apellido, fecha_nacimiento, dni, alta, id_familia, id_categoria, id))
-        self.conexion.commit()
+    def actualitzar_faller(self, faller):
 
+        query_params=(faller.nom, faller.cognoms, faller.naixement, faller.sexe, faller.dni, faller.adresa, faller.telefon, faller.alta, faller.familia.id, faller.categoria.id, faller.correu, faller.id,)
+        try:
+            self.cursor.execute("UPDATE faller SET nom=?, cognoms=?, naixement=?, sexe=?, dni=?, adresa=?, telefon=?, alta=?, id_familia=?, id_categoria=?, correu=? WHERE id=?", query_params)
+        except sqlite3.Error:
+            messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
+        else:
+            self.conexio.commit()
+
+    
+    
     def eliminar_socio(self, id):
         self.cursor.execute("DELETE FROM Socio WHERE id=?", (id,))
         self.conexion.commit()
@@ -205,12 +232,15 @@ class BaseDeDades:
 
         try:
             self.cursor.execute("SELECT * FROM familia ORDER BY id DESC LIMIT 1")
-        except sqlite3.Error:
-            messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
-        else:
-            resultat=self.cursor.fetchone()
-            familia=Familia(resultat[0], resultat[1], resultat[2])
-            return familia
+            resultat = self.cursor.fetchone()
+            if resultat is not None:
+                familia = Familia(resultat[0], resultat[1], resultat[2])
+                return familia
+            else:
+                return None
+        except (sqlite3.Error, TypeError, ValueError) as e:
+            print("Error al llegir la familia de la base de dades:", e)
+            return None
         
         
     def actualitzar_familia(self, familia):
@@ -247,7 +277,27 @@ class BaseDeDades:
         dades=moviment.data, moviment.quantitat, moviment.tipo, moviment.concepte, moviment.exercici, moviment.faller.id, moviment.descripcio, 0
         self.cursor.execute("INSERT INTO moviment VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)",(dades))
         self.conexio.commit()
+    
 
+    def llegir_moviments(self, id, exercici):
+    
+        query_params=(id, exercici,)
+        try:
+            self.cursor.execute("SELECT * FROM moviment WHERE idfaller=? and exercici=?", query_params)
+            resultat = self.cursor.fetchall()
+            llistat_moviments=[]
+            for valors in resultat:
+                faller=self.llegir_faller(valors[6])
+                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
+                llistat_moviments.append(moviment)
+            return llistat_moviments
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+        
 
     #mètodes per a operacions CRUD en la taula categoria
         
