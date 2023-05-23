@@ -14,6 +14,7 @@ from tkinter import messagebox
 
 from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
+from finestra_historial import FinestraHistorial
 
 from falla import Falla
 
@@ -27,6 +28,7 @@ class Aplicacio(tk.Frame):
     master : tk.Tk
         La instància principal de l'aplicació.
     """
+		
 		
 	def __init__(self, master=None):
 		"""
@@ -71,7 +73,7 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Historial.
 		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.historialMenu.add_command(label="Modificar", command=self.ModificarHistorial)
+		self.historialMenu.add_command(label="Modificar", command=self.historial)
 
 		# Submenú Llistats.
 		self.llistatsMenu=tk.Menu(self.barraMenu, tearoff=0)
@@ -100,14 +102,19 @@ class Aplicacio(tk.Frame):
 		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
 	
 	
-	def gestionar(self): #funció que obre la finestra "Gestionar" del menú "Faller"
-
+	def gestionar(self):
+		''' 
+		Crea una nova instància de la classe FinestraGestionar
+		que obri la finestra "Gestionar" del menú "Faller".
+		'''
 		gestionar=FinestraGestionar(self)
 		gestionar.iniciar()
 
 
-	def EventGestionar(self, event): #funció per al bindeig del submenú "Gestionar"
-
+	def EventGestionar(self, event):
+		'''
+		Bindeig del submenú "Gestionar".
+		'''
 		self.gestionar()
 	
 
@@ -141,10 +148,13 @@ class Aplicacio(tk.Frame):
 		falla.assignar_rifa_auto()
 
 
-	def ModificarHistorial(self): #funció que obre la finestra "Modificar" del menú "Historial"
-
-		#FinestraHistorial(self.master)
-		pass
+	def historial(self): #funció que obre la finestra "Modificar" del menú "Historial"
+		''' 
+		Crea una nova instància de la classe FinestraIntroduir
+		que obri la finestra "Introduir" del menú "Faller".
+		'''
+		historial = FinestraHistorial(self)
+		historial.iniciar()
 
 
 	def MovimentsDia(self): #funció per a traure el llistat en pdf dels moviments del dia

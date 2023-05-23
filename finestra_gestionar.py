@@ -8,17 +8,12 @@ from arxiu import Arxiu
 from base_de_dades import BaseDeDades
 from utils import Utils
 
-from faller import Faller
 from falla import Falla
-from familia import Familia
 from moviment import Moviment
-#from modificar import *
+from finestra_modificar import FinestraModificar
 #from informe import *
-#from reportlab.pdfgen import canvas
-#from reportlab.lib.pagesizes import A4
-import os
-import errno
-import os.path as path
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 
 class FinestraGestionar(tk.Toplevel):
@@ -40,452 +35,435 @@ class FinestraGestionar(tk.Toplevel):
 		self.title("Gestionar Faller")
 		self.iconbitmap("escut.ico")
 
-		self.exerciciString=StringVar() #definim la variable per al exercici
-		self.idString=StringVar() #definim la variable per al id
-		self.nomString=StringVar() #definim la variable per al nom
-		self.naixementString=StringVar() #definim la variable per a la data de naixement
-		self.dniString=StringVar() #definim la variable per al dni
-		self.adresaString=StringVar() #definim la variable per a l'adreça
-		self.telefonString=StringVar() #definim la variable per al telefon
-		self.correuString=StringVar() #definim la variable per al correu electrònic
-		self.quotaString=StringVar() #definim la variable per a la quota
-		self.quotapagString=StringVar() #definim la variable per a la quota pagada
-		self.deutequotaString=StringVar() #definim la variable per a mostrar el deute de la quota
-		self.pagarquotaString=StringVar() #definim la variable on guardarem el moviment de quota
-		self.loteriaString=StringVar()
-		self.loteriapagString=StringVar()
-		self.deuteloteriaString=StringVar()
-		self.pagarloteriaString=StringVar()
-		self.rifaString=StringVar()
-		self.rifapagString=StringVar()
-		self.deuterifaString=StringVar()
-		self.pagarrifaString=StringVar()
-		self.totalasignatString=StringVar()
-		self.totalpagatString=StringVar()
-		self.totalString=StringVar()
-		self.formapagamentString=StringVar()
-		self.pagartotalString=StringVar()
-		self.membresString=StringVar() #variable per a guardar els membres actius de la familia
-		self.quotafamString=StringVar()
-		self.quotapagadafamString=StringVar()
-		self.deutequotafamString=StringVar()
-		self.pagarquotafamString=StringVar()
-		self.loteriafamString=StringVar()
-		self.loteriapagadafamString=StringVar()
-		self.deuteloteriafamString=StringVar()
-		self.pagarloteriafamString=StringVar()
-		self.rifafamString=StringVar()
-		self.rifapagadafamString=StringVar()
-		self.deuterifafamString=StringVar()
-		self.pagarrifafamString=StringVar()
-		self.totalasignatfamString=StringVar()
-		self.totalpagatfamString=StringVar()
-		self.totalfamString=StringVar()
-		self.formapagamentfamString=StringVar()
-		self.pagartotalfamString=StringVar()
-		self.asignacioString=StringVar() #variable que controla el element del radiobutton
-		self.descripcioString=StringVar() #descripcio del moviment a realitzar
-		self.asignarString=StringVar() #variable asignada al entry de asignar
-		self.ident=[] #variable per a controlar el camp id de la llista de noms del combo
-		self.modificar=0 #variable amb què controlem l'obertura de la finestra de modificar faller
-		self.id_anterior=0 #variable on guardem el id anteriorment buscat per a retornar-lo en cas d'error
+		self.exercici=StringVar()
+		self.id=StringVar()
+		self.nom=StringVar()
+		self.naixement=StringVar()
+		self.dni=StringVar()
+		self.adresa=StringVar()
+		self.telefon=StringVar()
+		self.correu=StringVar()
+
+		self.membres_familia=StringVar()
+
+		self.quota_assignada=StringVar()
+		self.quota_pagada=StringVar()
+		self.deute_quota=StringVar()
+		self.pagar_quota=StringVar()
+		self.loteria_assignada=StringVar()
+		self.loteria_pagada=StringVar()
+		self.deute_loteria=StringVar()
+		self.pagar_loteria=StringVar()
+		self.rifa_assignada=StringVar()
+		self.rifa_pagada=StringVar()
+		self.deute_rifa=StringVar()
+		self.pagar_rifa=StringVar()
+		self.total_assignat=StringVar()
+		self.total_pagat=StringVar()
+		self.deute_total=StringVar()
+		self.pagar_total=StringVar()
+		self.forma_pagament=StringVar()
 		
-		#Frames en els que dividim la finestra
-
-		frameExercici=LabelFrame(self, text="Exercici") #li diguem en quina finestra va el frame
-		frameExercici.grid(row=0, column=0, columnspan=1, pady=5, ipadx=20, ipady=2)
-
-		frameBuscar=LabelFrame(self, text="Faller")
-		frameBuscar.grid(row=0, column=1, columnspan=8, ipadx=2, ipady=2)
-
-		frameDades=LabelFrame(self, text="Dades personals")
-		frameDades.grid(row=1, column=0, columnspan=4, ipadx=2, ipady=2)
-
-		frameFamilia=LabelFrame(self, text="Familia")
-		frameFamilia.grid(row=1, column=4, columnspan=1, ipadx=2, ipady=2)
-
-		frameMoviments=LabelFrame(self, text="Moviments")
-		frameMoviments.grid(row=2, column=0, columnspan=4, padx=5, pady=5, ipadx=2, ipady=2)
-
-		frameMovimentsFam=LabelFrame(self, text="Moviments de la familia")
-		frameMovimentsFam.grid(row=2, column=4, columnspan=1, padx=5, pady=5, ipadx=2, ipady=2)
-
-		frameAsignar=LabelFrame(self, text="Assignar")
-		frameAsignar.grid(row=3, column=0, pady=5, ipady=2, sticky="n")
-
-		frameTaula=LabelFrame(self, text="Historial de moviments")
-		frameTaula.grid(row=3, column=1, columnspan=8, pady=5, ipady=2)
-
-		self.pdfBoto=Button(self, width=15, text="crear pdf", command=self.CrearPdf)
-		self.pdfBoto.grid(row=4, column=0, padx=5, sticky="w"+"e")
-
-		#Widgets de cada frame
-
-		#Frame Exercici
-
-		self.exerciciEntry=Entry(frameExercici, width=10, state="disabled", disabledforeground="black", textvariable=self.exerciciString)
-		self.exerciciEntry.pack()
-
-		arxiu=Arxiu("exercici")
-		exercici_actual=arxiu.llegir_exercici_actual()
-		self.exerciciString.set(str(exercici_actual-1) + "-" + str(exercici_actual))
-
-		#Frame Buscar Faller
-
-		self.altaBoto=Button(frameBuscar, state="disabled", width=15, text="Donar d'alta", command=self.CanviarEstat)
-		self.altaBoto.grid(row=0, column=0, padx=5, sticky="w"+"e")
+		self.quota_assignada_familia=StringVar()
+		self.quota_pagada_familia=StringVar()
+		self.deute_quota_familia=StringVar()
+		self.pagar_quota_familia=StringVar()
+		self.loteria_assignada_familia=StringVar()
+		self.loteria_pagada_familia=StringVar()
+		self.deute_loteria_familia=StringVar()
+		self.pagar_loteria_familia=StringVar()
+		self.rifa_assignada_familia=StringVar()
+		self.rifa_pagada_familia=StringVar()
+		self.deute_rifa_familia=StringVar()
+		self.pagar_rifa_familia=StringVar()
+		self.total_assignat_familia=StringVar()
+		self.total_pagat_familia=StringVar()
+		self.deute_total_familia=StringVar()
+		self.pagar_total_familia=StringVar()
+		self.forma_pagament_familia=StringVar()
 		
-		self.idLabel=Label(frameBuscar, text="ID del faller:")
-		self.idLabel.grid(row=0, column=1)
+		self.concepte_assignacio=StringVar()
+		self.descripcio_assignacio=StringVar()
+		self.total_assignacio=StringVar()
 
-		self.idEntry=Entry(frameBuscar, width=8, textvariable=self.idString)
-		self.idEntry.grid(row=0, column=2)
-		self.idEntry.focus() #fiquem el foco en el entry
-		self.idEntry.bind('<Return>', self.BuscarId) #bindegem el intro a BuscarId
+		self.identificadors=[] # Atribut per guardar els id_faller del llistat del combo.
+		self.modificar_oberta=0 # Atribut amb què controlem l'obertura de la finestra FinestraModificar.
+		self.id_anterior=0 # Atribut on guardem el id anteriorment buscat per a retornar-lo en cas d'error.
+		
+		# Frames en els que dividim la finestra
+		label_frame_exercici=LabelFrame(self, text="Exercici")
+		label_frame_exercici.grid(row=0, column=0, columnspan=1, pady=5, ipadx=20, ipady=2)
 
-		self.nomLabel=Label(frameBuscar, text="Cognoms i nom:")
-		self.nomLabel.grid(row=0, column=3)
+		label_frame_buscar=LabelFrame(self, text="Faller")
+		label_frame_buscar.grid(row=0, column=1, columnspan=8, ipadx=2, ipady=2)
 
-		self.fallerCombo=ttk.Combobox(frameBuscar, width=30, postcommand=self.dropdown_opened)
-		self.fallerCombo.grid(row=0, column=4)
-		self.fallerCombo.bind("<<ComboboxSelected>>", self.selection_changed)
+		label_frame_dades=LabelFrame(self, text="Dades personals")
+		label_frame_dades.grid(row=1, column=0, columnspan=4, ipadx=2, ipady=2)
 
-		#Frame Dades Personals
+		label_frame_familia=LabelFrame(self, text="Familia")
+		label_frame_familia.grid(row=1, column=4, columnspan=1, ipadx=2, ipady=2)
 
-		self.naixementLabel=Label(frameDades, text="Data de naixement:")
-		self.naixementLabel.grid(row=0, column=0, sticky="e")
+		label_frame_moviments=LabelFrame(self, text="Moviments")
+		label_frame_moviments.grid(row=2, column=0, columnspan=4, padx=5, pady=5, ipadx=2, ipady=2)
 
-		self.naixementEntry=Entry(frameDades, state="disabled", textvariable=self.naixementString)
-		self.naixementEntry.grid(row=0, column=1)
+		label_frame_moviments_familia=LabelFrame(self, text="Moviments de la familia")
+		label_frame_moviments_familia.grid(row=2, column=4, columnspan=1, padx=5, pady=5, ipadx=2, ipady=2)
 
-		self.dniLabel=Label(frameDades, text="DNI:")
-		self.dniLabel.grid(row=0, column=2, sticky="e")
+		label_frame_assignar=LabelFrame(self, text="Assignar")
+		label_frame_assignar.grid(row=3, column=0, pady=5, ipady=2, sticky="n")
 
-		self.dniEntry=Entry(frameDades, state="disabled", textvariable=self.dniString)
-		self.dniEntry.grid(row=0, column=3)
+		label_frame_historial=LabelFrame(self, text="Historial de moviments")
+		label_frame_historial.grid(row=3, column=1, columnspan=8, pady=5, ipady=2)
 
-		self.adresaLabel=Label(frameDades, text="Adreça:")
-		self.adresaLabel.grid(row=1, column=0, sticky="e")
+		# Widgets per a cada frame.
 
-		self.adresaEntry=Entry(frameDades, state="disabled", textvariable=self.adresaString)
-		self.adresaEntry.grid(row=1, column=1)
+		# Frame "Exercici".
+		self.entry_exercici=Entry(label_frame_exercici, width=10, state="disabled", disabledforeground="black", textvariable=self.exercici)
+		self.entry_exercici.pack()
 
-		self.telefonLabel=Label(frameDades, text="Telèfon:")
-		self.telefonLabel.grid(row=1, column=2, sticky="e")
+		# Frame "Buscar faller"
+		self.button_alta=Button(label_frame_buscar, state="disabled", width=15, text="Donar d'alta", command=self.canviar_estat)
+		self.button_alta.grid(row=0, column=0, padx=5, sticky="w"+"e")
+		
+		self.label_id=Label(label_frame_buscar, text="ID del faller:")
+		self.label_id.grid(row=0, column=1)
 
-		self.telefonEntry=Entry(frameDades, state="disabled", textvariable=self.telefonString)
-		self.telefonEntry.grid(row=1, column=3)
+		self.entry_id=Entry(label_frame_buscar, width=8, textvariable=self.id)
+		self.entry_id.grid(row=0, column=2)
+		self.entry_id.bind('<Return>', self.buscar_per_id)
 
-		self.correuLabel=Label(frameDades, text="Correu electrònic:")
-		self.correuLabel.grid(row=2, column=0, sticky="e")
+		self.label_nom=Label(label_frame_buscar, text="Cognoms i nom:")
+		self.label_nom.grid(row=0, column=3)
 
-		self.correuEntry=Entry(frameDades, state="disabled", textvariable=self.correuString)
-		self.correuEntry.grid(row=2, column=1)
+		self.combo_box_faller=ttk.Combobox(label_frame_buscar, width=30, postcommand=self.desplegar_faller)
+		self.combo_box_faller.grid(row=0, column=4)
+		self.combo_box_faller.bind("<<ComboboxSelected>>", self.seleccionar_faller)
 
-		#self.modificarBoto=Button(frameDades, state="disabled", text="Modificar dades", command=self.Modificar)
-		#self.modificarBoto.grid(row=2, column=3)
+		# Frame "Dades personals".
+		self.label_naixement=Label(label_frame_dades, text="Data de naixement:")
+		self.label_naixement.grid(row=0, column=0, sticky="e")
 
-		#Frame Familia
+		self.entry_naixement=Entry(label_frame_dades, state="disabled", textvariable=self.naixement)
+		self.entry_naixement.grid(row=0, column=1)
 
-		self.familiaLabel=Label(frameFamilia, text="Membres de la familia:")
-		self.familiaLabel.grid(row=0, column=0)
+		self.label_dni=Label(label_frame_dades, text="DNI:")
+		self.label_dni.grid(row=0, column=2, sticky="e")
 
-		self.familiaCombo=ttk.Combobox(frameFamilia, postcommand=self.dropdown_opened_fam)
-		self.familiaCombo.grid(row=0, column=1)
-		self.familiaCombo.bind("<<ComboboxSelected>>", self.selection_changed_fam)
+		self.entry_dni=Entry(label_frame_dades, state="disabled", textvariable=self.dni)
+		self.entry_dni.grid(row=0, column=3)
 
-		self.membresLabel=Label(frameFamilia, text="Membres actius:")
-		self.membresLabel.grid(row=0, column=2)
+		self.label_adresa=Label(label_frame_dades, text="Adreça:")
+		self.label_adresa.grid(row=1, column=0, sticky="e")
 
-		self.membresEntry=Entry(frameFamilia, width=4, state="disabled", disabledforeground="black", textvariable=self.membresString)
-		self.membresEntry.grid(row=0, column=3)
+		self.entry_adresa=Entry(label_frame_dades, state="disabled", textvariable=self.adresa)
+		self.entry_adresa.grid(row=1, column=1)
 
-		#Frame Moviments
+		self.label_telefon=Label(label_frame_dades, text="Telèfon:")
+		self.label_telefon.grid(row=1, column=2, sticky="e")
 
-		self.asignatLabel=Label(frameMoviments, text="Assignat")
-		self.asignatLabel.grid(row=0, column=1)
+		self.entry_telefon=Entry(label_frame_dades, state="disabled", textvariable=self.telefon)
+		self.entry_telefon.grid(row=1, column=3)
 
-		self.pagatLabel=Label(frameMoviments, text="Pagat")
-		self.pagatLabel.grid(row=0, column=2)
+		self.label_correu=Label(label_frame_dades, text="Correu electrònic:")
+		self.label_correu.grid(row=2, column=0, sticky="e")
 
-		self.diferenciaLabel=Label(frameMoviments, text="Diferència")
-		self.diferenciaLabel.grid(row=0, column=3)
+		self.entry_correu=Entry(label_frame_dades, state="disabled", textvariable=self.correu)
+		self.entry_correu.grid(row=2, column=1)
 
-		self.quotaLabel=Label(frameMoviments, text="Quota:")
-		self.quotaLabel.grid(row=1, column=0, sticky="e")
+		self.button_modificar=Button(label_frame_dades, state="disabled", text="Modificar dades", command=self.modificar)
+		self.button_modificar.grid(row=2, column=3)
 
-		self.quotaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quotaString)
-		self.quotaEntry.grid(row=1, column=1)
+		#Frame "Familia".
+		self.label_familia=Label(label_frame_familia, text="Membres de la familia:")
+		self.label_familia.grid(row=0, column=0)
 
-		self.quotapagEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quotapagString)
-		self.quotapagEntry.grid(row=1, column=2)
+		self.combo_box_familia=ttk.Combobox(label_frame_familia, postcommand=self.desplegar_familia)
+		self.combo_box_familia.grid(row=0, column=1)
+		self.combo_box_familia.bind("<<ComboboxSelected>>", self.seleccionar_familia)
 
-		self.deutequotaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deutequotaString)
-		self.deutequotaEntry.grid(row=1, column=3)
+		self.label_membres=Label(label_frame_familia, text="Membres actius:")
+		self.label_membres.grid(row=0, column=2)
 
-		self.pagarquotaEntry=Entry(frameMoviments, width=15, state="disabled", textvariable=self.pagarquotaString)
-		self.pagarquotaEntry.grid(row=1, column=4)
-		self.pagarquotaEntry.bind('<FocusOut>', self.CalcularPagarTotalQuota)
-		self.pagarquotaEntry.bind('<FocusIn>', self.LlevarCeroQuota)
+		self.entry_membres=Entry(label_frame_familia, width=4, state="disabled", disabledforeground="black", textvariable=self.membres_familia)
+		self.entry_membres.grid(row=0, column=3)
 
-		self.loteriaLabel=Label(frameMoviments, text="Loteria:")
-		self.loteriaLabel.grid(row=2, column=0, sticky="e")
+		#Frame "Moviments".
+		self.label_assignat=Label(label_frame_moviments, text="Assignat")
+		self.label_assignat.grid(row=0, column=1)
 
-		self.loteriaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteriaString)
-		self.loteriaEntry.grid(row=2, column=1)
+		self.label_pagat=Label(label_frame_moviments, text="Pagat")
+		self.label_pagat.grid(row=0, column=2)
 
-		self.loteriapagEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteriapagString)
-		self.loteriapagEntry.grid(row=2, column=2)
+		self.label_diferencia=Label(label_frame_moviments, text="Diferència")
+		self.label_diferencia.grid(row=0, column=3)
 
-		self.deuteloteriaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deuteloteriaString)
-		self.deuteloteriaEntry.grid(row=2, column=3)
+		self.label_quota=Label(label_frame_moviments, text="Quota:")
+		self.label_quota.grid(row=1, column=0, sticky="e")
 
-		self.pagarloteriaEntry=Entry(frameMoviments, width=15, state="disabled", textvariable=self.pagarloteriaString)
-		self.pagarloteriaEntry.grid(row=2, column=4)
-		self.pagarloteriaEntry.bind('<FocusOut>', self.CalcularPagarTotalLoteria)
-		self.pagarloteriaEntry.bind('<FocusIn>', self.LlevarCeroLoteria)
+		self.entry_quota_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada)
+		self.entry_quota_assignada.grid(row=1, column=1)
 
-		self.rifaLabel=Label(frameMoviments, text="Rifa:")
-		self.rifaLabel.grid(row=3, column=0, sticky="e")
+		self.entry_quota_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada)
+		self.entry_quota_pagada.grid(row=1, column=2)
 
-		self.rifaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifaString)
-		self.rifaEntry.grid(row=3, column=1)
+		self.entry_deute_quota=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota)
+		self.entry_deute_quota.grid(row=1, column=3)
 
-		self.rifapagEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifapagString)
-		self.rifapagEntry.grid(row=3, column=2)
+		self.entry_pagar_quota=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_quota)
+		self.entry_pagar_quota.grid(row=1, column=4)
+		self.entry_pagar_quota.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_quota))
+		self.entry_pagar_quota.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_quota))
 
-		self.deuterifaEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deuterifaString)
-		self.deuterifaEntry.grid(row=3, column=3)
+		self.label_loteria=Label(label_frame_moviments, text="Loteria:")
+		self.label_loteria.grid(row=2, column=0, sticky="e")
 
-		self.pagarrifaEntry=Entry(frameMoviments, width=15, state="disabled", textvariable=self.pagarrifaString)
-		self.pagarrifaEntry.grid(row=3, column=4)
-		self.pagarrifaEntry.bind('<FocusOut>', self.CalcularPagarTotalRifa)
-		self.pagarrifaEntry.bind('<FocusIn>', self.LlevarCeroRifa)
+		self.entry_loteria_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada)
+		self.entry_loteria_assignada.grid(row=2, column=1)
 
-		self.totalasignatLabel=Label(frameMoviments, text="Totals:")
-		self.totalasignatLabel.grid(row=4, column=0, sticky="e")
+		self.entry_loteria_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada)
+		self.entry_loteria_pagada.grid(row=2, column=2)
 
-		self.totalasignatEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.totalasignatString)
-		self.totalasignatEntry.grid(row=4, column=1)
+		self.entry_deute_loteria=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria)
+		self.entry_deute_loteria.grid(row=2, column=3)
 
-		self.totalpagatEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.totalpagatString)
-		self.totalpagatEntry.grid(row=4, column=2)
+		self.entry_pagar_loteria=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_loteria)
+		self.entry_pagar_loteria.grid(row=2, column=4)
+		self.entry_pagar_loteria.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_loteria))
+		self.entry_pagar_loteria.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_loteria))
 
-		self.totalEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.totalString)
-		self.totalEntry.grid(row=4, column=3)
+		self.label_rifa=Label(label_frame_moviments, text="Rifa:")
+		self.label_rifa.grid(row=3, column=0, sticky="e")
 
-		self.pagartotalEntry=Entry(frameMoviments, width=15, state="disabled", disabledforeground="black", textvariable=self.pagartotalString)
-		self.pagartotalEntry.grid(row=4, column=4)
+		self.entry_rifa_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada)
+		self.entry_rifa_assignada.grid(row=3, column=1)
 
-		self.caixaRadioButton=Radiobutton(frameMoviments, text="Caixa", variable=self.formapagamentString, value=1)
-		self.bancRadioButton=Radiobutton(frameMoviments, text="Banc", variable=self.formapagamentString, value=2)
-		self.caixaRadioButton.grid(row=5, column=2)
-		self.bancRadioButton.grid(row=5, column=3)
-		self.caixaRadioButton.select() #seleccionem caixa com a predeterminat
+		self.entry_rifa_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada)
+		self.entry_rifa_pagada.grid(row=3, column=2)
 
-		self.pagarBoto=Button(frameMoviments, state="disabled", text="Pagar", command=self.Pagar)
-		self.pagarBoto.grid(row=5, column=4, padx=5, sticky="w"+"e")
+		self.entry_deute_rifa=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa)
+		self.entry_deute_rifa.grid(row=3, column=3)
 
-		#Frame Moviments de la familia
+		self.entry_pagar_rifa=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_rifa)
+		self.entry_pagar_rifa.grid(row=3, column=4)
+		self.entry_pagar_rifa.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_rifa))
+		self.entry_pagar_rifa.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_rifa))
 
-		self.asignatfamLabel=Label(frameMovimentsFam, text="Assignat")
-		self.asignatfamLabel.grid(row=0, column=1)
+		self.label_totals=Label(label_frame_moviments, text="Totals:")
+		self.label_totals.grid(row=4, column=0, sticky="e")
 
-		self.pagatfamLabel=Label(frameMovimentsFam, text="Pagat")
-		self.pagatfamLabel.grid(row=0, column=2)
+		self.entry_total_assignat=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat)
+		self.entry_total_assignat.grid(row=4, column=1)
 
-		self.diferenciafamLabel=Label(frameMovimentsFam, text="Diferència")
-		self.diferenciafamLabel.grid(row=0, column=3)
+		self.entry_total_pagat=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat)
+		self.entry_total_pagat.grid(row=4, column=2)
 
-		self.quotafamLabel=Label(frameMovimentsFam, text="Quota:")
-		self.quotafamLabel.grid(row=1, column=0, sticky="e")
+		self.entry_deute_total=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total)
+		self.entry_deute_total.grid(row=4, column=3)
 
-		self.quotafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.quotafamString)
-		self.quotafamEntry.grid(row=1, column=1)
+		self.entry_pagar_total=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total)
+		self.entry_pagar_total.grid(row=4, column=4)
 
-		self.quotapagadafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.quotapagadafamString)
-		self.quotapagadafamEntry.grid(row=1, column=2)
+		self.radio_button_caixa=Radiobutton(label_frame_moviments, text="Caixa", variable=self.forma_pagament, value=1)
+		self.radio_button_banc=Radiobutton(label_frame_moviments, text="Banc", variable=self.forma_pagament, value=2)
+		self.radio_button_caixa.grid(row=5, column=2)
+		self.radio_button_banc.grid(row=5, column=3)
+		self.radio_button_caixa.select()
 
-		self.deutequotafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.deutequotafamString)
-		self.deutequotafamEntry.grid(row=1, column=3)
+		self.button_pagar=Button(label_frame_moviments, state="disabled", text="Pagar", command=self.Pagar)
+		self.button_pagar.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
-		self.pagarquotafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", textvariable=self.pagarquotafamString)
-		self.pagarquotafamEntry.grid(row=1, column=4)
-		self.pagarquotafamEntry.bind('<FocusOut>', self.CalcularPagarFamTotalQuota)
-		self.pagarquotafamEntry.bind('<FocusIn>', self.LlevarCeroQuotaFam)
+		# Frame "Moviments de la familia".
+		self.label_assignat_familia=Label(label_frame_moviments_familia, text="Assignat")
+		self.label_assignat_familia.grid(row=0, column=1)
 
-		self.loteriafamLabel=Label(frameMovimentsFam, text="Loteria:")
-		self.loteriafamLabel.grid(row=2, column=0, sticky="e")
+		self.label_pagat_familia=Label(label_frame_moviments_familia, text="Pagat")
+		self.label_pagat_familia.grid(row=0, column=2)
 
-		self.loteriafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.loteriafamString)
-		self.loteriafamEntry.grid(row=2, column=1)
+		self.label_diferencia_familia=Label(label_frame_moviments_familia, text="Diferència")
+		self.label_diferencia_familia.grid(row=0, column=3)
 
-		self.loteriapagadafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.loteriapagadafamString)
-		self.loteriapagadafamEntry.grid(row=2, column=2)
+		self.Label_quota_familia=Label(label_frame_moviments_familia, text="Quota:")
+		self.Label_quota_familia.grid(row=1, column=0, sticky="e")
 
-		self.deuteloteriafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.deuteloteriafamString)
-		self.deuteloteriafamEntry.grid(row=2, column=3)
+		self.entry_quota_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada_familia)
+		self.entry_quota_assignada_familia.grid(row=1, column=1)
 
-		self.pagarloteriafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", textvariable=self.pagarloteriafamString)
-		self.pagarloteriafamEntry.grid(row=2, column=4)
-		self.pagarloteriafamEntry.bind('<FocusOut>', self.CalcularPagarFamTotalLoteria)
-		self.pagarloteriafamEntry.bind('<FocusIn>', self.LlevarCeroLoteriaFam)
+		self.entry_quota_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada_familia)
+		self.entry_quota_pagada_familia.grid(row=1, column=2)
 
-		self.rifafamLabel=Label(frameMovimentsFam, text="Rifa:")
-		self.rifafamLabel.grid(row=3, column=0, sticky="e")
+		self.entry_deute_quota_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota_familia)
+		self.entry_deute_quota_familia.grid(row=1, column=3)
 
-		self.rifafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.rifafamString)
-		self.rifafamEntry.grid(row=3, column=1)
+		self.entry_pagar_quota_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_quota_familia)
+		self.entry_pagar_quota_familia.grid(row=1, column=4)
+		self.entry_pagar_quota_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_quota_familia))
+		self.entry_pagar_quota_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_quota_familia))
 
-		self.rifapagadafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.rifapagadafamString)
-		self.rifapagadafamEntry.grid(row=3, column=2)
+		self.label_loteria_familia=Label(label_frame_moviments_familia, text="Loteria:")
+		self.label_loteria_familia.grid(row=2, column=0, sticky="e")
 
-		self.deuterifafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.deuterifafamString)
-		self.deuterifafamEntry.grid(row=3, column=3)
+		self.entry_loteria_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada_familia)
+		self.entry_loteria_assignada_familia.grid(row=2, column=1)
 
-		self.pagarrifafamEntry=Entry(frameMovimentsFam, width=15, state="disabled", textvariable=self.pagarrifafamString)
-		self.pagarrifafamEntry.grid(row=3, column=4)
-		self.pagarrifafamEntry.bind('<FocusOut>', self.CalcularPagarFamTotalRifa)
-		self.pagarrifafamEntry.bind('<FocusIn>', self.LlevarCeroRifaFam)
+		self.entry_loteria_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada_familia)
+		self.entry_loteria_pagada_familia.grid(row=2, column=2)
 
-		self.totalasignatfamLabel=Label(frameMovimentsFam, text="Totals:")
-		self.totalasignatfamLabel.grid(row=4, column=0, sticky="e")
+		self.entry_deute_loteria_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria_familia)
+		self.entry_deute_loteria_familia.grid(row=2, column=3)
 
-		self.totalasignatfamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.totalasignatfamString)
-		self.totalasignatfamEntry.grid(row=4, column=1)
+		self.entry_pagar_loteria_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_loteria_familia)
+		self.entry_pagar_loteria_familia.grid(row=2, column=4)
+		self.entry_pagar_loteria_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_loteria_familia))
+		self.entry_pagar_loteria_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_loteria_familia))
 
-		self.totalpagatfamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.totalpagatfamString)
-		self.totalpagatfamEntry.grid(row=4, column=2)
+		self.label_rifa_familia=Label(label_frame_moviments_familia, text="Rifa:")
+		self.label_rifa_familia.grid(row=3, column=0, sticky="e")
 
-		self.totalfamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.totalfamString)
-		self.totalfamEntry.grid(row=4, column=3)
+		self.entry_rifa_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada_familia)
+		self.entry_rifa_assignada_familia.grid(row=3, column=1)
 
-		self.pagartotalfamEntry=Entry(frameMovimentsFam, width=15, state="disabled", disabledforeground="black", textvariable=self.pagartotalfamString)
-		self.pagartotalfamEntry.grid(row=4, column=4)
+		self.entry_rifa_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada_familia)
+		self.entry_rifa_pagada_familia.grid(row=3, column=2)
 
-		self.caixafamRadioButton=Radiobutton(frameMovimentsFam, text="Caixa", variable=self.formapagamentfamString, value=1)
-		self.bancfamRadioButton=Radiobutton(frameMovimentsFam, text="Banc", variable=self.formapagamentfamString, value=2)
-		self.caixafamRadioButton.grid(row=5, column=2)
-		self.bancfamRadioButton.grid(row=5, column=3)
-		self.caixafamRadioButton.select() #seleccionem caixa com a predeterminat
+		self.entry_deute_rifa_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa_familia)
+		self.entry_deute_rifa_familia.grid(row=3, column=3)
 
-		self.pagarfamBoto=Button(frameMovimentsFam, state="disabled", text="Pagar", command=self.PagarFam)
-		self.pagarfamBoto.grid(row=5, column=4, padx=5, sticky="w"+"e")
+		self.entry_pagar_rifa_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_rifa_familia)
+		self.entry_pagar_rifa_familia.grid(row=3, column=4)
+		self.entry_pagar_rifa_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_rifa_familia))
+		self.entry_pagar_rifa_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_rifa_familia))
 
-		#Frame Asignar
+		self.label_total_familia=Label(label_frame_moviments_familia, text="Totals:")
+		self.label_total_familia.grid(row=4, column=0, sticky="e")
 
-		self.quotaRadioButton=Radiobutton(frameAsignar, text="Quota", variable=self.asignacioString, value=1)
-		self.loteriaRadioButton=Radiobutton(frameAsignar, text="Loteria", variable=self.asignacioString, value=2)
-		self.rifaRadioButton=Radiobutton(frameAsignar, text="Rifa", variable=self.asignacioString, value=3)
-		self.quotaRadioButton.grid(row=0, column=0)
-		self.loteriaRadioButton.grid(row=0, column=1)
-		self.rifaRadioButton.grid(row=0, column=2)
-		self.quotaRadioButton.select() #seleccionem quota com a predeterminat
+		self.entry_total_assignat_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat_familia)
+		self.entry_total_assignat_familia.grid(row=4, column=1)
 
-		self.descripcioLabel=Label(frameAsignar, text="Descripció:")
-		self.descripcioLabel.grid(row=1, column=0, sticky="e")
+		self.entry_total_pagat_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat_familia)
+		self.entry_total_pagat_familia.grid(row=4, column=2)
 
-		self.descripcioEntry=Entry(frameAsignar, state="disabled", textvariable=self.descripcioString)
-		self.descripcioEntry.grid(row=1, column=1, padx=2)
+		self.entry_deute_total_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total_familia)
+		self.entry_deute_total_familia.grid(row=4, column=3)
 
-		self.asignarLabel=Label(frameAsignar, text="Quantitat:")
-		self.asignarLabel.grid(row=2, column=0, sticky="e")
+		self.entry_pagar_total_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total_familia)
+		self.entry_pagar_total_familia.grid(row=4, column=4)
 
-		self.asignarEntry=Entry(frameAsignar, state="disabled", textvariable=self.asignarString)
-		self.asignarEntry.grid(row=2, column=1, padx=2)
+		self.radio_button_familia_caixa=Radiobutton(label_frame_moviments_familia, text="Caixa", variable=self.forma_pagament_familia, value=1)
+		self.radio_button_familia_banc=Radiobutton(label_frame_moviments_familia, text="Banc", variable=self.forma_pagament_familia, value=2)
+		self.radio_button_familia_caixa.grid(row=5, column=2)
+		self.radio_button_familia_banc.grid(row=5, column=3)
+		self.radio_button_familia_caixa.select()
 
-		self.asignarBoto=Button(frameAsignar, state="disabled", text="Assignar", command=self.Asignar)
-		self.asignarBoto.grid(row=2, column=2, padx=5)
+		self.button_pagar_familia=Button(label_frame_moviments_familia, state="disabled", text="Pagar", command=self.PagarFam)
+		self.button_pagar_familia.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
-		#Frame Taula
+		# Frame "Assignar".
+		self.radio_button_quota=Radiobutton(label_frame_assignar, text="Quota", variable=self.concepte_assignacio, value=1)
+		self.radio_button_loteria=Radiobutton(label_frame_assignar, text="Loteria", variable=self.concepte_assignacio, value=2)
+		self.radio_button_rifa=Radiobutton(label_frame_assignar, text="Rifa", variable=self.concepte_assignacio, value=3)
+		self.radio_button_quota.grid(row=0, column=0)
+		self.radio_button_loteria.grid(row=0, column=1)
+		self.radio_button_rifa.grid(row=0, column=2)
+		self.radio_button_quota.select()
 
-		self.movimentsTree=ttk.Treeview(frameTaula, height=10) #li indiquem la altura 
-		self.movimentsTree.grid(row=0, column=0, padx=10, pady=5)
-		self.movimentsTree["columns"]=("uno","dos","tres","quatre","cinc") #designem les columnes
-		self.movimentsTree.column("#0", width=80) #designem els diferents amples
-		self.movimentsTree.column("uno", width=80)
-		self.movimentsTree.column("dos", width=80)
-		self.movimentsTree.column("tres", width=80)
-		self.movimentsTree.column("quatre", width=80)
-		self.movimentsTree.column("cinc", width=80)
-		self.movimentsTree.heading("#0", text="moviment") #rotulem les columnes
-		self.movimentsTree.heading('uno', text="data")
-		self.movimentsTree.heading('dos', text="assignat")
-		self.movimentsTree.heading('tres', text="pagat")
-		self.movimentsTree.heading('quatre', text="concepte")
-		self.movimentsTree.heading('cinc', text="descripció")
+		self.label_descripcio=Label(label_frame_assignar, text="Descripció:")
+		self.label_descripcio.grid(row=1, column=0, sticky="e")
 
-		self.scrollTaula=Scrollbar(frameTaula, command=self.movimentsTree.yview) #barra de desplaçament per a la taula
-		self.scrollTaula.grid(row=0, column=1, sticky="nsew") #la fem de l'altura de la taula
+		self.entry_descripcio_assignacio=Entry(label_frame_assignar, state="disabled", textvariable=self.descripcio_assignacio)
+		self.entry_descripcio_assignacio.grid(row=1, column=1, padx=2)
 
-		self.movimentsTree.config(yscrollcommand=self.scrollTaula.set) #associem la taula a la barra per a que funcione correctament
+		self.label_assignar_quantitat=Label(label_frame_assignar, text="Quantitat:")
+		self.label_assignar_quantitat.grid(row=2, column=0, sticky="e")
 
-		#Bindegem la finestra per a que refresque quan pille el foco
+		self.entry_total_assignacio=Entry(label_frame_assignar, state="disabled", textvariable=self.total_assignacio)
+		self.entry_total_assignacio.grid(row=2, column=1, padx=2)
 
-		self.bind("<FocusIn>", self.handle_focus)
+		self.button_assignar=Button(label_frame_assignar, state="disabled", text="Assignar", command=self.assignar)
+		self.button_assignar.grid(row=2, column=2, padx=5)
+
+		# Frame "Taula".
+		self.tree_moviments=ttk.Treeview(label_frame_historial, height=10) # Li indiquem la altura.
+		self.tree_moviments.grid(row=0, column=0, padx=10, pady=5)
+		self.tree_moviments["columns"]=("uno","dos","tres","quatre","cinc") # Designem les columnes.
+		self.tree_moviments.column("#0", width=80) # Designem els diferents amples.
+		self.tree_moviments.column("uno", width=80)
+		self.tree_moviments.column("dos", width=80)
+		self.tree_moviments.column("tres", width=80)
+		self.tree_moviments.column("quatre", width=80)
+		self.tree_moviments.column("cinc", width=80)
+		self.tree_moviments.heading("#0", text="moviment") # Rotulem les columnes.
+		self.tree_moviments.heading('uno', text="data")
+		self.tree_moviments.heading('dos', text="assignat")
+		self.tree_moviments.heading('tres', text="pagat")
+		self.tree_moviments.heading('quatre', text="concepte")
+		self.tree_moviments.heading('cinc', text="descripció")
+
+		self.scroll_taula=Scrollbar(label_frame_historial, command=self.tree_moviments.yview) # Barra de desplaçament per a la taula.
+		self.scroll_taula.grid(row=0, column=1, sticky="nsew") # La fem de l'altura de la taula.
+
+		self.tree_moviments.config(yscrollcommand=self.scroll_taula.set) # Associem la taula a la barra per a que funcione correctament.
+
+		# Bindegem la finestra per a que refresque quan pille el foco al tancar la finestra "modificar".
+		self.bind("<FocusIn>", self.manejar_foco)
 
 
 	def iniciar(self):
 		'''
-		Inicia la nova finestra.
+		Inicia la nova finestra omplint automàticament el camp "exercici"
+		i ficant el foco en el id per a buscar faller.
 		'''
+		arxiu=Arxiu("exercici")
+		exercici_actual=arxiu.llegir_exercici_actual()
+		self.exercici.set(str(exercici_actual-1) + "-" + str(exercici_actual))
+		self.entry_id.focus()
 		self.grab_set()
 		self.transient(self.master)
 		self.mainloop()
 
 
-	def CrearPdf(self):
+	def manejar_foco(self, event):
+		'''
+		Controla el tancament de la finestra "Modificar" de forma que al tancar
+		dita finestra, recupera el foco i torna a carregar totes les dades del faller
+		ja actualitzades.
+		'''
+		if self.id.get()!="" and self.modificar_oberta==1:
+			self.entry_id.focus()
+			self.buscar_per_id('<Return>')
+			self.modificar_oberta=0
 
-		pass
 
-		#elRebut=Informe()
-		#pagquo=0
-		#paglot=0
-		#pagrif=0
-		# elRebut.Rebut(self.fallerCombo.get(), pagquo, paglot, pagrif, self.quotaString.get(), self.quotapagString.get(), self.loteriaString.get(), self.loteriapagString.get(), self.rifaString.get(), self.rifapagString.get())
-
-
-	def handle_focus(self, event):
+	def modificar(self):
+		''' 
+		Crea una nova instància de la classe FinestraModificar
+		que obri la finestra "Modificar" des del botó.
+		'''
+		modificar=FinestraModificar(self)
+		self.modificar_oberta=1
+		modificar.iniciar(int(self.id.get()))
 		
-		if self.idString.get()!="" and self.modificar==1: #si el contingut del idEntry no està buit i s'ha obert la finestra de modificar faller
-			self.idEntry.focus()
-			self.BuscarId('<Return>') #actualitza el contingut de la finestra
-			self.modificar=0
 
-
-	#def Modificar(self):
-
-		#laModificacio=FinestraModificar(self.fgestionar)
-		#laModificacio.OmplirModificar(self.idString.get())
-		#self.modificar=1
-
-
-	def CanviarEstat(self):
-		
+	def canviar_estat(self):
+		'''
+		Canvia l'estat del faller d'alta a baixa i al revés.
+		Es modifica el seu estat en la base de dades i es canvia també l'historial.
+		Després es recalcula el descompte familiar depenent dels fallers que queden actius.
+		'''
 		arxiu=Arxiu("exercici")
 		bd=BaseDeDades("falla.db")
-		falla=Falla()
-		id=self.idString.get()
+		id=self.id.get()
 		exercici_actual=arxiu.llegir_exercici_actual()
-		faller=bd.llegir_faller(id)		
+		faller=bd.llegir_faller_complet(id)
+		nom_arxiu="historials"+"/"+str(faller.id)
+		arxiu=Arxiu(nom_arxiu)
+		historial=arxiu.llegir_historial()
 		if faller.alta==1:
 			valor=messagebox.askquestion("Baixa","Estàs segur que vols donar de baixa al faller?")
 			if valor=="yes":
 				faller.alta=0
 				bd.actualitzar_faller(faller)
-				#accedim a l'historial del faller
-				#arxiu="historials"+"/"+str(cadena)
-				#fitxer=open(arxiu,"rb")
-				#historial=pickle.load(fitxer)
-				#fitxer.close()
-				#del(fitxer)					
-				#historial[exer]=["baixa", ""] #el donem de baixa en l'any de l'exercici
-				#arxiu="historials"+"/"+str(cadena)
-				#fitxer=open(arxiu,"wb")
-				#pickle.dump(historial, fitxer)
-				#fitxer.close()
-				#del(fitxer)
-		if faller.alta==0:
+				historial[exercici_actual]=["baixa", ""]
+		elif faller.alta==0:
 			valor=messagebox.askquestion("Alta","Estàs segur que vols donar d'alta al faller?")
 			if valor=="yes":
 				edat=faller.calcular_edat(faller.naixement, exercici_actual)
@@ -494,144 +472,160 @@ class FinestraGestionar(tk.Toplevel):
 				faller.categoria=bd.llegir_categoria(faller.categoria.id)
 				faller.alta=1
 				bd.actualitzar_faller(faller)
-				#accedim a l'historial del faller
-				#arxiu="historials"+"/"+str(cadena)
-				#fitxer=open(arxiu,"rb")
-				#historial=pickle.load(fitxer)
-				#fitxer.close()
-				#del(fitxer)					
-				#historial[exer]=["vocal", "Sants Patrons"] #el donem d'alta com a vocal en l'any de l'exercici
-				#arxiu="historials"+"/"+str(cadena)
-				#fitxer=open(arxiu,"wb")
-				#pickle.dump(historial, fitxer)
-				#fitxer.close()
-				#del(fitxer)
-		llistat_fallers=falla.llegir_fallers("familia", faller.familia.id)
+				historial[exercici_actual]=["vocal", "Sants Patrons"]				
+		llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(faller.familia.id)
 		faller.familia.calcular_descompte(llistat_fallers)
 		bd.actualitzar_familia(faller.familia)
-		self.idEntry.focus() # Fica el foco en el camp id.
-		self.BuscarId('<Return>') # Refresca les dades fent la cerca de nou amb el id del faller.
+		arxiu.modificar_historial(historial)
+		self.entry_id.focus() # Fica el foco en el camp id.
+		self.buscar_per_id('<Return>') # Refresca les dades fent la cerca de nou amb el id del faller.
 
 	
-	def BuscarId(self, event): #funció que llança el botó quan es pulsa, event fa que funcione el bindeig del intro
-		
+	def buscar_per_id(self, event):
+		'''
+		Comprova que el faller amb l'id indicat està a la base de dades i, si es així
+		llença la funció que ompli el formulari complet. En cas de no ser així mostra
+		un error. Utilitza l'atribut "self.id_anterior" per a guardar l'identificador
+		de l'últim faller mostrat per a tornar-lo a mostrar en cas d'error.
+		Va associat a l'event de pulsar la tecla "Enter" dins del camp "id".
+		'''
 		bd=BaseDeDades("falla.db")
-		id=self.idString.get() # Guardem el contingut del idEntry en una variable.
+		id=self.id.get()
 		faller=bd.llegir_ultim_faller()
-		if faller.id < int(id): # Si el id que fiquem es major que el de l'últim faller.
+		if faller.id < int(self.id.get()): # Si el id que fiquem es major que el de l'últim faller.
 			messagebox.showwarning("Error", "No existeix un faller amb eixa id")
 			if self.id_anterior==0: # Si es la primera cerca.
-				self.idString.set("")
+				self.id.set("")
 			else:
-				self.idString.set(self.id_anterior) # Fiquem el id que hem buscat anteriorment.
+				self.id.set(self.id_anterior) # Fiquem el id que hem buscat anteriorment.
 		else:
 			self.id_anterior=id # Guardem l'ultima cerca per si apareix un error en la següent.
-			self.OmplirBuscar(id)
+			self.omplir_dades(id)
 		
 
-	def dropdown_opened(self):
+	def desplegar_faller(self):
 		'''
 		Controla el combobox comparant la cadena escrita amb la base de dades i mostrant els resultats en el combobox.
-		Utilitza la variable global "self.ident" per a passar el identificador de faller a la funció "selection_changed"
+		Utilitza l'atribut "self.identificadors" per a passar el identificador de faller a la funció "seleccionar_faller".
 		'''
-		cadena=self.fallerCombo.get()
-		falla=Falla()
-		llistat_fallers=falla.llegir_fallers("cognoms", cadena)
+		bd=BaseDeDades("falla.db")
+		cadena=self.combo_box_faller.get()
+		llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
 		llista=[] # Llista on anem a acumular els valors.
-		self.ident=[]
+		self.identificadors=[]
 		for faller in llistat_fallers:
-			self.ident=self.ident+[faller.id]
+			self.identificadors=self.identificadors+[faller.id]
 			llista=llista + [(faller.cognoms + ", " + faller.nom)]
-		self.fallerCombo["values"]=llista # Insertem cada valor en el desplegable.
+		self.combo_box_faller["values"]=llista # Insertem cada valor en el desplegable.
 
 	
-	def selection_changed(self, event):
+	def seleccionar_faller(self, event):
 		'''
-		Controla la selecció del combobox per a guardar el identificador del faller i omplir les dades a partir d'aquest
+		Controla la selecció del combobox per a guardar el identificador del faller i omplir les dades a partir d'aquest.
 		'''
-		index=self.fallerCombo.current()
-		self.idString.set(self.ident[index])
-		cadena=self.idString.get()
-		self.ident=[]
-		self.OmplirBuscar(cadena)
+		index=self.combo_box_faller.current()
+		self.id.set(self.identificadors[index])
+		self.identificadors=[]
+		self.omplir_dades(self.id.get())
 		
 
-	def dropdown_opened_fam(self):
-
+	def desplegar_familia(self):
+		'''
+		Ompli el combobox amb tots els familiars del faller.
+		'''
 		bd=BaseDeDades("falla.db")
-		falla=Falla()
-		faller=bd.llegir_faller(self.idString.get())
-		llistat_fallers=falla.llegir_fallers("familia", faller.familia.id)
-		llista=[] # Llista on anem a acumular els valors.
-		self.ident=[]
+		faller=bd.llegir_faller_complet(self.id.get())
+		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
+		llista=[]
+		self.identificadors=[]
 		for faller in llistat_fallers:
-			self.ident=self.ident+[faller.id]
+			self.identificadors=self.identificadors+[faller.id]
 			llista=llista + [(faller.cognoms + ", " + faller.nom)]
-		self.familiaCombo["values"]=llista
+		self.combo_box_familia["values"]=llista
 
 
-	def selection_changed_fam(self, event):
+	def seleccionar_familia(self, event):
+		'''
+		Controla la selecció del combobox per a guardar el identificador del familiar del faller
+		i ompli les dades a partir d'aquest.
+		'''
+		index=self.combo_box_familia.current()
+		self.id.set(self.identificadors[index])
+		self.identificadors=[]
+		self.omplir_dades(self.id.get())
+		self.combo_box_familia.set("") # El borrem per a que no mostre l'últim nom.
 
-		index=self.familiaCombo.current()
-		self.idString.set(self.ident[index])
-		cadena=self.idString.get()
-		self.ident=[]
-		self.OmplirBuscar(cadena)
-		self.familiaCombo.set("") # El borrem per a que no mostre l'últim nom.
 
-
-	def OmplirBuscar(self, id):
-
+	def omplir_dades(self, id):
+		'''
+		Ompli el formulari complet (dades, pagaments, familia...) a partir de l'id del faller.
+		'''
 		bd=BaseDeDades("falla.db")
 		arxiu=Arxiu("exercici")
 		falla=Falla()
 		quota=0
-		faller=bd.llegir_faller(id) # Busquem el faller a partir de la cadena guardada.
+		faller=bd.llegir_faller_complet(id)
+
 		# Omplim els camps de dades personals.
-		self.fallerCombo.set(faller.cognoms + ", " + faller.nom) # Mostrem en el combo els cognoms i nom del faller.
-		self.naixementString.set(faller.naixement) # Mostrem la data de naixement del faller.
-		self.dniString.set(faller.dni) # Mostrem el dni del faller.
-		self.adresaString.set(faller.adresa) # Mostrem l'adreça del faller.
-		self.telefonString.set(faller.telefon) # Mostrem el telèfon del faller.
-		self.correuString.set(faller.correu) # Mostrem el correu electrònic del faller.
-		#self.idmod=num
-		#self.modificarBoto.config(state="normal")
+		self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
+		self.naixement.set(faller.naixement)
+		self.dni.set(faller.dni)
+		self.adresa.set(faller.adresa)
+		self.telefon.set(faller.telefon)
+		self.correu.set(faller.correu)
+		self.button_modificar.config(state="normal")
+
+		# En cas de baixa, es mostren en roig els camps de dades personals.
+		# Es dehabiliten els camps de pagament i d'assignació i el botó "alta" es fica en "Donar d'alta".
 		if faller.alta==0: # Mostrem en verd o en roig els camps segons alta.
-			self.altaBoto.config(state="normal", text="Donar d'alta")
-			self.naixementEntry.configure(disabledbackground="#ff3f3f", disabledforeground="white")
-			self.dniEntry.configure(disabledbackground="#ff3f3f", disabledforeground="white")
-			self.adresaEntry.configure(disabledbackground="#ff3f3f", disabledforeground="white")
-			self.telefonEntry.configure(disabledbackground="#ff3f3f", disabledforeground="white")
-			self.correuEntry.configure(disabledbackground="#ff3f3f", disabledforeground="white")
-			self.pagarquotaString.set("")
-			self.pagarquotaEntry.config(state="disabled")
-			self.pagarloteriaString.set("")
-			self.pagarloteriaEntry.config(state="disabled")
-			self.pagarrifaString.set("")
-			self.pagarrifaEntry.config(state="disabled")
-			self.pagartotalString.set("")
-			self.pagarBoto.config(state="disabled")
+			self.button_alta.config(state="normal", text="Donar d'alta")
+			self.entry_naixement.configure(disabledbackground="#ff3f3f", disabledforeground="white")
+			self.entry_dni.configure(disabledbackground="#ff3f3f", disabledforeground="white")
+			self.entry_adresa.configure(disabledbackground="#ff3f3f", disabledforeground="white")
+			self.entry_telefon.configure(disabledbackground="#ff3f3f", disabledforeground="white")
+			self.entry_correu.configure(disabledbackground="#ff3f3f", disabledforeground="white")
+			self.pagar_quota.set("")
+			self.entry_pagar_quota.config(state="disabled")
+			self.pagar_loteria.set("")
+			self.entry_pagar_loteria.config(state="disabled")
+			self.pagar_rifa.set("")
+			self.entry_pagar_rifa.config(state="disabled")
+			self.pagar_total.set("")
+			self.button_pagar.config(state="disabled")
+			self.entry_descripcio_assignacio.config(state="disabled")
+			self.total_assignacio.set("")
+			self.entry_total_assignacio.config(state="disabled")
+			self.button_assignar.config(state="disabled")
+		# En cas de d'alta, es mostren en verd els camps de dades personals.
+		# S'habiliten els camps de pagament i d'assignació i el botó "alta" es fica en "Donar de baixa". 
 		else:
-			self.altaBoto.config(state="normal", text="Donar de baixa")
-			self.naixementEntry.configure(disabledbackground="#98ff98", disabledforeground="black")
-			self.dniEntry.configure(disabledbackground="#98ff98", disabledforeground="black")
-			self.adresaEntry.configure(disabledbackground="#98ff98", disabledforeground="black")
-			self.telefonEntry.configure(disabledbackground="#98ff98", disabledforeground="black")
-			self.correuEntry.configure(disabledbackground="#98ff98", disabledforeground="black")
-			self.pagarquotaString.set("0") # Fiquem un 0 en el entry per a que no done error l'operació.
-			self.pagarquotaEntry.config(state="normal") # Passa a normal per a poder operar.
-			self.pagarloteriaString.set("0")
-			self.pagarloteriaEntry.config(state="normal")
-			self.pagarrifaString.set("0")
-			self.pagarrifaEntry.config(state="normal")
-			self.pagartotalString.set("0 €")
-			self.pagarBoto.config(state="normal")
-			if faller.naixement=="01-01-1900": # Mostrem en groc als fallers dels quals ens falta la data de naixement.
-				self.naixementEntry.configure(disabledbackground="#ffff00")
-				self.dniEntry.configure(disabledbackground="#ffff00")
-				self.adresaEntry.configure(disabledbackground="#ffff00")
-				self.telefonEntry.configure(disabledbackground="#ffff00")
-				self.correuEntry.configure(disabledbackground="#ffff00")
+			self.button_alta.config(state="normal", text="Donar de baixa")
+			self.entry_naixement.configure(disabledbackground="#98ff98", disabledforeground="black")
+			self.entry_dni.configure(disabledbackground="#98ff98", disabledforeground="black")
+			self.entry_adresa.configure(disabledbackground="#98ff98", disabledforeground="black")
+			self.entry_telefon.configure(disabledbackground="#98ff98", disabledforeground="black")
+			self.entry_correu.configure(disabledbackground="#98ff98", disabledforeground="black")
+			self.pagar_quota.set("0") # Fiquem un 0 en el entry per a que no done error l'operació.
+			self.entry_pagar_quota.config(state="normal") # Passa a normal per a poder operar.
+			self.pagar_loteria.set("0")
+			self.entry_pagar_loteria.config(state="normal")
+			self.pagar_rifa.set("0")
+			self.entry_pagar_rifa.config(state="normal")
+			self.pagar_total.set("0 €")
+			self.button_pagar.config(state="normal")
+			self.entry_descripcio_assignacio.config(state="normal")
+			self.total_assignacio.set("0")
+			self.entry_total_assignacio.config(state="normal")
+			self.button_assignar.config(state="normal")
+			# Mostrem en groc als fallers dels quals ens falta la data de naixement com a recordatori de que l'hem de demanar.
+			# Gastem la data "01-01-1900" per a quan no sabem la data de naixement però el faller és adult.
+			if faller.naixement=="01-01-1900":
+				self.entry_naixement.configure(disabledbackground="#ffff00")
+				self.entry_dni.configure(disabledbackground="#ffff00")
+				self.entry_adresa.configure(disabledbackground="#ffff00")
+				self.entry_telefon.configure(disabledbackground="#ffff00")
+				self.entry_correu.configure(disabledbackground="#ffff00")
+
 		# Omplim els camps d'assignacions i pagaments del faller.
 		quota_base=bd.llegir_quota_faller(faller.id)
 		descompte=faller.familia.descompte*quota_base/100
@@ -640,96 +634,91 @@ class FinestraGestionar(tk.Toplevel):
 		# Busquem tots els moviments del faller en l'exercici i els separem en quotes, loteries o rifes i en assignat o pagat.
 		llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
 		# Assignem cada element de la llista a una variable per a que siga més fàcil d'identificar.
-		quotaassignada=llista_assignacions_pagaments[0]
-		quotapagada=llista_assignacions_pagaments[1]
-		loteriaassignada=llista_assignacions_pagaments[2]
-		loteriapagada=llista_assignacions_pagaments[3]
-		rifaassignada=llista_assignacions_pagaments[4]
-		rifapagada=llista_assignacions_pagaments[5]
-		quotafinal=quota+quotaassignada
-		self.quotaString.set("{0:.2f}".format(quotafinal) + " €") # La quota assignada es la quota total menys el descompte més les assignacions.
-		self.quotapagString.set("{0:.2f}".format(quotapagada) + " €") # Mostrem la quota pagada.
-		self.deutequotaString.set("{0:.2f}".format(quotafinal-quotapagada) + " €") # Mostrem el deute de la quota.
-		self.loteriaString.set("{0:.2f}".format(loteriaassignada) + " €") # El mateix en loteria.
-		self.loteriapagString.set("{0:.2f}".format(loteriapagada) + " €")
-		self.deuteloteriaString.set("{0:.2f}".format(loteriaassignada-loteriapagada) + " €")
-		self.rifaString.set("{0:.2f}".format(rifaassignada) + " €") # El mateix en rifa.
-		self.rifapagString.set("{0:.2f}".format(rifapagada) + " €")
-		self.deuterifaString.set("{0:.2f}".format(rifaassignada-rifapagada) + " €")
-		self.totalasignatString.set("{0:.2f}".format(quotafinal+loteriaassignada+rifaassignada) + " €") #totals
-		self.totalpagatString.set("{0:.2f}".format(quotapagada+loteriapagada+rifapagada) + " €")
-		self.totalString.set("{0:.2f}".format((quotafinal+loteriaassignada+rifaassignada)-(quotapagada+loteriapagada+rifapagada)) + " €")
+		quota_assignada=llista_assignacions_pagaments[0]
+		quota_pagada=llista_assignacions_pagaments[1]
+		loteria_assignada=llista_assignacions_pagaments[2]
+		loteria_pagada=llista_assignacions_pagaments[3]
+		rifa_assignada=llista_assignacions_pagaments[4]
+		rifa_pagada=llista_assignacions_pagaments[5]
+		quota_final=quota+quota_assignada
+		self.quota_assignada.set("{0:.2f}".format(quota_final) + " €")
+		self.quota_pagada.set("{0:.2f}".format(quota_pagada) + " €")
+		self.deute_quota.set("{0:.2f}".format(quota_final-quota_pagada) + " €")
+		self.loteria_assignada.set("{0:.2f}".format(loteria_assignada) + " €")
+		self.loteria_pagada.set("{0:.2f}".format(loteria_pagada) + " €")
+		self.deute_loteria.set("{0:.2f}".format(loteria_assignada-loteria_pagada) + " €")
+		self.rifa_assignada.set("{0:.2f}".format(rifa_assignada) + " €")
+		self.rifa_pagada.set("{0:.2f}".format(rifa_pagada) + " €")
+		self.deute_rifa.set("{0:.2f}".format(rifa_assignada-rifa_pagada) + " €")
+		self.total_assignat.set("{0:.2f}".format(quota_final+loteria_assignada+rifa_assignada) + " €")
+		self.total_pagat.set("{0:.2f}".format(quota_pagada+loteria_pagada+rifa_pagada) + " €")
+		self.deute_total.set("{0:.2f}".format((quota_final+loteria_assignada+rifa_assignada)-(quota_pagada+loteria_pagada+rifa_pagada)) + " €")
+
 		# Omplim els camps d'assignacions i pagaments de la familia completa del faller.
-		llistat_fallers=falla.llegir_fallers("familia", faller.familia.id)
+		llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
 		membres=0
-		#idfaller=[]
 		for faller in llistat_fallers:
 			if faller.alta==1:
 				membres=membres + 1
-				#idfaller=idfaller+faller.id # Afegim a la llista el id.
-		self.membresString.set(membres)
-		if membres==0: # Activarem els camps si hi ha membres actius a la familia.
-			self.pagarquotafamString.set("")
-			self.pagarquotafamEntry.config(state="disabled")
-			self.pagarloteriafamString.set("")
-			self.pagarloteriafamEntry.config(state="disabled")
-			self.pagarrifafamString.set("")
-			self.pagarrifafamEntry.config(state="disabled")
-			self.pagartotalfamString.set("")
-			self.pagarfamBoto.config(state="disabled")
+		self.membres_familia.set(membres)
+		if faller.alta==1 and membres>1: # Activarem els camps si hi ha membres actius a la familia.
+			self.pagar_quota_familia.set("0")
+			self.entry_pagar_quota_familia.config(state="normal")
+			self.pagar_loteria_familia.set("0")
+			self.entry_pagar_loteria_familia.config(state="normal")
+			self.pagar_rifa_familia.set("0")
+			self.entry_pagar_rifa_familia.config(state="normal")
+			self.pagar_total_familia.set("0 €")
+			self.button_pagar_familia.config(state="normal")			
 		else:
-			self.pagarquotafamString.set("0")
-			self.pagarquotafamEntry.config(state="normal")
-			self.pagarloteriafamString.set("0")
-			self.pagarloteriafamEntry.config(state="normal")
-			self.pagarrifafamString.set("0")
-			self.pagarrifafamEntry.config(state="normal")
-			self.pagartotalfamString.set("0 €")
-			self.pagarfamBoto.config(state="normal")
-		self.descripcioString.set("") # Reiniciem el valor de descripció de les assignacions
-		quota=0 # Les iniciem a 0 per què no s'acumulen amb les anteriors.
-		quotaassignada=0
-		quotapagada=0
-		loteriaassignada=0
-		loteriapagada=0
-		rifaassignada=0
-		rifapagada=0
+			self.pagar_quota_familia.set("")
+			self.entry_pagar_quota_familia.config(state="disabled")
+			self.pagar_loteria_familia.set("")
+			self.entry_pagar_loteria_familia.config(state="disabled")
+			self.pagar_rifa_familia.set("")
+			self.entry_pagar_rifa_familia.config(state="disabled")
+			self.pagar_total_familia.set("")
+			self.button_pagar_familia.config(state="disabled")				
+		# Iniciem les variables per a poder iterar.
+		quota_familia=0
+		quota_assignada_familia=0
+		quota_pagada_familia=0
+		loteria_assignada_familia=0
+		loteria_pagada_familia=0
+		rifa_assignada_familia=0
+		rifa_pagada_familia=0
 		for faller in llistat_fallers:
-			quota_base=bd.llegir_quota_faller(faller.id)
-			descompte=(faller.familia.descompte*quota_base/100)
-			quota=quota+quota_base-descompte
-			llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
-			# Assignem cada element de la llista a una variable per a que siga més fàcil d'identificar.
-			quotaassignada=quotaassignada+llista_assignacions_pagaments[0]
-			quotapagada=quotapagada+llista_assignacions_pagaments[1]
-			loteriaassignada=loteriaassignada+llista_assignacions_pagaments[2]
-			loteriapagada=loteriapagada+llista_assignacions_pagaments[3]
-			rifaassignada=rifaassignada+llista_assignacions_pagaments[4]
-			rifapagada=rifapagada+llista_assignacions_pagaments[5]
-		quotafinal=quota+quotaassignada
-		self.quotafamString.set("{0:.2f}".format(quotafinal) + " €") # Mostrem la quota de la familia.
-		self.quotapagadafamString.set("{0:.2f}".format(quotapagada) + " €") # Mostrem el total pagat de quota de la familia.
-		self.deutequotafamString.set("{0:.2f}".format(quotafinal-quotapagada) + " €")
-		self.loteriafamString.set("{0:.2f}".format(loteriaassignada) + " €")
-		self.loteriapagadafamString.set("{0:.2f}".format(loteriapagada) + " €")
-		self.deuteloteriafamString.set("{0:.2f}".format(loteriaassignada-loteriapagada) + " €")
-		self.rifafamString.set("{0:.2f}".format(rifaassignada) + " €")
-		self.rifapagadafamString.set("{0:.2f}".format(rifapagada) + " €")
-		self.deuterifafamString.set("{0:.2f}".format(rifaassignada-rifapagada) + " €")
-		self.totalasignatfamString.set("{0:.2f}".format(quotafinal+loteriaassignada+rifaassignada) + " €")
-		self.totalpagatfamString.set("{0:.2f}".format(quotapagada+loteriapagada+rifapagada) + " €")
-		self.totalfamString.set("{0:.2f}".format((quotafinal-quotapagada)+(loteriaassignada-loteriapagada)+(rifaassignada-rifapagada)) + " €")	
-		if faller.alta==1: # Habilitar o deshabilitem el botó i el entry de l'assignació.
-			self.descripcioEntry.config(state="normal")
-			self.asignarString.set("0")
-			self.asignarEntry.config(state="normal")
-			self.asignarBoto.config(state="normal")
-		if faller.alta==0:
-			self.descripcioEntry.config(state="disabled")
-			self.asignarString.set("")
-			self.asignarEntry.config(state="disabled")
-			self.asignarBoto.config(state="disabled")
-		self.movimentsTree.delete(*self.movimentsTree.get_children()) # Borrem la taula
+			if faller.alta==1:
+				quota_base=bd.llegir_quota_faller(faller.id)
+				descompte=(faller.familia.descompte*quota_base/100)
+				quota_familia=quota_familia+quota_base-descompte
+				llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
+				# Assignem cada element de la llista a una variable per a que siga més fàcil d'identificar.
+				quota_assignada_familia=quota_assignada_familia+llista_assignacions_pagaments[0]
+				quota_pagada_familia=quota_pagada_familia+llista_assignacions_pagaments[1]
+				loteria_assignada_familia=loteria_assignada_familia+llista_assignacions_pagaments[2]
+				loteria_pagada_familia=loteria_pagada_familia+llista_assignacions_pagaments[3]
+				rifa_assignada_familia=rifa_assignada_familia+llista_assignacions_pagaments[4]
+				rifa_pagada_familia=rifa_pagada_familia+llista_assignacions_pagaments[5]
+		quota_final_familia=quota_familia+quota_assignada_familia
+		self.quota_assignada_familia.set("{0:.2f}".format(quota_final_familia) + " €") # Mostrem la quota de la familia.
+		self.quota_pagada_familia.set("{0:.2f}".format(quota_pagada_familia) + " €") # Mostrem el total pagat de quota de la familia.
+		self.deute_quota_familia.set("{0:.2f}".format(quota_final_familia-quota_pagada_familia) + " €")
+		self.loteria_assignada_familia.set("{0:.2f}".format(loteria_assignada_familia) + " €")
+		self.loteria_pagada_familia.set("{0:.2f}".format(loteria_pagada_familia) + " €")
+		self.deute_loteria_familia.set("{0:.2f}".format(loteria_assignada_familia-loteria_pagada_familia) + " €")
+		self.rifa_assignada_familia.set("{0:.2f}".format(rifa_assignada_familia) + " €")
+		self.rifa_pagada_familia.set("{0:.2f}".format(rifa_pagada_familia) + " €")
+		self.deute_rifa_familia.set("{0:.2f}".format(rifa_assignada_familia-rifa_pagada_familia) + " €")
+		self.total_assignat_familia.set("{0:.2f}".format(quota_final_familia+loteria_assignada_familia+rifa_assignada_familia) + " €")
+		self.total_pagat_familia.set("{0:.2f}".format(quota_pagada_familia+loteria_pagada_familia+rifa_pagada_familia) + " €")
+		self.deute_total_familia.set("{0:.2f}".format((quota_final_familia-quota_pagada_familia)+(loteria_assignada_familia-loteria_pagada_familia)+(rifa_assignada_familia-rifa_pagada_familia)) + " €")
+
+		# Reiniciem el valor de descripció de les assignacions.
+		self.descripcio_assignacio.set("")	
+
+		# Omplim les dades de la taula.
+		self.tree_moviments.delete(*self.tree_moviments.get_children()) # Borrem la taula
 		llistat_moviments=bd.llegir_moviments(id, exercici_actual)
 		for moviment in llistat_moviments:
 			if moviment.concepte==1:
@@ -739,157 +728,130 @@ class FinestraGestionar(tk.Toplevel):
 			elif moviment.concepte==3:
 				concepte="rifa"
 			if moviment.tipo==1: # Segons si es asignació o pagament fiquem la quantitat en una o altra columna
-				self.movimentsTree.insert("","end", text=moviment.id, values=(moviment.data, "{0:.2f}".format(moviment.quantitat) + " €", "", concepte, moviment.descripcio))
+				self.tree_moviments.insert("","end", text=moviment.id, values=(moviment.data, "{0:.2f}".format(moviment.quantitat) + " €", "", concepte, moviment.descripcio))
 			elif moviment.tipo==2:
-				self.movimentsTree.insert("","end", text=moviment.id, values=(moviment.data, "", "{0:.2f}".format(moviment.quantitat) + " €", concepte, moviment.descripcio))
+				self.tree_moviments.insert("","end", text=moviment.id, values=(moviment.data, "", "{0:.2f}".format(moviment.quantitat) + " €", concepte, moviment.descripcio))
 
 		
-	def LlevarCeroQuota(self, event): #aquestes 3 funcions lleven el 0 per a deixar espai en blanc per a escriure
+	def fer_seleccio(self, event, entry):
+		'''
+		Es bindeja a un camp de forma que al fer "FocusIn" en ell es selecciona el contingut
+		del camp i es pot sobreescriure sense haver de borrar.
 
-		if self.pagarquotaString.get()=="0":
-			self.pagarquotaString.set("")
-
-
-	def LlevarCeroLoteria(self, event):
-
-		if self.pagarloteriaString.get()=="0":
-			self.pagarloteriaString.set("")
-
-
-	def LlevarCeroRifa(self, event):
-
-		if self.pagarrifaString.get()=="0":
-			self.pagarrifaString.set("")
+		Paràmetres:
+        -----------
+        entry : tkinter.Entry
+            Camp en el que es fa el foco.
+		'''
+		entry.select_range(0, tk.END)
 
 	
-	def LlevarCeroQuotaFam(self, event):
+	def calcular_pagar_total(self, event, entry):
+		'''
+		Es bindeja a un camp de forma que al fer "FocusOut" en ell es comprova el contingut
+		del camp per veure si es un valor correcte. En cas de ser així mostra la suma dels 3 camps
+		en el camp total i en cas de que no ho siga el fica a 0, manté el foco per a poder canviar
+		el valor i fa la suma però amb el valor del camp a 0.
 
-		if self.pagarquotafamString.get()=="0":
-			self.pagarquotafamString.set("")
-
-	
-	def LlevarCeroLoteriaFam(self, event):
-
-		if self.pagarloteriafamString.get()=="0":
-			self.pagarloteriafamString.set("")
-
-	
-	def LlevarCeroRifaFam(self, event):
-
-		if self.pagarrifafamString.get()=="0":
-			self.pagarrifafamString.set("")
-
-
-	def CalcularPagarTotalQuota(self, event): #calcula la suma dels 3 camps de pagament segons el camp en el que estiga
-
-		pq=0
-		pl=float(self.pagarloteriaString.get())
-		pr=float(self.pagarrifaString.get())
-		if self.pagarquotaString.get()=="": #si el camp es queda buit fiquem automàticament un 0
-			self.pagarquotaString.set("0")
-		try:
-			pq=float(self.pagarquotaString.get())
-		except ValueError: #si el valor no es vàlid el fiquem a 0 per a que no done error, fem la suma amb els altres camps
-			self.pagarquotaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(pl+pr) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarquotaEntry.focus() #li deixem el focus per a ficar el valor vàlid
-		self.pagartotalString.set("{0:.2f}".format(pq+pl+pr) + " €")
-
-	
-	def CalcularPagarTotalLoteria(self, event):
+		Paràmetres:
+        -----------
+        entry : tkinter.Entry
+            Camp en el que es fa el foco.
+		'''
+		pagar_quota=0
+		pagar_loteria=0
+		pagar_rifa=0
+		pagar_quota_familia=0
+		pagar_loteria_familia=0
+		pagar_rifa_familia=0
+		# Camp "pagar_quota".
+		if entry==self.entry_pagar_quota:
+			pagar_loteria=float(self.entry_pagar_loteria.get())
+			pagar_rifa=float(self.entry_pagar_rifa.get())
+			try:
+				pagar_quota=float(self.entry_pagar_quota.get())
+			except ValueError:
+				pagar_quota=0
+				self.pagar_quota.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_quota.focus()
+			self.pagar_total.set("{0:.2f}".format(pagar_quota+pagar_loteria+pagar_rifa) + " €")
+		# Camp "pagar_loteria".
+		elif entry==self.entry_pagar_loteria:
+			pagar_quota=float(self.entry_pagar_quota.get())
+			pagar_rifa=float(self.entry_pagar_rifa.get())
+			try:
+				pagar_loteria=float(self.entry_pagar_loteria.get())
+			except ValueError:
+				pagar_loteria=0
+				self.pagar_loteria.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_loteria.focus()
+			self.pagar_total.set("{0:.2f}".format(pagar_quota+pagar_loteria+pagar_rifa) + " €")
+		# Camp "pagar_rifa".
+		elif entry==self.entry_pagar_rifa:
+			pagar_quota=float(self.entry_pagar_quota.get())
+			pagar_loteria=float(self.entry_pagar_loteria.get())		
+			try:
+				pagar_rifa=float(self.entry_pagar_rifa.get())
+			except ValueError:
+				pagar_rifa=0
+				self.pagar_rifa.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_rifa.focus()
+			self.pagar_total.set("{0:.2f}".format(pagar_quota+pagar_loteria+pagar_rifa) + " €")
+		# Camp "pagar_quota_familia".
+		elif entry==self.entry_pagar_quota_familia:
+			pagar_loteria_familia=float(self.entry_pagar_loteria_familia.get())
+			pagar_rifa_familia=float(self.entry_pagar_rifa_familia.get())
+			try:
+				pagar_quota_familia=float(self.entry_pagar_quota_familia.get())
+			except ValueError:
+				pagar_quota_familia=0
+				self.pagar_quota_familia.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_quota_familia.focus()
+			if float(self.pagar_quota_familia.get())<0:
+				pagar_quota_familia=0
+				self.pagar_quota_familia.set(0)
+				messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
+				self.entry_pagar_quota_familia.focus()
+			self.pagar_total_familia.set("{0:.2f}".format(pagar_quota_familia+pagar_loteria_familia+pagar_rifa_familia) + " €")
+		# Camp "pagar_loteria_familia".
+		elif entry==self.entry_pagar_loteria_familia:
+			pagar_quota_familia=float(self.entry_pagar_quota_familia.get())
+			pagar_rifa_familia=float(self.entry_pagar_rifa_familia.get())
+			try:
+				pagar_loteria_familia=float(self.entry_pagar_loteria_familia.get())
+			except ValueError:
+				pagar_loteria_familia=0
+				self.pagar_loteria_familia.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_loteria_familia.focus()
+			if float(self.pagar_loteria_familia.get())<0:
+				pagar_loteria_familia=0
+				self.pagar_loteria_familia.set(0)
+				messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
+				self.entry_pagar_loteria_familia.focus()
+			self.pagar_total_familia.set("{0:.2f}".format(pagar_quota_familia+pagar_loteria_familia+pagar_rifa_familia) + " €")
+		# Camp "pagar_rifa_familia".
+		elif entry==self.entry_pagar_rifa_familia:
+			pagar_quota_familia=float(self.entry_pagar_quota_familia.get())
+			pagar_loteria_familia=float(self.entry_pagar_loteria_familia.get())
+			try:
+				pagar_rifa_familia=float(self.entry_pagar_rifa_familia.get())
+			except ValueError:
+				pagar_rifa_familia=0
+				self.pagar_rifa_familia.set(0)
+				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
+				self.entry_pagar_rifa_familia.focus()
+			if float(self.pagar_rifa_familia.get())<0:
+				pagar_rifa_familia=0
+				self.pagar_rifa_familia.set(0)
+				messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
+				self.entry_pagar_rifa_familia.focus()
+			self.pagar_total_familia.set("{0:.2f}".format(pagar_quota_familia+pagar_loteria_familia+pagar_rifa_familia) + " €")
 		
-		pl=0
-		pq=float(self.pagarquotaString.get())
-		pr=float(self.pagarrifaString.get())
-		if self.pagarloteriaString.get()=="":
-			self.pagarloteriaString.set("0")
-		try:
-			pl=float(self.pagarloteriaString.get())
-		except ValueError:
-			self.pagarloteriaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(pq+pr) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarloteriaEntry.focus()
-		self.pagartotalString.set("{0:.2f}".format(pq+pl+pr) + " €")
-
-	
-	def CalcularPagarTotalRifa(self, event):
-		
-		pr=0
-		pl=float(self.pagarloteriaString.get())
-		pq=float(self.pagarquotaString.get())
-		if self.pagarrifaString.get()=="":
-			self.pagarrifaString.set("0")
-		try:
-			pr=float(self.pagarrifaString.get())
-		except ValueError:
-			self.pagarrifaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(pq+pl) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarrifaEntry.focus()
-		self.pagartotalString.set("{0:.2f}".format(pq+pl+pr) + " €")
-
-	
-	def CalcularPagarFamTotalQuota(self, event):
-
-		pq=0
-		pl=float(self.pagarloteriafamString.get())
-		pr=float(self.pagarrifafamString.get())
-		if self.pagarquotafamString.get()=="":
-			self.pagarquotafamString.set("0")
-		if float(self.pagarquotafamString.get())<0:
-			self.pagarquotafamString.set("0")
-			messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
-		try:
-			pq=float(self.pagarquotafamString.get())
-		except ValueError:
-			self.pagarquotafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(pl+pr) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarquotafamEntry.focus()
-		self.pagartotalfamString.set("{0:.2f}".format(pq+pl+pr) + " €")
-
-	
-	def CalcularPagarFamTotalLoteria(self, event):
-		
-		pl=0
-		pq=float(self.pagarquotafamString.get())
-		pr=float(self.pagarrifafamString.get())
-		if self.pagarloteriafamString.get()=="":
-			self.pagarloteriafamString.set("0")
-		if float(self.pagarloteriafamString.get())<0:
-			self.pagarloteriafamString.set("0")
-			messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
-		try:
-			pl=float(self.pagarloteriafamString.get())
-		except ValueError:
-			self.pagarloteriafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(pq+pr) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarloteriafamEntry.focus()
-		self.pagartotalfamString.set("{0:.2f}".format(pq+pl+pr) + " €")
-	
-
-	def CalcularPagarFamTotalRifa(self, event):
-		
-		pr=0
-		pl=float(self.pagarloteriafamString.get())
-		pq=float(self.pagarquotafamString.get())
-		if self.pagarrifafamString.get()=="":
-			self.pagarrifafamString.set("0")
-		if float(self.pagarrifafamString.get())<0:
-			self.pagarrifafamString.set("0")
-			messagebox.showwarning("Error", "Els abonos només es poden fer als fallers per separat")
-		try:
-			pr=float(self.pagarrifafamString.get())
-		except ValueError:
-			self.pagarrifafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(pq+pl) + " €")
-			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-			self.pagarrifafamEntry.focus()
-		self.pagartotalfamString.set("{0:.2f}".format(pq+pl+pr) + " €")
-	
 	
 	def Pagar(self):
 
@@ -899,34 +861,34 @@ class FinestraGestionar(tk.Toplevel):
 		pagquo=0
 		paglot=0
 		pagrif=0
-		if self.pagarquotaString.get()=="":
-			self.pagarquotaString.set(0)
-		if self.pagarloteriaString.get()=="":
-			self.pagarloteriaString.set(0)
-		if self.pagarrifaString.get()=="":
-			self.pagarrifaString.set(0)
+		if self.pagar_quota.get()=="":
+			self.pagar_quota.set(0)
+		if self.pagar_loteria.get()=="":
+			self.pagar_loteria.set(0)
+		if self.pagar_rifa.get()=="":
+			self.pagar_rifa.set(0)
 		try:
-			pagquo=float(self.pagarquotaString.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
+			pagquo=float(self.pagar_quota.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
 		except ValueError:
 			pagquo=0
-			self.pagarquotaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(paglot+pagrif) + " €")
+			self.pagar_quota.set(0)
+			self.pagar_total.set("{0:.2f}".format(paglot+pagrif) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			paglot=float(self.pagarloteriaString.get())
+			paglot=float(self.pagar_loteria.get())
 		except ValueError:
 			paglot=0
-			self.pagarloteriaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(pagquo+pagrif) + " €")
+			self.pagar_loteria.set(0)
+			self.pagar_total.set("{0:.2f}".format(pagquo+pagrif) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			pagrif=float(self.pagarrifaString.get())
+			pagrif=float(self.pagar_rifa.get())
 		except ValueError:
 			pagrif=0
-			self.pagarrifaString.set(0)
-			self.pagartotalString.set("{0:.2f}".format(paglot+pagrif) + " €")
+			self.pagar_rifa.set(0)
+			self.pagar_total.set("{0:.2f}".format(paglot+pagrif) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-		opcio=self.formapagamentString.get() #guardem l'opció triada per a la descripció de la base de dades
+		opcio=self.forma_pagament.get() #guardem l'opció triada per a la descripció de la base de dades
 		descripcio=""
 		if opcio=="1":
 			descripcio="pagat en caixa"
@@ -935,13 +897,13 @@ class FinestraGestionar(tk.Toplevel):
 			#desc="domiciliació"
 		valor=messagebox.askquestion("Pagar","Estàs segur que vols fer el pagament?")
 		if valor=="yes":
-			if self.pagarquotaString.get()=="":
-				self.pagarquotaString.set("0")
-			if self.pagarloteriaString.get()=="":
-				self.pagarloteriaString.set("0")
-			if self.pagarrifaString.get()=="":
-				self.pagarrifaString.set("0")
-			if float(self.pagarquotaString.get())==0 and float(self.pagarloteriaString.get())==0 and float(self.pagarrifaString.get())==0:
+			if self.pagar_quota.get()=="":
+				self.pagar_quota.set("0")
+			if self.pagar_loteria.get()=="":
+				self.pagar_loteria.set("0")
+			if self.pagar_rifa.get()=="":
+				self.pagar_rifa.set("0")
+			if float(self.pagar_quota.get())==0 and float(self.pagar_loteria.get())==0 and float(self.pagar_rifa.get())==0:
 				messagebox.showwarning("Error", "No es pot fer un pagament de 0 euros")
 			else:
 				rebut=0
@@ -951,24 +913,24 @@ class FinestraGestionar(tk.Toplevel):
 					#numrebut=elRebut.AsignarNumRebut()
 				exercici_actual=arxiu.llegir_exercici_actual()
 				data=utils.calcular_data_actual()
-				id=self.idString.get()
-				faller=bd.llegir_faller(id)
+				#id=self.idString.get()
+				faller=bd.llegir_faller(self.id.get())
 				#inserta a la base de dades cada moviment realitzat
-				if float(self.pagarquotaString.get())!=0:
-					moviment=Moviment(0, data, float(self.pagarquotaString.get()), 2, 1, exercici_actual, descripcio, rebut, faller)
+				if float(self.pagar_quota.get())!=0:
+					moviment=Moviment(0, data, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarquotaString.get()), 1, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
-				if float(self.pagarloteriaString.get())!=0:
-					moviment=Moviment(0, data, float(self.pagarloteriaString.get()), 2, 2, exercici_actual, descripcio, rebut, faller)
+				if float(self.pagar_loteria.get())!=0:
+					moviment=Moviment(0, data, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarloteriaString.get()), 2, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
-				if float(self.pagarrifaString.get())!=0:
-					moviment=Moviment(0, data, float(self.pagarrifaString.get()), 2, 3, exercici_actual, descripcio, rebut, faller)
+				if float(self.pagar_rifa.get())!=0:
+					moviment=Moviment(0, data, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarrifaString.get()), 3, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				#netegem les dades i refresquem per a vore el quadre de pagaments actualitzat
-				self.idEntry.focus()
-				self.BuscarId('<Return>')
+				self.entry_id.focus()
+				self.buscar_per_id('<Return>')
 				#if opcio=="1":
 					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
 					#elRebut=Informe()
@@ -985,40 +947,40 @@ class FinestraGestionar(tk.Toplevel):
 		pagquofam=0
 		paglotfam=0
 		pagriffam=0
-		if self.pagarquotafamString.get()=="":
-			self.pagarquotafamString.set("0")
-		if self.pagarloteriafamString.get()=="":
-			self.pagarloteriafamString.set("0")
-		if self.pagarrifafamString.get()=="":
-			self.pagarrifafamString.set("0")
+		if self.pagar_quota_familia.get()=="":
+			self.pagar_quota_familia.set("0")
+		if self.pagar_loteria_familia.get()=="":
+			self.pagar_loteria_familia.set("0")
+		if self.pagar_rifa_familia.get()=="":
+			self.pagar_rifa_familia.set("0")
 		try:
-			pagquofam=float(self.pagarquotafamString.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
-			if float(self.pagarquotafamString.get())<0:
+			pagquofam=float(self.pagar_quota_familia.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
+			if float(self.pagar_quota_familia.get())<0:
 				pagquofam=0
 		except ValueError:
 			pagquofam=0
-			self.pagarquotafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
+			self.pagar_quota_familia.set(0)
+			self.pagar_total_familia.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			paglotfam=float(self.pagarloteriafamString.get())
-			if float(self.pagarloteriafamString.get())<0:
+			paglotfam=float(self.pagar_loteria_familia.get())
+			if float(self.pagar_loteria_familia.get())<0:
 				paglotfam=0
 		except ValueError:
 			paglotfam=0
-			self.pagarloteriafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(pagquofam+pagriffam) + " €")
+			self.pagar_loteria_familia.set(0)
+			self.pagar_total_familia.set("{0:.2f}".format(pagquofam+pagriffam) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			pagriffam=float(self.pagarrifafamString.get())
-			if float(self.pagarrifafamString.get())<0:
+			pagriffam=float(self.pagar_rifa_familia.get())
+			if float(self.pagar_rifa_familia.get())<0:
 				pagriffam=0
 		except ValueError:
 			pagriffam=0
-			self.pagarrifafamString.set(0)
-			self.pagartotalfamString.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
+			self.pagar_rifa_familia.set(0)
+			self.pagar_total_familia.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-		opcio=self.formapagamentfamString.get()
+		opcio=self.forma_pagament_familia.get()
 		descripcio=""
 		if opcio=="1":
 			descripcio="pagat en caixa"
@@ -1026,17 +988,18 @@ class FinestraGestionar(tk.Toplevel):
 			descripcio="pagat pel banc"
 		valor=messagebox.askquestion("Pagar","Estàs segur que vols fer el pagament?")
 		if valor=="yes":
-			if self.pagarquotafamString.get()=="":
-				self.pagarquotafamString.set("0")
-			if self.pagarloteriafamString.get()=="":
-				self.pagarloteriafamString.set("0")
-			if self.pagarrifafamString.get()=="":
-				self.pagarrifafamString.set("0")
-			if float(self.pagarquotafamString.get())==0 and float(self.pagarloteriafamString.get())==0 and float(self.pagarrifafamString.get())==0:
+			if self.pagar_quota_familia.get()=="":
+				self.pagar_quota_familia.set("0")
+			if self.pagar_loteria_familia.get()=="":
+				self.pagar_loteria_familia.set("0")
+			if self.pagar_rifa_familia.get()=="":
+				self.pagar_rifa_familia.set("0")
+			if float(self.pagar_quota_familia.get())==0 and float(self.pagar_loteria_familia.get())==0 and float(self.pagar_rifa_familia.get())==0:
 				messagebox.showwarning("Error", "No es pot fer un pagament de 0 euros")						
 			else:
-				faller=bd.llegir_faller(self.idString.get())
-				llistat_fallers=falla.llegir_fallers("familia", faller.familia.id)
+				faller=bd.llegir_faller_complet(self.id.get())
+				llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+				#falla.llegir_fallers("familia", faller.familia.id)
 				membres=0
 				idfaller=[]
 				for faller in llistat_fallers:
@@ -1053,9 +1016,9 @@ class FinestraGestionar(tk.Toplevel):
 				difquota=0
 				difloteria=0
 				difrifa=0
-				pagamentquota=float(self.pagarquotafamString.get()) #guardem els continguts en variables
-				pagamentloteria=float(self.pagarloteriafamString.get())
-				pagamentrifa=float(self.pagarrifafamString.get())
+				pagamentquota=float(self.pagar_quota_familia.get()) #guardem els continguts en variables
+				pagamentloteria=float(self.pagar_loteria_familia.get())
+				pagamentrifa=float(self.pagar_rifa_familia.get())
 				rebut=0
 				#if opcio=="1":
 					#busquem el número que li pertocarà al rebut
@@ -1143,34 +1106,33 @@ class FinestraGestionar(tk.Toplevel):
 							#elMoviment.InsertarPagament(difrifa, 3, elMoviment.exercici, val, desc, numrebut)
 						pagamentrifa=pagamentrifa-difrifa
 					membres=membres-1
-				self.idEntry.focus()
-				self.BuscarId('<Return>')
+				self.entry_id.focus()
+				self.buscar_per_id('<Return>')
 				#if opcio=="1":
 					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
 					#elRebut.Rebut(1,self.fallerCombo.get(), pagquofam, paglotfam, pagriffam, self.quotafamString.get()[:-2], self.quotapagadafamString.get()[:-2], self.loteriafamString.get()[:-2], self.loteriapagadafamString.get()[:-2], self.rifafamString.get()[:-2], self.rifapagadafamString.get()[:-2])
 
 	
-	def Asignar(self):
-
+	def assignar(self):
+		'''
+		Crea un moviment d'assignació de quota, loteria o rifa amb la descripció que li fiquem.
+		'''
 		arxiu=Arxiu("exercici")
 		bd=BaseDeDades("falla.db")
 		utils=Utils()
 		exercici_actual=arxiu.llegir_exercici_actual()
 		data=utils.calcular_data_actual()
-		descripcio=self.descripcioString.get() #recuperem la descripció per a l'assignació
-		opcio=self.asignacioString.get() #recuperem l'opció triada
 		valor=messagebox.askquestion("Asignar","Estàs segur que vols fer l'assignació?")
 		if valor=="yes":
 			try:
-				if float(self.asignarString.get())==0:
+				if float(self.total_assignacio.get())==0:
 					messagebox.showwarning("Error", "No es pot fer una assignació de 0 euros")
 				else:
-					faller=bd.llegir_faller(self.idString.get())
-					moviment=Moviment(0, data, float(self.asignarString.get()), 1, int(opcio), exercici_actual, descripcio, 0, faller)
+					faller=bd.llegir_faller(self.id.get())
+					moviment=Moviment(0, data, float(self.total_assignacio.get()), 1, int(self.concepte_assignacio.get()), exercici_actual, self.descripcio_assignacio.get(), 0, faller)
 					bd.crear_moviment(moviment)
-					#elMoviment.InsertarAsignacio(float(self.asignarString.get()), int(opcio), elMoviment.exercici, int(self.idString.get()), desc)
-					self.idEntry.focus()
-					self.BuscarId('<Return>')
+					self.entry_id.focus()
+					self.buscar_per_id('<Return>')
 			except ValueError:
 				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-				self.asignarString.set(0)
+				self.total_assignacio.set(0)

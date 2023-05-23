@@ -14,18 +14,32 @@ class Categoria():
 	nom : string
 		Forma amb la que es nombra dita categoria.
 	descripcio : string
-		Informació curta sobre les edats a les quals correspon la categoria
+		Informació curta sobre les edats a les quals correspon la categoria.
 	'''
 
 	
 	def __init__(self, id, quota, nom, descripcio):
+		'''
+		Inicialitza una nova instància de la classe Categoria.
 
+		Paràmetres:
+		-----------
+		id : int
+			El identificador a la taula "categoria" de la base de dades.
+		quota : float
+			Quantitat a pagar corresponent a dita categoria.
+		nom : string
+			Forma amb la que es nombra dita categoria.
+		descripcio : string
+			Informació curta sobre les edats a les quals correspon la categoria.
+		'''
 		self.id=id
 		self.quota=quota
 		self.nom=nom
 		self.descripcio=descripcio
 
-
+	
+	# Getters i setters
 	@property
 	def id(self):
 
@@ -74,9 +88,15 @@ class Categoria():
 		self._descripcio=value
 	
 
-
 	def calcular_categoria(self, edat):
+		'''
+		A partir de l'edat del faller assigna l'id de la categoria a la que pertany.
 
+		Paràmetres:
+		-----------
+		edat : int
+			L'edat del faller a data 19 de març del present exercici.
+		'''
 		if edat<5:
 			self.id=5
 		elif 5<=edat<=9:

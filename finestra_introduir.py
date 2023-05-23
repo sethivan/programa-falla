@@ -1,18 +1,18 @@
 '''
 Módul que conté la classe FinestraIntroduir.
-És la finestra en la qual s'indiquen les dades del nou faller per a guardar-lo a la base de dades.
+És la finestra en la qual s'indiquen les dades del nou faller per a guardar-lo
+a la base de dades.
 '''
 import tkinter as tk
-from tkinter import * # Importem les llibreries gràfiques
-from tkinter import messagebox # Importem el sistema de missatges emergents
-from tkinter import ttk # Importem les classes per al combobox
+from tkinter import * # Importem les llibreries gràfiques.
+from tkinter import messagebox # Importem el sistema de missatges emergents.
+from tkinter import ttk # Importem les classes per al combobox.
 from tkinter import LabelFrame
 
 from base_de_dades import BaseDeDades
 from arxiu import Arxiu
 
 from categoria import Categoria
-from falla import Falla
 from faller import Faller
 from familia import Familia
 
@@ -35,7 +35,8 @@ class FinestraIntroduir(tk.Toplevel):
 		Parametres:
 		-----------
 		master : tk.Tk o tk.Toplevel, opcional
-			La instància principal de l'aplicació o de la finestra que crea esta nova finestra.
+			La instància principal de l'aplicació o de la finestra
+			que crea esta nova finestra.
 			Si no es proporciona, es creará una nueva instancia de tk.Tk().
 		'''
 		super().__init__(master)
@@ -54,8 +55,8 @@ class FinestraIntroduir(tk.Toplevel):
 		self.correu=StringVar()
 		self.familia=StringVar()
 
-		self.identificadors=[] # Variable global per guardar els id_familia de la llista del combo.
-		self.identificador_familia=0 # Variable global on guardem el valor final de l'id_familia.
+		self.identificadors=[] # Atribut per guardar els id_familia de la llista del combo.
+		self.identificador_familia=0 # Atribut on guardem el valor final de l'id_familia.
 		
 		# Frames en els que dividim la finestra.
 		label_frame_dades=LabelFrame(self, text="Introduir dades")
@@ -83,8 +84,18 @@ class FinestraIntroduir(tk.Toplevel):
 		self.label_sexe=Label(label_frame_dades, text="Sexe:")
 		self.label_sexe.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_masculi=Radiobutton(label_frame_dades, text="M", variable=self.sexe, value=1)
-		self.radio_button_femeni=Radiobutton(label_frame_dades, text="F", variable=self.sexe, value=2)
+		self.radio_button_masculi=Radiobutton(
+			label_frame_dades,
+			text="M",
+			variable=self.sexe,
+			value=1
+		)
+		self.radio_button_femeni=Radiobutton(
+			label_frame_dades,
+			text="F",
+			variable=self.sexe,
+			value=2
+		)
 		self.radio_button_masculi.grid(row=1, column=1, sticky="w")
 		self.radio_button_femeni.grid(row=1, column=1)
 		self.radio_button_masculi.select() # Seleccionem masculí com a predeterminat.
@@ -192,15 +203,17 @@ class FinestraIntroduir(tk.Toplevel):
 		Utilitza la variable global "self.identificadors"
 		per a guardar tots els identificadors del llistat.
 		'''
+		bd=BaseDeDades("falla.db")
 		cadena=self.combo_box_familiar_faller.get()
-		falla=Falla()
-		llistat_fallers=falla.llegir_fallers("cognoms", cadena)
+		llistat_fallers=bd.llegir_fallers_amb_familia_per_cognom(cadena)
 		llista=[] # Llista on anem a acumular els valors.
 		self.identificadors=[]
 		for faller in llistat_fallers:
 			self.identificadors=self.identificadors+[faller.familia.id]
 			llista=llista + [(faller.cognoms + ", " + faller.nom)]
-		self.combo_box_familiar_faller["values"]=llista # Insertem cada valor en el desplegable.
+		# Insertem cada valor en el desplegable.
+		self.combo_box_familiar_faller["values"]=llista
+		bd.tancar_conexio()
 
 
 	def seleccionar_familia(self, event):
@@ -209,7 +222,8 @@ class FinestraIntroduir(tk.Toplevel):
 		a la variable "self.identificador_familia"
 		'''
 		index=self.combo_box_familiar_faller.current()
-		self.identificador_familia=self.identificadors[index] # Recollim la familia a la que pertany.
+		# Recollim la familia a la que pertany.
+		self.identificador_familia=self.identificadors[index]
 		self.identificadors=[]
 	
 
@@ -224,8 +238,6 @@ class FinestraIntroduir(tk.Toplevel):
 		arxiu=Arxiu("exercici")
 		categoria=Categoria(0,0,"","")
 		faller=Faller(0,"","","",0,"","","",0,"")
-		falla=Falla()
-		bd=BaseDeDades("falla.db")
 		exercici_actual=arxiu.llegir_exercici_actual()
 		try:
 			edat=faller.calcular_edat(self.naixement.get(), exercici_actual)
@@ -234,6 +246,7 @@ class FinestraIntroduir(tk.Toplevel):
 		else:
 			valor=messagebox.askquestion("Alta nova", "Donar d'alta el nou faller?")
 			if valor=="yes":
+				bd=BaseDeDades("falla.db")
 				categoria.calcular_categoria(edat)
 				categoria=bd.llegir_categoria(categoria.id)
 				if self.familia.get()=="1":
@@ -253,7 +266,9 @@ class FinestraIntroduir(tk.Toplevel):
 						categoria
 					)
 					bd.crear_faller(faller)
-					llistat_fallers=falla.llegir_fallers("familia", self.identificador_familia)
+					llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(
+						self.identificador_familia
+					)
 					familia.calcular_descompte(llistat_fallers)
 					bd.actualitzar_familia(familia)
 				else:
@@ -298,6 +313,6 @@ class FinestraIntroduir(tk.Toplevel):
 				self.telefon.set("")
 				self.correu.set("")
 				self.radio_button_masculi.select()
-				self.combo_box_familiar_faller.set("")
 				self.radio_button_familiar_no.select()
+				self.deshabilitar_familia()
 				self.entry_nom.focus()

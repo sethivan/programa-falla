@@ -44,7 +44,7 @@ class Familia():
 
 	
 	def calcular_descompte(self, llistat_fallers):
-
+		#falta controlar errors. Per exemple si falta la categoria
 		membres=0
 		maxima=False
 		for faller in llistat_fallers:
@@ -58,3 +58,11 @@ class Familia():
 			self.descompte=10
 		else:
 			self.descompte=0
+
+	def calcular_membres(self, llistat_fallers):
+
+		membres=0
+		for faller in llistat_fallers:
+			if faller.alta==1:
+				membres=membres+1
+		return membres

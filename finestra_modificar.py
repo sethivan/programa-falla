@@ -32,9 +32,9 @@ class FinestraModificar(tk.Toplevel):
 		self.familia=StringVar()
 
 		self.id=0 # Atribut on guardem el id del faller que ens passa la finestra "gestionar".
-		self.fam=0
+		self.id_familia=0
 		self.identificadors=[] #variable per a controlar el camp idfamilia de la llista de noms del combo
-		self.identfamilia=0 #variable on guardem el valor final del idfamilia
+		self.identificador_familia=0 #variable on guardem el valor final del idfamilia
 		self.modificacio=0
 
 		# Frames en els que dividim la finestra.
@@ -109,8 +109,20 @@ class FinestraModificar(tk.Toplevel):
 		self.label_opcio_familiar=Label(label_frame_familiar, text="Familiar en la falla:")
 		self.label_opcio_familiar.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_familia_si=Radiobutton(label_frame_familiar, text="Si", variable=self.familia, value=1)
-		self.radio_button_familia_no=Radiobutton(label_frame_familiar, text="No", variable=self.familia, value=2)
+		self.radio_button_familia_si=Radiobutton(
+			label_frame_familiar,
+			text="Si",
+			variable=self.familia,
+			value=1,
+			command=self.habilitar_familia
+		)
+		self.radio_button_familia_no=Radiobutton(
+			label_frame_familiar,
+			text="No",
+			variable=self.familia,
+			value=2,
+			command=self.deshabilitar_familia
+		)
 		self.radio_button_familia_si.grid(row=1, column=1, sticky="w")
 		self.radio_button_familia_no.grid(row=1, column=1)
 		self.radio_button_familia_no.select()
@@ -143,25 +155,53 @@ class FinestraModificar(tk.Toplevel):
 		self.adresa.set(faller.adresa)
 		self.telefon.set(faller.telefon)
 		self.correu.set(faller.correu)
-		self.fam=str(faller.familia.id)
+		self.id_familia=str(faller.familia.id)
 		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 		llista=[]
-		familiars=0
 		for faller in llistat_fallers:
 			if faller.id!=id:
 				llista=llista + [(faller.cognoms + ", " + faller.nom)]
-			familiars=familiars+1
-		if familiars>1:
-			self.combo_box_familia.set(llista[0])
+		if len(llistat_fallers)>1:
 			self.familia.set(1)
-		elif familiars==1:
-			self.familia.set(2)	
+			self.combo_box_familia.set(llista[0])
+		elif len(llistat_fallers)==1:
+			self.familia.set(2)
+			self.deshabilitar_familia()
 		bd.tancar_conexio()
 		self.grab_set()
 		self.transient(self.master)
 		self.mainloop()
 
+	
+	def habilitar_familia(self):
+		'''
+		Habilita el combobox per a indicar la familia del faller
+		quan el Radiobutton de familia esta en "si".
+		'''
+		bd=BaseDeDades("falla.db")
+		self.combo_box_familia.configure(state="normal")
+		faller=bd.llegir_faller_complet(self.id)
+		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
+		llista=[]
+		for faller in llistat_fallers:
+			if faller.id!=self.id:
+				llista=llista + [(faller.cognoms + ", " + faller.nom)]
+		if len(llistat_fallers)>1:
+			self.combo_box_familia.set(llista[0])
+		bd.tancar_conexio()
 
+	
+	def deshabilitar_familia(self):
+		'''
+		Deshabilita el combobox per a indicar la familia del faller
+		quan el Radiobutton de familia esta en "no" i elimina el seu contingut.
+		'''
+		self.combo_box_familia.configure(state="disabled")
+		self.combo_box_familia.delete(0, tk.END) # Borra tot el contingut de la llista
+		self.combo_box_familia.set("") # Borra l'element que es queda a la vista
+		self.identificador_familia=0 # Borra l'identificador de familia en cas que s'haguera creat.
+
+	
 	def desplegar_familia(self):
 		'''
 		Controla el combobox comparant la cadena escrita amb la base de dades i mostrant els resultats en el combobox.
@@ -184,7 +224,7 @@ class FinestraModificar(tk.Toplevel):
 		Controla la selecció del combobox per a guardar el identificador de la familia i omplir les dades a partir d'aquest.
 		'''
 		index=self.combo_box_familia.current()
-		self.identfamilia=self.identificadors[index]
+		self.identificador_familia=self.identificadors[index]
 		self.identificadors=[]
 	
 
@@ -202,94 +242,72 @@ class FinestraModificar(tk.Toplevel):
 		else:
 			valor=messagebox.askquestion("Modificar dades","Vols modificar les dades del faller?")
 			if valor=="yes":
-				#crear un historial nou si ha canviat la data de naixement PENDENT!!!!!!!!
 				categoria.calcular_categoria(edat)
 				categoria=bd.llegir_categoria(categoria.id)
 				faller.nom=self.nom.get()
 				faller.cognoms=self.cognoms.get()
-				faller.naixement=self.naixement.get()
 				faller.sexe=self.sexe.get()
 				faller.dni=self.dni.get()
 				faller.adresa=self.adresa.get()
 				faller.telefon=self.telefon.get()
 				faller.correu=self.correu.get()
 				faller.categoria=categoria
-				bd.actualitzar_faller(faller)
-				self.destroy()
+				if faller.naixement!=self.naixement.get():
+					valor=messagebox.askquestion("Modificar dades","Has modificat la data de naixement del faller i s'haurà de crear un nou historial, estas segur?")
+					if valor=="yes":
+						faller.naixement=self.naixement.get()
+						exercici=faller.calcular_primer_exercici(faller.naixement)
+						historial={}
+						while exercici < exercici_actual:
+							historial[exercici]=["baixa", ""]
+							exercici=exercici+1
+						historial[exercici_actual]=["vocal", "Sants Patrons"]
+						nom_arxiu="historials"+"/"+str(faller.id)
+						arxiu=Arxiu(nom_arxiu)
+						arxiu.modificar_historial(historial)
 
-	
-	def CanviFamiliabt(self):
-		
-		#cadena=self.identfamilia
-		#elFaller=Faller()
-		bd=BaseDeDades("falla.db")
-		faller=bd.llegir_faller_complet(self.id)
-		if self.familia.get()=="1": #si va a pertanyer a una familia
-			familia=bd.llegir_familia(self.identfamilia)
-			faller.familia=familia
-			bd.actualitzar_faller(faller)
-			#elFaller.ModificarFamilia(self.id, cadena)
-		else: #creem familia nova
-			#laFamilia=Familia()
-			#laFamilia.InsertarFamilia()
-			#laFamilia.RecuperarUltimaFamilia()
-			#ultimid=laFamilia.id
-			#elFaller.ModificarFamilia(self.id, ultimid)
-			familia=Familia(0, 0, 0)
-			bd.crear_familia(familia)
-			familia=bd.llegir_ultima_familia()
-			faller.familia=familia
-			bd.actualitzar_faller(faller)
-		#comprovar els descomptes familiars en les dos families
-		#familia 1
-		#res1=elFaller.BuscarFallerPerIdfamilia(self.fam)
-		#fem el càlcul dels descompte a partir dels membres i si hi ha una quota màxima
-		#membres=0
-		#maxima=False
-		#descompte=0
-		#for faller in llistat_fallers:
-			#if faller.alta==1: #si el faller está actiu
-				#membres=membres + 1
-				#if val[10]==1: #si la quota es màxima
-					#maxima=True
-		familia=bd.llegir_familia(self.fam)
-		llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(self.fam)
-		
-		#laFamilia=Familia()
-		membres=familia.calcular_membres(llistat_fallers)
-		if membres==0:
-			bd.eliminar_familia(self.fam)
-			#laFamilia.BorrarFamilia(self.fam)
-		else:
-			familia.calcular_descompte(llistat_fallers)
-			bd.actualitzar_familia(familia)
-			#if maxima==True and membres==3:
-				#descompte=5
-			#if maxima==True and membres>=4:
-				#descompte=10
-			#laFamilia.AsignarDescompteFamilia(self.fam, descompte) #asignem el descompte a la familia
-		
-		#familia 2
-		faller=bd.llegir_faller_complet(self.id)
-		#elFaller2=Faller()
-		#elFaller2.BuscarFallerPerId(self.id)
-		#fam2=str(elFaller2.familia)
-		llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(faller.familia.id)
-		#res2=elFaller.BuscarFallerPerIdfamilia(fam2)
-		#fem el càlcul dels descompte a partir dels membres i si hi ha una quota màxima
-		faller.familia.calcular_descompte(llistat_fallers)
-		bd.actualitzar_familia(faller.familia)
-		#membres=0
-		#maxima=False
-		#descompte=0
-		#for val in res2:
-			#if val[8]==1: #si el faller está actiu
-				#membres=membres + 1
-				#if val[10]==1: #si la quota es màxima
-					#maxima=True
-		#if maxima==True and membres==3:
-			#descompte=5
-		#if maxima==True and membres>=4:
-			#descompte=10
-		#laFamilia=Familia()
-		#laFamilia.AsignarDescompteFamilia(fam2, descompte) #asignem el descompte a la familia
+				llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
+
+				if faller.familia.id!=self.identificador_familia and self.identificador_familia!=0:
+					
+					#si estava sol i entra en familia
+					if len(llistat_fallers)==1:
+						faller.familia=bd.llegir_familia(self.identificador_familia)
+						bd.actualitzar_faller(faller)
+						bd.eliminar_familia(self.id_familia)
+						llistat_fallers=[]
+						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+						faller.familia.calcular_descompte(llistat_fallers)
+						bd.actualitzar_familia(faller.familia)
+					#si estava en familia i canvia de familia
+					else:
+						faller.familia=bd.llegir_familia(self.identificador_familia)
+						bd.actualitzar_faller(faller)
+						#actualitcem familia vella
+						llistat_fallers=[]
+						llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
+						familia=Familia(self.id_familia,0,0)
+						familia.calcular_descompte(llistat_fallers)
+						bd.actualitzar_familia(familia)
+						#actualitcem familia nova
+						llistat_fallers=[]
+						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+						faller.familia.calcular_descompte(llistat_fallers)
+						bd.actualitzar_familia(faller.familia)
+					
+				elif len(llistat_fallers)>1 and self.identificador_familia==0:
+					#si estava en familia i passa a estar sol
+					familia=Familia(0, 0, 0)
+					bd.crear_familia(familia)
+					faller.familia=bd.llegir_ultima_familia()
+					print(faller.familia.descompte)
+					bd.actualitzar_faller(faller)
+					#actualitcem familia vella
+					llistat_fallers=[]
+					llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
+					familia=Familia(self.id_familia,0,0)
+					familia.calcular_descompte(llistat_fallers)
+					bd.actualitzar_familia(familia)
+
+				bd.tancar_conexio()
+				self.destroy()

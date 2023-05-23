@@ -174,7 +174,7 @@ class Faller():
 			edat=int(any_exercici)-int(any_naixement)-1
 		else:
 			edat=int(any_exercici)-int(any_naixement)
-		return(edat)
+		return edat
 	
 
 	def calcular_primer_exercici(self, naixement):
@@ -187,7 +187,7 @@ class Faller():
 			exercici=int(any_naixement)+1
 		else:
 			exercici=int(any_naixement)
-		return(exercici)
+		return exercici
 
      
 
