@@ -351,6 +351,40 @@ class BaseDeDades:
             messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
             return None
         
+        
+    def llegir_fallers_complets_per_alta(self, alta):
+        '''
+        Llig de la taula "faller" tots aquells fallers amb l'estat d'alta del faller
+        passat per paràmetre.
+
+        Paràmetres:
+        -----------
+        alta : integer
+            Identificador de l'estat d'alta del faller.
+
+        Retorna:
+        --------
+        llistat_fallers : llista
+            Llistat d'objectes de la classe Faller.
+        '''
+        query_params=(alta,)
+        try:
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.alta=? ORDER BY faller.cognoms", query_params)
+            resultat = self.cursor.fetchall()
+            llistat_fallers=[]
+            for valors in resultat:
+                familia= Familia(valors[12], valors[13], valors[14])
+                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                llistat_fallers.append(faller)
+            return llistat_fallers
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+        
 
     def llegir_quota_faller(self, id):
         '''

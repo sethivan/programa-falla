@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter import *
+import tkinter.ttk as ttk
 from tkinter import messagebox
-from tkinter import ttk
 from tkinter import LabelFrame
 
 from base_de_dades import BaseDeDades
@@ -21,15 +20,15 @@ class FinestraModificar(tk.Toplevel):
 		self.title("Modificar Dades del Faller")
 		self.iconbitmap("escut.ico")
 
-		self.nom=StringVar()
-		self.cognoms=StringVar()
-		self.naixement=StringVar()
-		self.sexe=StringVar()
-		self.dni=StringVar()
-		self.adresa=StringVar()
-		self.telefon=StringVar()
-		self.correu=StringVar()
-		self.familia=StringVar()
+		self.nom=tk.StringVar()
+		self.cognoms=tk.StringVar()
+		self.naixement=tk.StringVar()
+		self.sexe=tk.StringVar()
+		self.dni=tk.StringVar()
+		self.adresa=tk.StringVar()
+		self.telefon=tk.StringVar()
+		self.correu=tk.StringVar()
+		self.familia=tk.StringVar()
 
 		self.id=0 # Atribut on guardem el id del faller que ens passa la finestra "gestionar".
 		self.id_familia=0
@@ -47,76 +46,76 @@ class FinestraModificar(tk.Toplevel):
 		# Widgets per a cada frame.
 
 		# Frame Dades personals.
-		self.label_nom=Label(label_frame_dades, text="Nom:")
+		self.label_nom=tk.Label(label_frame_dades, text="Nom:")
 		self.label_nom.grid(row=0, column=0, sticky="e")
 
-		self.entry_nom=Entry(label_frame_dades, textvariable=self.nom)
+		self.entry_nom=tk.Entry(label_frame_dades, textvariable=self.nom)
 		self.entry_nom.grid(row=0, column=1)
 
-		self.label_cognoms=Label(label_frame_dades, text="Cognoms:")
+		self.label_cognoms=tk.Label(label_frame_dades, text="Cognoms:")
 		self.label_cognoms.grid(row=0, column=2, sticky="e")
 
-		self.entry_cognoms=Entry(label_frame_dades, textvariable=self.cognoms)
+		self.entry_cognoms=tk.Entry(label_frame_dades, textvariable=self.cognoms)
 		self.entry_cognoms.grid(row=0, column=3)
 
-		self.label_sexe=Label(label_frame_dades, text="Sexe:")
+		self.label_sexe=tk.Label(label_frame_dades, text="Sexe:")
 		self.label_sexe.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_masculi=Radiobutton(label_frame_dades, text="M", variable=self.sexe, value=1)
-		self.radio_button_femeni=Radiobutton(label_frame_dades, text="F", variable=self.sexe, value=2)
+		self.radio_button_masculi=tk.Radiobutton(label_frame_dades, text="M", variable=self.sexe, value=1)
+		self.radio_button_femeni=tk.Radiobutton(label_frame_dades, text="F", variable=self.sexe, value=2)
 		self.radio_button_masculi.grid(row=1, column=1, sticky="w")
 		self.radio_button_femeni.grid(row=1, column=1)
 		self.radio_button_masculi.select()
 
-		self.label_naixement=Label(label_frame_dades, text="Data de naixement:")
+		self.label_naixement=tk.Label(label_frame_dades, text="Data de naixement:")
 		self.label_naixement.grid(row=1, column=2, sticky="e")
 
-		self.entry_naixement=Entry(label_frame_dades, textvariable=self.naixement)
+		self.entry_naixement=tk.Entry(label_frame_dades, textvariable=self.naixement)
 		self.entry_naixement.grid(row=1, column=3)
 
-		self.label_dni=Label(label_frame_dades, text="DNI:")
+		self.label_dni=tk.Label(label_frame_dades, text="DNI:")
 		self.label_dni.grid(row=2, column=0, sticky="e")
 
-		self.entry_dni=Entry(label_frame_dades, textvariable=self.dni)
+		self.entry_dni=tk.Entry(label_frame_dades, textvariable=self.dni)
 		self.entry_dni.grid(row=2, column=1)
 
-		self.label_adresa=Label(label_frame_dades, text="Adreça:")
+		self.label_adresa=tk.Label(label_frame_dades, text="Adreça:")
 		self.label_adresa.grid(row=2, column=2, sticky="e")
 
-		self.entry_adresa=Entry(label_frame_dades, textvariable=self.adresa)
+		self.entry_adresa=tk.Entry(label_frame_dades, textvariable=self.adresa)
 		self.entry_adresa.grid(row=2, column=3)
 
-		self.label_telefon=Label(label_frame_dades, text="Telèfon:")
+		self.label_telefon=tk.Label(label_frame_dades, text="Telèfon:")
 		self.label_telefon.grid(row=3, column=0, sticky="e")
 
-		self.entry_telefon=Entry(label_frame_dades, textvariable=self.telefon)
+		self.entry_telefon=tk.Entry(label_frame_dades, textvariable=self.telefon)
 		self.entry_telefon.grid(row=3, column=1)
 
-		self.label_correu=Label(label_frame_dades, text="Correu electrònic:")
+		self.label_correu=tk.Label(label_frame_dades, text="Correu electrònic:")
 		self.label_correu.grid(row=3, column=2, sticky="e")
 
-		self.entry_correu=Entry(label_frame_dades, textvariable=self.correu)
+		self.entry_correu=tk.Entry(label_frame_dades, textvariable=self.correu)
 		self.entry_correu.grid(row=3, column=3)
 
 		# Frame Familiar del faller.
-		self.label_nom_familiar=Label(label_frame_familiar, text="Cognoms i nom:")
+		self.label_nom_familiar=tk.Label(label_frame_familiar, text="Cognoms i nom:")
 		self.label_nom_familiar.grid(row=0, column=0)
 
 		self.combo_box_familia=ttk.Combobox(label_frame_familiar, width=30, postcommand=self.desplegar_familia)
 		self.combo_box_familia.grid(row=0, column=1)
 		self.combo_box_familia.bind("<<ComboboxSelected>>", self.seleccionar_familia)
 
-		self.label_opcio_familiar=Label(label_frame_familiar, text="Familiar en la falla:")
+		self.label_opcio_familiar=tk.Label(label_frame_familiar, text="Familiar en la falla:")
 		self.label_opcio_familiar.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_familia_si=Radiobutton(
+		self.radio_button_familia_si=tk.Radiobutton(
 			label_frame_familiar,
 			text="Si",
 			variable=self.familia,
 			value=1,
 			command=self.habilitar_familia
 		)
-		self.radio_button_familia_no=Radiobutton(
+		self.radio_button_familia_no=tk.Radiobutton(
 			label_frame_familiar,
 			text="No",
 			variable=self.familia,
@@ -128,11 +127,8 @@ class FinestraModificar(tk.Toplevel):
 		self.radio_button_familia_no.select()
 
 		# Botons.
-		self.button_actualitzar=Button(self, text="Actualitzar dades", command=self.Actualitzarbt)
+		self.button_actualitzar=tk.Button(self, text="Actualitzar dades", command=self.actualitzar)
 		self.button_actualitzar.grid(row=3, column=0, padx=5)
-
-		self.button_canvi_familia=Button(self, text="Canviar familia", command=self.CanviFamiliabt)
-		self.button_canvi_familia.grid(row=3, column=1, padx=5)
 
 
 	def iniciar(self, id):
@@ -197,8 +193,8 @@ class FinestraModificar(tk.Toplevel):
 		quan el Radiobutton de familia esta en "no" i elimina el seu contingut.
 		'''
 		self.combo_box_familia.configure(state="disabled")
-		self.combo_box_familia.delete(0, tk.END) # Borra tot el contingut de la llista
-		self.combo_box_familia.set("") # Borra l'element que es queda a la vista
+		self.combo_box_familia.delete(0, tk.END) # Borra tot el contingut de la llista.
+		self.combo_box_familia.set("") # Borra l'element que es queda a la vista.
 		self.identificador_familia=0 # Borra l'identificador de familia en cas que s'haguera creat.
 
 	
@@ -228,8 +224,13 @@ class FinestraModificar(tk.Toplevel):
 		self.identificadors=[]
 	
 
-	def Actualitzarbt(self):
-		
+	def actualitzar(self):
+		'''
+		Es fica en marxa al fer clic en el botó "actualitzar".
+		Es lligen totes les dades presents en el formulari i s'actualitza la base de dades.
+		En el cas del canvi de familia, s'evalúa si aquest canvi existeix i es recalculen
+		els diferents descomptes familiars.
+		'''
 		arxiu=Arxiu("exercici")
 		bd=BaseDeDades("falla.db")
 		categoria=Categoria(0,0,"","")
@@ -265,12 +266,10 @@ class FinestraModificar(tk.Toplevel):
 						nom_arxiu="historials"+"/"+str(faller.id)
 						arxiu=Arxiu(nom_arxiu)
 						arxiu.modificar_historial(historial)
-
+				# Canvis de familia.
 				llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
-
-				if faller.familia.id!=self.identificador_familia and self.identificador_familia!=0:
-					
-					#si estava sol i entra en familia
+				if faller.familia.id!=self.identificador_familia and self.identificador_familia!=0:					
+					# Si estava sol i entra en familia.
 					if len(llistat_fallers)==1:
 						faller.familia=bd.llegir_familia(self.identificador_familia)
 						bd.actualitzar_faller(faller)
@@ -279,35 +278,33 @@ class FinestraModificar(tk.Toplevel):
 						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
 						faller.familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(faller.familia)
-					#si estava en familia i canvia de familia
+					# Si estava en familia i canvia de familia.
 					else:
 						faller.familia=bd.llegir_familia(self.identificador_familia)
 						bd.actualitzar_faller(faller)
-						#actualitcem familia vella
+						# Actualitzem familia vella
 						llistat_fallers=[]
 						llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
 						familia=Familia(self.id_familia,0,0)
 						familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(familia)
-						#actualitcem familia nova
+						# Actualitzem familia nova
 						llistat_fallers=[]
 						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
 						faller.familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(faller.familia)
-					
-				elif len(llistat_fallers)>1 and self.identificador_familia==0:
-					#si estava en familia i passa a estar sol
+				# Si estava en familia i passa a estar sol	
+				elif len(llistat_fallers)>1 and self.identificador_familia==0:					
 					familia=Familia(0, 0, 0)
 					bd.crear_familia(familia)
 					faller.familia=bd.llegir_ultima_familia()
 					print(faller.familia.descompte)
 					bd.actualitzar_faller(faller)
-					#actualitcem familia vella
+					# Actualitzem familia vella
 					llistat_fallers=[]
 					llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
 					familia=Familia(self.id_familia,0,0)
 					familia.calcular_descompte(llistat_fallers)
 					bd.actualitzar_familia(familia)
-
 				bd.tancar_conexio()
 				self.destroy()

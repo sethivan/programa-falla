@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter import *
+import tkinter.ttk as ttk
 from tkinter import messagebox
-from tkinter import ttk
 from tkinter import LabelFrame
 
 from arxiu import Arxiu
@@ -35,56 +34,56 @@ class FinestraGestionar(tk.Toplevel):
 		self.title("Gestionar Faller")
 		self.iconbitmap("escut.ico")
 
-		self.exercici=StringVar()
-		self.id=StringVar()
-		self.nom=StringVar()
-		self.naixement=StringVar()
-		self.dni=StringVar()
-		self.adresa=StringVar()
-		self.telefon=StringVar()
-		self.correu=StringVar()
+		self.exercici=tk.StringVar()
+		self.id=tk.StringVar()
+		self.nom=tk.StringVar()
+		self.naixement=tk.StringVar()
+		self.dni=tk.StringVar()
+		self.adresa=tk.StringVar()
+		self.telefon=tk.StringVar()
+		self.correu=tk.StringVar()
 
-		self.membres_familia=StringVar()
+		self.membres_familia=tk.StringVar()
 
-		self.quota_assignada=StringVar()
-		self.quota_pagada=StringVar()
-		self.deute_quota=StringVar()
-		self.pagar_quota=StringVar()
-		self.loteria_assignada=StringVar()
-		self.loteria_pagada=StringVar()
-		self.deute_loteria=StringVar()
-		self.pagar_loteria=StringVar()
-		self.rifa_assignada=StringVar()
-		self.rifa_pagada=StringVar()
-		self.deute_rifa=StringVar()
-		self.pagar_rifa=StringVar()
-		self.total_assignat=StringVar()
-		self.total_pagat=StringVar()
-		self.deute_total=StringVar()
-		self.pagar_total=StringVar()
-		self.forma_pagament=StringVar()
+		self.quota_assignada=tk.StringVar()
+		self.quota_pagada=tk.StringVar()
+		self.deute_quota=tk.StringVar()
+		self.pagar_quota=tk.StringVar()
+		self.loteria_assignada=tk.StringVar()
+		self.loteria_pagada=tk.StringVar()
+		self.deute_loteria=tk.StringVar()
+		self.pagar_loteria=tk.StringVar()
+		self.rifa_assignada=tk.StringVar()
+		self.rifa_pagada=tk.StringVar()
+		self.deute_rifa=tk.StringVar()
+		self.pagar_rifa=tk.StringVar()
+		self.total_assignat=tk.StringVar()
+		self.total_pagat=tk.StringVar()
+		self.deute_total=tk.StringVar()
+		self.pagar_total=tk.StringVar()
+		self.forma_pagament=tk.StringVar()
 		
-		self.quota_assignada_familia=StringVar()
-		self.quota_pagada_familia=StringVar()
-		self.deute_quota_familia=StringVar()
-		self.pagar_quota_familia=StringVar()
-		self.loteria_assignada_familia=StringVar()
-		self.loteria_pagada_familia=StringVar()
-		self.deute_loteria_familia=StringVar()
-		self.pagar_loteria_familia=StringVar()
-		self.rifa_assignada_familia=StringVar()
-		self.rifa_pagada_familia=StringVar()
-		self.deute_rifa_familia=StringVar()
-		self.pagar_rifa_familia=StringVar()
-		self.total_assignat_familia=StringVar()
-		self.total_pagat_familia=StringVar()
-		self.deute_total_familia=StringVar()
-		self.pagar_total_familia=StringVar()
-		self.forma_pagament_familia=StringVar()
+		self.quota_assignada_familia=tk.StringVar()
+		self.quota_pagada_familia=tk.StringVar()
+		self.deute_quota_familia=tk.StringVar()
+		self.pagar_quota_familia=tk.StringVar()
+		self.loteria_assignada_familia=tk.StringVar()
+		self.loteria_pagada_familia=tk.StringVar()
+		self.deute_loteria_familia=tk.StringVar()
+		self.pagar_loteria_familia=tk.StringVar()
+		self.rifa_assignada_familia=tk.StringVar()
+		self.rifa_pagada_familia=tk.StringVar()
+		self.deute_rifa_familia=tk.StringVar()
+		self.pagar_rifa_familia=tk.StringVar()
+		self.total_assignat_familia=tk.StringVar()
+		self.total_pagat_familia=tk.StringVar()
+		self.deute_total_familia=tk.StringVar()
+		self.pagar_total_familia=tk.StringVar()
+		self.forma_pagament_familia=tk.StringVar()
 		
-		self.concepte_assignacio=StringVar()
-		self.descripcio_assignacio=StringVar()
-		self.total_assignacio=StringVar()
+		self.concepte_assignacio=tk.StringVar()
+		self.descripcio_assignacio=tk.StringVar()
+		self.total_assignacio=tk.StringVar()
 
 		self.identificadors=[] # Atribut per guardar els id_faller del llistat del combo.
 		self.modificar_oberta=0 # Atribut amb què controlem l'obertura de la finestra FinestraModificar.
@@ -118,21 +117,21 @@ class FinestraGestionar(tk.Toplevel):
 		# Widgets per a cada frame.
 
 		# Frame "Exercici".
-		self.entry_exercici=Entry(label_frame_exercici, width=10, state="disabled", disabledforeground="black", textvariable=self.exercici)
+		self.entry_exercici=tk.Entry(label_frame_exercici, width=10, state="disabled", disabledforeground="black", textvariable=self.exercici)
 		self.entry_exercici.pack()
 
 		# Frame "Buscar faller"
-		self.button_alta=Button(label_frame_buscar, state="disabled", width=15, text="Donar d'alta", command=self.canviar_estat)
+		self.button_alta=tk.Button(label_frame_buscar, state="disabled", width=15, text="Donar d'alta", command=self.canviar_estat)
 		self.button_alta.grid(row=0, column=0, padx=5, sticky="w"+"e")
 		
-		self.label_id=Label(label_frame_buscar, text="ID del faller:")
+		self.label_id=tk.Label(label_frame_buscar, text="ID del faller:")
 		self.label_id.grid(row=0, column=1)
 
-		self.entry_id=Entry(label_frame_buscar, width=8, textvariable=self.id)
+		self.entry_id=tk.Entry(label_frame_buscar, width=8, textvariable=self.id)
 		self.entry_id.grid(row=0, column=2)
 		self.entry_id.bind('<Return>', self.buscar_per_id)
 
-		self.label_nom=Label(label_frame_buscar, text="Cognoms i nom:")
+		self.label_nom=tk.Label(label_frame_buscar, text="Cognoms i nom:")
 		self.label_nom.grid(row=0, column=3)
 
 		self.combo_box_faller=ttk.Combobox(label_frame_buscar, width=30, postcommand=self.desplegar_faller)
@@ -140,245 +139,245 @@ class FinestraGestionar(tk.Toplevel):
 		self.combo_box_faller.bind("<<ComboboxSelected>>", self.seleccionar_faller)
 
 		# Frame "Dades personals".
-		self.label_naixement=Label(label_frame_dades, text="Data de naixement:")
+		self.label_naixement=tk.Label(label_frame_dades, text="Data de naixement:")
 		self.label_naixement.grid(row=0, column=0, sticky="e")
 
-		self.entry_naixement=Entry(label_frame_dades, state="disabled", textvariable=self.naixement)
+		self.entry_naixement=tk.Entry(label_frame_dades, state="disabled", textvariable=self.naixement)
 		self.entry_naixement.grid(row=0, column=1)
 
-		self.label_dni=Label(label_frame_dades, text="DNI:")
+		self.label_dni=tk.Label(label_frame_dades, text="DNI:")
 		self.label_dni.grid(row=0, column=2, sticky="e")
 
-		self.entry_dni=Entry(label_frame_dades, state="disabled", textvariable=self.dni)
+		self.entry_dni=tk.Entry(label_frame_dades, state="disabled", textvariable=self.dni)
 		self.entry_dni.grid(row=0, column=3)
 
-		self.label_adresa=Label(label_frame_dades, text="Adreça:")
+		self.label_adresa=tk.Label(label_frame_dades, text="Adreça:")
 		self.label_adresa.grid(row=1, column=0, sticky="e")
 
-		self.entry_adresa=Entry(label_frame_dades, state="disabled", textvariable=self.adresa)
+		self.entry_adresa=tk.Entry(label_frame_dades, state="disabled", textvariable=self.adresa)
 		self.entry_adresa.grid(row=1, column=1)
 
-		self.label_telefon=Label(label_frame_dades, text="Telèfon:")
+		self.label_telefon=tk.Label(label_frame_dades, text="Telèfon:")
 		self.label_telefon.grid(row=1, column=2, sticky="e")
 
-		self.entry_telefon=Entry(label_frame_dades, state="disabled", textvariable=self.telefon)
+		self.entry_telefon=tk.Entry(label_frame_dades, state="disabled", textvariable=self.telefon)
 		self.entry_telefon.grid(row=1, column=3)
 
-		self.label_correu=Label(label_frame_dades, text="Correu electrònic:")
+		self.label_correu=tk.Label(label_frame_dades, text="Correu electrònic:")
 		self.label_correu.grid(row=2, column=0, sticky="e")
 
-		self.entry_correu=Entry(label_frame_dades, state="disabled", textvariable=self.correu)
+		self.entry_correu=tk.Entry(label_frame_dades, state="disabled", textvariable=self.correu)
 		self.entry_correu.grid(row=2, column=1)
 
-		self.button_modificar=Button(label_frame_dades, state="disabled", text="Modificar dades", command=self.modificar)
+		self.button_modificar=tk.Button(label_frame_dades, state="disabled", text="Modificar dades", command=self.modificar)
 		self.button_modificar.grid(row=2, column=3)
 
 		#Frame "Familia".
-		self.label_familia=Label(label_frame_familia, text="Membres de la familia:")
+		self.label_familia=tk.Label(label_frame_familia, text="Membres de la familia:")
 		self.label_familia.grid(row=0, column=0)
 
 		self.combo_box_familia=ttk.Combobox(label_frame_familia, postcommand=self.desplegar_familia)
 		self.combo_box_familia.grid(row=0, column=1)
 		self.combo_box_familia.bind("<<ComboboxSelected>>", self.seleccionar_familia)
 
-		self.label_membres=Label(label_frame_familia, text="Membres actius:")
+		self.label_membres=tk.Label(label_frame_familia, text="Membres actius:")
 		self.label_membres.grid(row=0, column=2)
 
-		self.entry_membres=Entry(label_frame_familia, width=4, state="disabled", disabledforeground="black", textvariable=self.membres_familia)
+		self.entry_membres=tk.Entry(label_frame_familia, width=4, state="disabled", disabledforeground="black", textvariable=self.membres_familia)
 		self.entry_membres.grid(row=0, column=3)
 
 		#Frame "Moviments".
-		self.label_assignat=Label(label_frame_moviments, text="Assignat")
+		self.label_assignat=tk.Label(label_frame_moviments, text="Assignat")
 		self.label_assignat.grid(row=0, column=1)
 
-		self.label_pagat=Label(label_frame_moviments, text="Pagat")
+		self.label_pagat=tk.Label(label_frame_moviments, text="Pagat")
 		self.label_pagat.grid(row=0, column=2)
 
-		self.label_diferencia=Label(label_frame_moviments, text="Diferència")
+		self.label_diferencia=tk.Label(label_frame_moviments, text="Diferència")
 		self.label_diferencia.grid(row=0, column=3)
 
-		self.label_quota=Label(label_frame_moviments, text="Quota:")
+		self.label_quota=tk.Label(label_frame_moviments, text="Quota:")
 		self.label_quota.grid(row=1, column=0, sticky="e")
 
-		self.entry_quota_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada)
+		self.entry_quota_assignada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada)
 		self.entry_quota_assignada.grid(row=1, column=1)
 
-		self.entry_quota_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada)
+		self.entry_quota_pagada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada)
 		self.entry_quota_pagada.grid(row=1, column=2)
 
-		self.entry_deute_quota=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota)
+		self.entry_deute_quota=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota)
 		self.entry_deute_quota.grid(row=1, column=3)
 
-		self.entry_pagar_quota=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_quota)
+		self.entry_pagar_quota=tk.Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_quota)
 		self.entry_pagar_quota.grid(row=1, column=4)
 		self.entry_pagar_quota.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_quota))
 		self.entry_pagar_quota.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_quota))
 
-		self.label_loteria=Label(label_frame_moviments, text="Loteria:")
+		self.label_loteria=tk.Label(label_frame_moviments, text="Loteria:")
 		self.label_loteria.grid(row=2, column=0, sticky="e")
 
-		self.entry_loteria_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada)
+		self.entry_loteria_assignada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada)
 		self.entry_loteria_assignada.grid(row=2, column=1)
 
-		self.entry_loteria_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada)
+		self.entry_loteria_pagada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada)
 		self.entry_loteria_pagada.grid(row=2, column=2)
 
-		self.entry_deute_loteria=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria)
+		self.entry_deute_loteria=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria)
 		self.entry_deute_loteria.grid(row=2, column=3)
 
-		self.entry_pagar_loteria=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_loteria)
+		self.entry_pagar_loteria=tk.Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_loteria)
 		self.entry_pagar_loteria.grid(row=2, column=4)
 		self.entry_pagar_loteria.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_loteria))
 		self.entry_pagar_loteria.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_loteria))
 
-		self.label_rifa=Label(label_frame_moviments, text="Rifa:")
+		self.label_rifa=tk.Label(label_frame_moviments, text="Rifa:")
 		self.label_rifa.grid(row=3, column=0, sticky="e")
 
-		self.entry_rifa_assignada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada)
+		self.entry_rifa_assignada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada)
 		self.entry_rifa_assignada.grid(row=3, column=1)
 
-		self.entry_rifa_pagada=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada)
+		self.entry_rifa_pagada=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada)
 		self.entry_rifa_pagada.grid(row=3, column=2)
 
-		self.entry_deute_rifa=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa)
+		self.entry_deute_rifa=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa)
 		self.entry_deute_rifa.grid(row=3, column=3)
 
-		self.entry_pagar_rifa=Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_rifa)
+		self.entry_pagar_rifa=tk.Entry(label_frame_moviments, width=15, state="disabled", textvariable=self.pagar_rifa)
 		self.entry_pagar_rifa.grid(row=3, column=4)
 		self.entry_pagar_rifa.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_rifa))
 		self.entry_pagar_rifa.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_rifa))
 
-		self.label_totals=Label(label_frame_moviments, text="Totals:")
+		self.label_totals=tk.Label(label_frame_moviments, text="Totals:")
 		self.label_totals.grid(row=4, column=0, sticky="e")
 
-		self.entry_total_assignat=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat)
+		self.entry_total_assignat=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat)
 		self.entry_total_assignat.grid(row=4, column=1)
 
-		self.entry_total_pagat=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat)
+		self.entry_total_pagat=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat)
 		self.entry_total_pagat.grid(row=4, column=2)
 
-		self.entry_deute_total=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total)
+		self.entry_deute_total=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total)
 		self.entry_deute_total.grid(row=4, column=3)
 
-		self.entry_pagar_total=Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total)
+		self.entry_pagar_total=tk.Entry(label_frame_moviments, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total)
 		self.entry_pagar_total.grid(row=4, column=4)
 
-		self.radio_button_caixa=Radiobutton(label_frame_moviments, text="Caixa", variable=self.forma_pagament, value=1)
-		self.radio_button_banc=Radiobutton(label_frame_moviments, text="Banc", variable=self.forma_pagament, value=2)
+		self.radio_button_caixa=tk.Radiobutton(label_frame_moviments, text="Caixa", variable=self.forma_pagament, value=1)
+		self.radio_button_banc=tk.Radiobutton(label_frame_moviments, text="Banc", variable=self.forma_pagament, value=2)
 		self.radio_button_caixa.grid(row=5, column=2)
 		self.radio_button_banc.grid(row=5, column=3)
 		self.radio_button_caixa.select()
 
-		self.button_pagar=Button(label_frame_moviments, state="disabled", text="Pagar", command=self.Pagar)
+		self.button_pagar=tk.Button(label_frame_moviments, state="disabled", text="Pagar", command=self.Pagar)
 		self.button_pagar.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
 		# Frame "Moviments de la familia".
-		self.label_assignat_familia=Label(label_frame_moviments_familia, text="Assignat")
+		self.label_assignat_familia=tk.Label(label_frame_moviments_familia, text="Assignat")
 		self.label_assignat_familia.grid(row=0, column=1)
 
-		self.label_pagat_familia=Label(label_frame_moviments_familia, text="Pagat")
+		self.label_pagat_familia=tk.Label(label_frame_moviments_familia, text="Pagat")
 		self.label_pagat_familia.grid(row=0, column=2)
 
-		self.label_diferencia_familia=Label(label_frame_moviments_familia, text="Diferència")
+		self.label_diferencia_familia=tk.Label(label_frame_moviments_familia, text="Diferència")
 		self.label_diferencia_familia.grid(row=0, column=3)
 
-		self.Label_quota_familia=Label(label_frame_moviments_familia, text="Quota:")
+		self.Label_quota_familia=tk.Label(label_frame_moviments_familia, text="Quota:")
 		self.Label_quota_familia.grid(row=1, column=0, sticky="e")
 
-		self.entry_quota_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada_familia)
+		self.entry_quota_assignada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_assignada_familia)
 		self.entry_quota_assignada_familia.grid(row=1, column=1)
 
-		self.entry_quota_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada_familia)
+		self.entry_quota_pagada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.quota_pagada_familia)
 		self.entry_quota_pagada_familia.grid(row=1, column=2)
 
-		self.entry_deute_quota_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota_familia)
+		self.entry_deute_quota_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_quota_familia)
 		self.entry_deute_quota_familia.grid(row=1, column=3)
 
-		self.entry_pagar_quota_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_quota_familia)
+		self.entry_pagar_quota_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_quota_familia)
 		self.entry_pagar_quota_familia.grid(row=1, column=4)
 		self.entry_pagar_quota_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_quota_familia))
 		self.entry_pagar_quota_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_quota_familia))
 
-		self.label_loteria_familia=Label(label_frame_moviments_familia, text="Loteria:")
+		self.label_loteria_familia=tk.Label(label_frame_moviments_familia, text="Loteria:")
 		self.label_loteria_familia.grid(row=2, column=0, sticky="e")
 
-		self.entry_loteria_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada_familia)
+		self.entry_loteria_assignada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_assignada_familia)
 		self.entry_loteria_assignada_familia.grid(row=2, column=1)
 
-		self.entry_loteria_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada_familia)
+		self.entry_loteria_pagada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.loteria_pagada_familia)
 		self.entry_loteria_pagada_familia.grid(row=2, column=2)
 
-		self.entry_deute_loteria_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria_familia)
+		self.entry_deute_loteria_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_loteria_familia)
 		self.entry_deute_loteria_familia.grid(row=2, column=3)
 
-		self.entry_pagar_loteria_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_loteria_familia)
+		self.entry_pagar_loteria_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_loteria_familia)
 		self.entry_pagar_loteria_familia.grid(row=2, column=4)
 		self.entry_pagar_loteria_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_loteria_familia))
 		self.entry_pagar_loteria_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_loteria_familia))
 
-		self.label_rifa_familia=Label(label_frame_moviments_familia, text="Rifa:")
+		self.label_rifa_familia=tk.Label(label_frame_moviments_familia, text="Rifa:")
 		self.label_rifa_familia.grid(row=3, column=0, sticky="e")
 
-		self.entry_rifa_assignada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada_familia)
+		self.entry_rifa_assignada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_assignada_familia)
 		self.entry_rifa_assignada_familia.grid(row=3, column=1)
 
-		self.entry_rifa_pagada_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada_familia)
+		self.entry_rifa_pagada_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.rifa_pagada_familia)
 		self.entry_rifa_pagada_familia.grid(row=3, column=2)
 
-		self.entry_deute_rifa_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa_familia)
+		self.entry_deute_rifa_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_rifa_familia)
 		self.entry_deute_rifa_familia.grid(row=3, column=3)
 
-		self.entry_pagar_rifa_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_rifa_familia)
+		self.entry_pagar_rifa_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", textvariable=self.pagar_rifa_familia)
 		self.entry_pagar_rifa_familia.grid(row=3, column=4)
 		self.entry_pagar_rifa_familia.bind('<FocusOut>', lambda event: self.calcular_pagar_total(event, self.entry_pagar_rifa_familia))
 		self.entry_pagar_rifa_familia.bind('<FocusIn>', lambda event: self.fer_seleccio(event, self.entry_pagar_rifa_familia))
 
-		self.label_total_familia=Label(label_frame_moviments_familia, text="Totals:")
+		self.label_total_familia=tk.Label(label_frame_moviments_familia, text="Totals:")
 		self.label_total_familia.grid(row=4, column=0, sticky="e")
 
-		self.entry_total_assignat_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat_familia)
+		self.entry_total_assignat_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_assignat_familia)
 		self.entry_total_assignat_familia.grid(row=4, column=1)
 
-		self.entry_total_pagat_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat_familia)
+		self.entry_total_pagat_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.total_pagat_familia)
 		self.entry_total_pagat_familia.grid(row=4, column=2)
 
-		self.entry_deute_total_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total_familia)
+		self.entry_deute_total_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.deute_total_familia)
 		self.entry_deute_total_familia.grid(row=4, column=3)
 
-		self.entry_pagar_total_familia=Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total_familia)
+		self.entry_pagar_total_familia=tk.Entry(label_frame_moviments_familia, width=15, state="disabled", disabledforeground="black", textvariable=self.pagar_total_familia)
 		self.entry_pagar_total_familia.grid(row=4, column=4)
 
-		self.radio_button_familia_caixa=Radiobutton(label_frame_moviments_familia, text="Caixa", variable=self.forma_pagament_familia, value=1)
-		self.radio_button_familia_banc=Radiobutton(label_frame_moviments_familia, text="Banc", variable=self.forma_pagament_familia, value=2)
+		self.radio_button_familia_caixa=tk.Radiobutton(label_frame_moviments_familia, text="Caixa", variable=self.forma_pagament_familia, value=1)
+		self.radio_button_familia_banc=tk.Radiobutton(label_frame_moviments_familia, text="Banc", variable=self.forma_pagament_familia, value=2)
 		self.radio_button_familia_caixa.grid(row=5, column=2)
 		self.radio_button_familia_banc.grid(row=5, column=3)
 		self.radio_button_familia_caixa.select()
 
-		self.button_pagar_familia=Button(label_frame_moviments_familia, state="disabled", text="Pagar", command=self.PagarFam)
+		self.button_pagar_familia=tk.Button(label_frame_moviments_familia, state="disabled", text="Pagar", command=self.PagarFam)
 		self.button_pagar_familia.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
 		# Frame "Assignar".
-		self.radio_button_quota=Radiobutton(label_frame_assignar, text="Quota", variable=self.concepte_assignacio, value=1)
-		self.radio_button_loteria=Radiobutton(label_frame_assignar, text="Loteria", variable=self.concepte_assignacio, value=2)
-		self.radio_button_rifa=Radiobutton(label_frame_assignar, text="Rifa", variable=self.concepte_assignacio, value=3)
+		self.radio_button_quota=tk.Radiobutton(label_frame_assignar, text="Quota", variable=self.concepte_assignacio, value=1)
+		self.radio_button_loteria=tk.Radiobutton(label_frame_assignar, text="Loteria", variable=self.concepte_assignacio, value=2)
+		self.radio_button_rifa=tk.Radiobutton(label_frame_assignar, text="Rifa", variable=self.concepte_assignacio, value=3)
 		self.radio_button_quota.grid(row=0, column=0)
 		self.radio_button_loteria.grid(row=0, column=1)
 		self.radio_button_rifa.grid(row=0, column=2)
 		self.radio_button_quota.select()
 
-		self.label_descripcio=Label(label_frame_assignar, text="Descripció:")
+		self.label_descripcio=tk.Label(label_frame_assignar, text="Descripció:")
 		self.label_descripcio.grid(row=1, column=0, sticky="e")
 
-		self.entry_descripcio_assignacio=Entry(label_frame_assignar, state="disabled", textvariable=self.descripcio_assignacio)
+		self.entry_descripcio_assignacio=tk.Entry(label_frame_assignar, state="disabled", textvariable=self.descripcio_assignacio)
 		self.entry_descripcio_assignacio.grid(row=1, column=1, padx=2)
 
-		self.label_assignar_quantitat=Label(label_frame_assignar, text="Quantitat:")
+		self.label_assignar_quantitat=tk.Label(label_frame_assignar, text="Quantitat:")
 		self.label_assignar_quantitat.grid(row=2, column=0, sticky="e")
 
-		self.entry_total_assignacio=Entry(label_frame_assignar, state="disabled", textvariable=self.total_assignacio)
+		self.entry_total_assignacio=tk.Entry(label_frame_assignar, state="disabled", textvariable=self.total_assignacio)
 		self.entry_total_assignacio.grid(row=2, column=1, padx=2)
 
-		self.button_assignar=Button(label_frame_assignar, state="disabled", text="Assignar", command=self.assignar)
+		self.button_assignar=tk.Button(label_frame_assignar, state="disabled", text="Assignar", command=self.assignar)
 		self.button_assignar.grid(row=2, column=2, padx=5)
 
 		# Frame "Taula".
@@ -398,7 +397,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.tree_moviments.heading('quatre', text="concepte")
 		self.tree_moviments.heading('cinc', text="descripció")
 
-		self.scroll_taula=Scrollbar(label_frame_historial, command=self.tree_moviments.yview) # Barra de desplaçament per a la taula.
+		self.scroll_taula=tk.Scrollbar(label_frame_historial, command=self.tree_moviments.yview) # Barra de desplaçament per a la taula.
 		self.scroll_taula.grid(row=0, column=1, sticky="nsew") # La fem de l'altura de la taula.
 
 		self.tree_moviments.config(yscrollcommand=self.scroll_taula.set) # Associem la taula a la barra per a que funcione correctament.

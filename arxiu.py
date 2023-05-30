@@ -46,6 +46,31 @@ class Arxiu():
         return exercici_actual
     
 
+    def crear_resum(self, llista):
+        '''
+        Crea un nou arxiu binari amb el llistat que se li passa com a paràmetre.
+        En cas de no existir la carpeta "resums", la crea.
+
+        Paràmetres:
+        -----------
+        llista : llista
+            Llistat amb el resum de l'any de assignacions, pagaments i totals de cada faller.
+
+        Excepcions:
+        -----------
+        OSError : Gestiona un error si ja està creat el directori.
+        '''
+        try:
+            os.mkdir("resums")
+        except OSError as e:
+            if e.errno!=errno.EEXIST:
+                raise
+        fitxer=open(self.nom_arxiu,"wb")
+        pickle.dump(llista, fitxer)
+        fitxer.close()
+        del(fitxer)
+    
+
     def crear_historial(self, historial):
         '''
         Crea un nou arxiu binari amb l'historial que se li passa com a paràmetre.

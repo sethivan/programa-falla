@@ -53,7 +53,7 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Arxiu.
 		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
-		self.arxiuMenu.add_command(label="Eixir", command=self.Eixir)
+		self.arxiuMenu.add_command(label="Eixir", command=self.eixir)
 
 		# Submenú Faller.
 		self.fallerMenu=tk.Menu(self.barraMenu, tearoff=0)
@@ -69,7 +69,7 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Rifa.
 		self.rifaMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.rifaMenu.add_command(label="Assignar", command=self.AssignarRifa)
+		self.rifaMenu.add_command(label="Assignar", command=self.assignar_rifa)
 
 		# Submenú Historial.
 		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
@@ -85,11 +85,11 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Exercici.
 		self.exerciciMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.exerciciMenu.add_command(label="Nou", command=self.NouExercici)
+		self.exerciciMenu.add_command(label="Nou", command=self.nou_exercici)
 
 		# Submenú Ajuda.
 		self.ajudaMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.ajudaMenu.add_command(label="Info", command=self.Info)
+		self.ajudaMenu.add_command(label="Info", command=self.info)
 
 		# Afegim tots els submenús a la barra.
 		self.barraMenu.add_cascade(label="Arxiu", menu=self.arxiuMenu)
@@ -140,7 +140,7 @@ class Aplicacio(tk.Frame):
 		pass
 
 
-	def AssignarRifa(self):
+	def assignar_rifa(self):
 		'''
 		Crea una nova instància de la classe Falla per que assigne la rifa corresponent als fallers.
 		'''
@@ -192,14 +192,15 @@ class Aplicacio(tk.Frame):
 		pass
 		
 
-	def NouExercici(self): #funció per a crear un nou exercici faller
-
-		#elMoviment=Moviment()
-		#elMoviment.NouExercici()
-		pass
+	def nou_exercici(self): #funció per a crear un nou exercici faller
+		'''
+		Crea una nova instància de la classe Falla per a que cree un exercici nou.
+		'''
+		falla=Falla()
+		falla.nou_exercici()
 
 	
-	def Eixir(self):
+	def eixir(self):
 		'''
 		Tanca la finestra principal de l'aplicació.
 		'''
@@ -208,7 +209,7 @@ class Aplicacio(tk.Frame):
 			self.master.destroy()
 
 
-	def Info(self):
+	def info(self):
 		'''
 		Mostra una finestra emergent amb informació del programa.
 		'''

@@ -4,9 +4,8 @@ Módul que conté la classe FinestraIntroduir.
 a la base de dades.
 '''
 import tkinter as tk
-from tkinter import * # Importem les llibreries gràfiques.
-from tkinter import messagebox # Importem el sistema de missatges emergents.
-from tkinter import ttk # Importem les classes per al combobox.
+import tkinter.ttk as ttk
+from tkinter import messagebox
 from tkinter import LabelFrame
 
 from base_de_dades import BaseDeDades
@@ -45,15 +44,15 @@ class FinestraIntroduir(tk.Toplevel):
 		self.title("Introduir Faller")
 		self.iconbitmap("escut.ico")
 
-		self.nom=StringVar()
-		self.cognoms=StringVar()
-		self.naixement=StringVar()
-		self.sexe=StringVar()
-		self.dni=StringVar()
-		self.adresa=StringVar()
-		self.telefon=StringVar()
-		self.correu=StringVar()
-		self.familia=StringVar()
+		self.nom=tk.StringVar()
+		self.cognoms=tk.StringVar()
+		self.naixement=tk.StringVar()
+		self.sexe=tk.StringVar()
+		self.dni=tk.StringVar()
+		self.adresa=tk.StringVar()
+		self.telefon=tk.StringVar()
+		self.correu=tk.StringVar()
+		self.familia=tk.StringVar()
 
 		self.identificadors=[] # Atribut per guardar els id_familia de la llista del combo.
 		self.identificador_familia=0 # Atribut on guardem el valor final de l'id_familia.
@@ -68,29 +67,29 @@ class FinestraIntroduir(tk.Toplevel):
 		# Widgets per a cada frame.
 
 		# Frame "Introduir dades".
-		self.label_nom=Label(label_frame_dades, text="Nom:")
+		self.label_nom=tk.Label(label_frame_dades, text="Nom:")
 		self.label_nom.grid(row=0, column=0, sticky="e")
 
-		self.entry_nom=Entry(label_frame_dades, textvariable=self.nom)
+		self.entry_nom=tk.Entry(label_frame_dades, textvariable=self.nom)
 		self.entry_nom.grid(row=0, column=1)
 		self.entry_nom.focus()
 
-		self.label_cognoms=Label(label_frame_dades, text="Cognoms:")
+		self.label_cognoms=tk.Label(label_frame_dades, text="Cognoms:")
 		self.label_cognoms.grid(row=0, column=2, sticky="e")
 
-		self.entry_cognoms=Entry(label_frame_dades, textvariable=self.cognoms)
+		self.entry_cognoms=tk.Entry(label_frame_dades, textvariable=self.cognoms)
 		self.entry_cognoms.grid(row=0, column=3)
 
-		self.label_sexe=Label(label_frame_dades, text="Sexe:")
+		self.label_sexe=tk.Label(label_frame_dades, text="Sexe:")
 		self.label_sexe.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_masculi=Radiobutton(
+		self.radio_button_masculi=tk.Radiobutton(
 			label_frame_dades,
 			text="M",
 			variable=self.sexe,
 			value=1
 		)
-		self.radio_button_femeni=Radiobutton(
+		self.radio_button_femeni=tk.Radiobutton(
 			label_frame_dades,
 			text="F",
 			variable=self.sexe,
@@ -100,38 +99,38 @@ class FinestraIntroduir(tk.Toplevel):
 		self.radio_button_femeni.grid(row=1, column=1)
 		self.radio_button_masculi.select() # Seleccionem masculí com a predeterminat.
 
-		self.label_naixement=Label(label_frame_dades, text="Data de naixement:")
+		self.label_naixement=tk.Label(label_frame_dades, text="Data de naixement:")
 		self.label_naixement.grid(row=1, column=2, sticky="e")
 
-		self.entry_naixement=Entry(label_frame_dades, textvariable=self.naixement)
+		self.entry_naixement=tk.Entry(label_frame_dades, textvariable=self.naixement)
 		self.entry_naixement.grid(row=1, column=3)
 
-		self.label_dni=Label(label_frame_dades, text="DNI:")
+		self.label_dni=tk.Label(label_frame_dades, text="DNI:")
 		self.label_dni.grid(row=2, column=0, sticky="e")
 
-		self.entry_dni=Entry(label_frame_dades, textvariable=self.dni)
+		self.entry_dni=tk.Entry(label_frame_dades, textvariable=self.dni)
 		self.entry_dni.grid(row=2, column=1)
 
-		self.label_adresa=Label(label_frame_dades, text="Adreça:")
+		self.label_adresa=tk.Label(label_frame_dades, text="Adreça:")
 		self.label_adresa.grid(row=2, column=2, sticky="e")
 
-		self.entry_adresa=Entry(label_frame_dades, textvariable=self.adresa)
+		self.entry_adresa=tk.Entry(label_frame_dades, textvariable=self.adresa)
 		self.entry_adresa.grid(row=2, column=3)
 
-		self.label_telefon=Label(label_frame_dades, text="Telèfon:")
+		self.label_telefon=tk.Label(label_frame_dades, text="Telèfon:")
 		self.label_telefon.grid(row=3, column=0, sticky="e")
 
-		self.entry_telefon=Entry(label_frame_dades, textvariable=self.telefon)
+		self.entry_telefon=tk.Entry(label_frame_dades, textvariable=self.telefon)
 		self.entry_telefon.grid(row=3, column=1)
 
-		self.label_correu=Label(label_frame_dades, text="Correu electrònic:")
+		self.label_correu=tk.Label(label_frame_dades, text="Correu electrònic:")
 		self.label_correu.grid(row=3, column=2, sticky="e")
 
-		self.entry_correu=Entry(label_frame_dades, textvariable=self.correu)
+		self.entry_correu=tk.Entry(label_frame_dades, textvariable=self.correu)
 		self.entry_correu.grid(row=3, column=3)
 
 		# Frame "Buscar familiar del faller".
-		self.label_nom_familiar=Label(label_frame_familiar, text="Cognoms i nom:")
+		self.label_nom_familiar=tk.Label(label_frame_familiar, text="Cognoms i nom:")
 		self.label_nom_familiar.grid(row=0, column=0)
 
 		self.combo_box_familiar_faller=ttk.Combobox(
@@ -143,17 +142,17 @@ class FinestraIntroduir(tk.Toplevel):
 		self.combo_box_familiar_faller.bind("<<ComboboxSelected>>", self.seleccionar_familia)
 		self.combo_box_familiar_faller.configure(state="disabled")
 
-		self.label_opcio_familiar=Label(label_frame_familiar, text="Familiar en la falla:")
+		self.label_opcio_familiar=tk.Label(label_frame_familiar, text="Familiar en la falla:")
 		self.label_opcio_familiar.grid(row=1, column=0, sticky="e")
 
-		self.radio_button_familiar_si=Radiobutton(
+		self.radio_button_familiar_si=tk.Radiobutton(
 			label_frame_familiar, 
 			text="Si", 
 			variable=self.familia, 
 			value=1, 
 			command=self.habilitar_familia
 		)
-		self.radio_button_familiar_no=Radiobutton(
+		self.radio_button_familiar_no=tk.Radiobutton(
 			label_frame_familiar, 
 			text="No", 
 			variable=self.familia, 
@@ -165,7 +164,7 @@ class FinestraIntroduir(tk.Toplevel):
 		self.radio_button_familiar_no.select() # Seleccionem "no" com a predeterminat.
 
 		#Botó "Introduir".
-		self.button_introduir=Button(self, text="Introduir", command=self.introduir_faller)
+		self.button_introduir=tk.Button(self, text="Introduir", command=self.introduir_faller)
 		self.button_introduir.grid(row=3, column=0, padx=5)
 
 
