@@ -8,6 +8,7 @@ from utils import Utils
 from arxiu import Arxiu
 
 from moviment import Moviment
+from categoria import Categoria
 
 
 class Falla():
@@ -75,13 +76,14 @@ class Falla():
             arxiu=Arxiu("exercici")
             utils=Utils()
             bd=BaseDeDades("falla.db")
-            datafinal=utils.calcular_data_actual()
+            data=utils.calcular_data_actual()
+            data_actual=data[0] + "-" + data[1] + "-" + data[2]
             self.llistat_fallers=bd.llegir_fallers_adults()
             exercici_actual=arxiu.llegir_exercici_actual()
             try:
                 for faller in self.llistat_fallers:
-                    moviment=Moviment(0, datafinal, 15, 1, 3, exercici_actual, "rifa", 0, faller)
-                    bd.crear_moviment(moviment)          
+                    moviment=Moviment(0, data_actual, 15, 1, 3, exercici_actual, "rifa", 0, faller)
+                    bd.crear_moviment(moviment)
             except TypeError:
                 bd.tancar_conexio()
                 messagebox.showerror("Assignar rifa", "La rifa no s'ha pogut assignar correctament")
@@ -139,7 +141,6 @@ class Falla():
 		#creem una cópia en fitxer binari del resultat de l'exercici
         bd=BaseDeDades("falla.db")
         arxiu=Arxiu("exercici")
-        falla=Falla()
         llistat_fallers=bd.llegir_fallers_complets_per_alta(1)
         exercici_actual=arxiu.llegir_exercici_actual()
         llista=[] #llista on anem a acumular els valors	de tots els fallers
@@ -153,12 +154,9 @@ class Falla():
             rifa_pagada=0
             valors.append(faller.id)
             quota_base=bd.llegir_quota_faller(faller.id)
-			#elFaller.BuscarQuotaFaller(val[0]) #busquem la quota corresponent al faller
             descompte=(faller.familia.descompte*quota_base/100)
-			#laFamilia.BuscarDescompteFamilia(val[0]) #busquem el descompte familiar del faller
             quota=quota_base-descompte
-            llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
-			#elMoviment.BuscarMoviments(val[0],str(elMoviment.exercici)) #busquem tots els moviments de l'exercici
+            llista_assignacions_pagaments=self.calcular_assignacions_pagaments(faller.id, exercici_actual)
             quota_assignada=llista_assignacions_pagaments[0]
             quota_pagada=llista_assignacions_pagaments[1]
             loteria_assignada=llista_assignacions_pagaments[2]
@@ -166,11 +164,8 @@ class Falla():
             rifa_assignada=llista_assignacions_pagaments[4]
             rifa_pagada=llista_assignacions_pagaments[5]
             quota_final=quota+quota_assignada
-			#quotafinal=elFaller.quota-(laFamilia.descompte*elFaller.quota/100)+elMoviment.quotaasignada
             total_assignacions=quota_final+loteria_assignada+rifa_assignada
-			#totalasig=quotafinal+elMoviment.loteriaasignada+elMoviment.rifaasignada
             total_pagaments=quota_pagada+loteria_pagada+rifa_pagada
-			#totalpag=elMoviment.quotapagada+elMoviment.loteriapagada+elMoviment.rifapagada
             valors.append("{0:.2f}".format(quota_final))
             valors.append("{0:.2f}".format(loteria_assignada))
             valors.append("{0:.2f}".format(rifa_assignada))
@@ -181,60 +176,55 @@ class Falla():
             valors.append("{0:.2f}".format(total_pagaments))
             valors.append("{0:.2f}".format(total_assignacions-total_pagaments))
             llista.append(valors)
-        print(llista)
+        #falta crear la carpeta resums
         arxiu=Arxiu("resum "+str(exercici_actual))
         arxiu.crear_resum(llista)
-        #fitxer=open("resum "+str(elMoviment.exercici),"wb")
-		#pickle.dump(llista, fitxer)
-		#fitxer.close()
-		#del(fitxer)
+        messagebox.showinfo("Info", "Resum de l'any anterior guardat correctament")
 
-'''
 
 		#modifiquem l'arxiu binari exercici amb l'any actual del sistema
-		llista=[]
-		fitxer=open("exercici","wb") #obrim l'arxiu exercici per a guardar l'exercici actual
-		data=datetime.now()
-		anyactual=int(datetime.strftime(data,'%Y'))
-		mesactual=int(datetime.strftime(data, '%m'))
-		diaactual=int(datetime.strftime(data, '%d'))
-		if mesactual>3: #si s'obri exercici després de març, l'exercici es l'any següent
-			anyexercici=anyactual+1
-		if mesactual<2: #si s'obri exercici abans de març, l'any coincideix amb l'exercici
-			anyexercici=anyactual
-		if mesactual==3 and diaactual>19:
-			anyexercici=anyactual+1
-		if mesactual==3 and diactual<=19:
-			anyexercici=anyactual
-		llista.append(anyexercici)
-		pickle.dump(llista, fitxer)
-		fitxer.close()
-		del(fitxer)
+        llista=[]
+        arxiu=Arxiu("exercici")
+        utils=Utils()
+        data_actual=utils.calcular_data_actual()
+        dia_actual=int(data_actual[0])
+        mes_actual=int(data_actual[1])
+        any_actual=int(data_actual[2])
+        if mes_actual>3: #si s'obri exercici després de març, l'exercici es l'any següent
+            any_exercici=any_actual+1
+        elif mes_actual<2: #si s'obri exercici abans de març, l'any coincideix amb l'exercici
+            any_exercici=any_actual
+        elif mes_actual==3 and dia_actual>19:
+            any_exercici=any_actual+1
+        elif mes_actual==3 and dia_actual<=19:
+            any_exercici=any_actual
+        llista.append(any_exercici)
+        arxiu.modificar_exercici_actual(llista)
+        messagebox.showinfo("Info", "Nou any assignat correctament")
 
-		#asignem la nova categoria a cada faller
-		elFaller=Faller()
-		res=elFaller.BuscarFallerAlta(1)
-		elMoviment=Moviment()
-		elMoviment.ExerciciActual()
-		naixement=0
-		edat=0
-		categ=0
-		for val in res:
-			naixement=val[3]
-			if val[10]>1:
-				edat=elFaller.EdatFaller(naixement, elMoviment.exercici) #per a calcular l'edat
-				categ=elFaller.AsignarCategoria(edat) #i la categoria
-				elFaller.ModificarCategoria(val[0],str(categ))
+        
+        #assignem la nova categoria a cada faller que haja canviat
+        categoria=Categoria(0,0,"","")
+        exercici_actual=arxiu.llegir_exercici_actual()
+        for faller in llistat_fallers:
+            if faller.categoria.id>1:
+                edat=faller.calcular_edat(faller.naixement, exercici_actual)
+                categoria.calcular_categoria(edat)
+                if categoria.id!=faller.categoria.id:
+                    categoria=bd.llegir_categoria(categoria.id)
+                    faller.categoria=categoria
+                    bd.actualitzar_faller(faller)
+        messagebox.showinfo("Info", "Categories de fallers actualitzades")
+
 
 		#recuperem l'arxiu binari de l'exercici anterior i asignem els valors distints de 0 a l'exercici actual
-		elMoviment=Moviment()
-		elMoviment.ExerciciActual()
-		fitxer=open("resum "+str(elMoviment.exercici-1),"rb")
-		lista=pickle.load(fitxer)
-		fitxer.close()
-		del(fitxer)
-		for val in lista:
-			if val[9]!="0.00":
-				elMoviment.InsertarAsignacio(val[9], 1, elMoviment.exercici, val[0], "any anterior", 0)
-                                
-                                '''
+        arxiu=Arxiu("resum "+str(exercici_actual-1))
+        llista=arxiu.llegir_resum()
+        data=data_actual[0] + "-" + data_actual[1] + "-" + data_actual[2]
+        for valor in llista:
+             if valor[9]!="0.00":
+                faller=bd.llegir_faller(valor[0])
+                moviment=Moviment(0, data, valor[9], 1, 1, exercici_actual, "any anterior", 0, faller)
+                bd.crear_moviment(moviment)
+        messagebox.showinfo("Info", "Deutes i sobrants de l'exercici anterior actualitzats")
+        messagebox.showinfo("Info", "El canvi d'exercici s'ha realitzat correctament")

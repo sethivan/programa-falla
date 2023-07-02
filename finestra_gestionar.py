@@ -912,19 +912,20 @@ class FinestraGestionar(tk.Toplevel):
 					#numrebut=elRebut.AsignarNumRebut()
 				exercici_actual=arxiu.llegir_exercici_actual()
 				data=utils.calcular_data_actual()
+				data_actual=data[0] + "-" + data[1] + "-" + data[2]
 				#id=self.idString.get()
 				faller=bd.llegir_faller(self.id.get())
 				#inserta a la base de dades cada moviment realitzat
 				if float(self.pagar_quota.get())!=0:
-					moviment=Moviment(0, data, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarquotaString.get()), 1, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				if float(self.pagar_loteria.get())!=0:
-					moviment=Moviment(0, data, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarloteriaString.get()), 2, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				if float(self.pagar_rifa.get())!=0:
-					moviment=Moviment(0, data, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, rebut, faller)
 					bd.crear_moviment(moviment)
 					#elMoviment.InsertarPagament(float(self.pagarrifaString.get()), 3, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				#netegem les dades i refresquem per a vore el quadre de pagaments actualitzat
@@ -1025,6 +1026,7 @@ class FinestraGestionar(tk.Toplevel):
 					#numrebut=elRebut.AsignarNumRebut()
 				exercici_actual=arxiu.llegir_exercici_actual()
 				data=utils.calcular_data_actual()
+				data_actual=data[0] + "-" + data[1] + "-" + data[2]
 				for faller in llistat_fallers:
 					quota_base=bd.llegir_quota_faller(faller.id)
 					descompte=(faller.familia.descompte*quota_base/100)
@@ -1053,18 +1055,18 @@ class FinestraGestionar(tk.Toplevel):
 					#quotapagada=elMoviment.quotapagada
 					difquota=quotafinal-quotapagada
 					if pagamentquota!=0 and membres==1:
-						moviment=Moviment(0, data, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentquota, 1, elMoviment.exercici, val, desc, numrebut)
 						pagamentquota=0
 					if pagamentquota!=0 and pagamentquota<=difquota and membres!=1:
-						moviment=Moviment(0, data, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentquota, 1, elMoviment.exercici, val, desc, numrebut)
 						pagamentquota=0
 					if pagamentquota!=0 and pagamentquota>difquota and membres!=1:
 						if difquota!=0: #per a que no cree moviments a 0
-							moviment=Moviment(0, data, difquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+							moviment=Moviment(0, data_actual, difquota, 2, 1, exercici_actual, descripcio, rebut, faller)
 							bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(difquota, 1, elMoviment.exercici, val, desc, numrebut)
 						pagamentquota=pagamentquota-difquota
@@ -1072,17 +1074,17 @@ class FinestraGestionar(tk.Toplevel):
 					#loteriapagada=elMoviment.loteriapagada
 					difloteria=loteriaassignada-loteriapagada
 					if pagamentloteria!=0 and membres==1:
-						moviment=Moviment(0, data, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentloteria, 2, elMoviment.exercici, val, desc, numrebut)
 					if pagamentloteria!=0 and pagamentloteria<=difloteria and membres!=1:
-						moviment=Moviment(0, data, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentloteria, 2, elMoviment.exercici, val, desc, numrebut)
 						pagamentloteria=0
 					if pagamentloteria!=0 and pagamentloteria>difloteria and membres!=1:
 						if difloteria!=0:
-							moviment=Moviment(0, data, difloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+							moviment=Moviment(0, data_actual, difloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
 							bd.crear_moviment(moviment)
 							#elMoviment.InsertarPagament(difloteria, 2, elMoviment.exercici, val, desc, numrebut)
 						pagamentloteria=pagamentloteria-difloteria
@@ -1090,17 +1092,17 @@ class FinestraGestionar(tk.Toplevel):
 					#rifapagada=elMoviment.rifapagada
 					difrifa=rifaassignada-rifapagada
 					if pagamentrifa!=0 and membres==1:
-						moviment=Moviment(0, data, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentrifa, 3, elMoviment.exercici, val, desc, numrebut)
 					if pagamentrifa!=0 and pagamentrifa<=difrifa and membres!=1:
-						moviment=Moviment(0, data, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+						moviment=Moviment(0, data_actual, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
 						bd.crear_moviment(moviment)
 						#elMoviment.InsertarPagament(pagamentrifa, 3, elMoviment.exercici, val, desc, numrebut)
 						pagamentrifa=0
 					if pagamentrifa!=0 and pagamentrifa>difrifa and membres!=1:
 						if difrifa!=0:
-							moviment=Moviment(0, data, difrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+							moviment=Moviment(0, data_actual, difrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
 							bd.crear_moviment(moviment)
 							#elMoviment.InsertarPagament(difrifa, 3, elMoviment.exercici, val, desc, numrebut)
 						pagamentrifa=pagamentrifa-difrifa
@@ -1121,6 +1123,7 @@ class FinestraGestionar(tk.Toplevel):
 		utils=Utils()
 		exercici_actual=arxiu.llegir_exercici_actual()
 		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
 		valor=messagebox.askquestion("Asignar","Estàs segur que vols fer l'assignació?")
 		if valor=="yes":
 			try:
@@ -1128,7 +1131,7 @@ class FinestraGestionar(tk.Toplevel):
 					messagebox.showwarning("Error", "No es pot fer una assignació de 0 euros")
 				else:
 					faller=bd.llegir_faller(self.id.get())
-					moviment=Moviment(0, data, float(self.total_assignacio.get()), 1, int(self.concepte_assignacio.get()), exercici_actual, self.descripcio_assignacio.get(), 0, faller)
+					moviment=Moviment(0, data_actual, float(self.total_assignacio.get()), 1, int(self.concepte_assignacio.get()), exercici_actual, self.descripcio_assignacio.get(), 0, faller)
 					bd.crear_moviment(moviment)
 					self.entry_id.focus()
 					self.buscar_per_id('<Return>')

@@ -45,6 +45,21 @@ class Arxiu():
         exercici_actual=int(llista[0])
         return exercici_actual
     
+    
+    def modificar_exercici_actual(self, llista):
+        '''
+        Modifica l'arxiu binari amb l'any que se li passa com a paràmetre.
+
+        Paràmetres:
+        -----------
+        exercici : int
+            Valor numèric corresponent a l'any de l'exercici actual.
+        '''
+        fitxer=open(self.nom_arxiu,"wb")
+        pickle.dump(llista, fitxer)
+        fitxer.close()
+        del(fitxer)
+    
 
     def crear_resum(self, llista):
         '''
@@ -54,7 +69,7 @@ class Arxiu():
         Paràmetres:
         -----------
         llista : llista
-            Llistat amb el resum de l'any de assignacions, pagaments i totals de cada faller.
+            Llistat amb el resum de l'any d'assignacions, pagaments i totals de cada faller.
 
         Excepcions:
         -----------
@@ -69,6 +84,22 @@ class Arxiu():
         pickle.dump(llista, fitxer)
         fitxer.close()
         del(fitxer)
+
+    
+    def llegir_resum(self):
+        '''
+        Llig l'historial de l'arxiu binari que va associat al fitxer i el retorna.
+
+        Retorna:
+        --------
+        resum : llista
+            Llistat amb el resum de l'any d'assignacions, pagaments i totals de cada faller.
+        '''
+        fitxer=open(self.nom_arxiu,"rb")
+        resum=pickle.load(fitxer)
+        fitxer.close()
+        del(fitxer)
+        return resum
     
 
     def crear_historial(self, historial):
