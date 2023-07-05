@@ -34,13 +34,13 @@ class FinestraHistorial(tk.Toplevel):
 		self.title("Introduir Faller")
 		self.iconbitmap("escut.ico")
 
-		self.id=ttk.StringVar()
-		self.infantil=ttk.StringVar()
-		self.punts=ttk.StringVar()
-		self.adult=ttk.StringVar()
-		self.falla=ttk.StringVar()
-		self.any_inici=ttk.StringVar()
-		self.any_final=ttk.StringVar()
+		self.id=tk.StringVar()
+		self.infantil=tk.StringVar()
+		self.punts=tk.StringVar()
+		self.adult=tk.StringVar()
+		self.falla=tk.StringVar()
+		self.any_inici=tk.StringVar()
+		self.any_final=tk.StringVar()
 
 		self.identificadors=[]
 

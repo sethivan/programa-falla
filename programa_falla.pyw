@@ -73,7 +73,8 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Historial.
 		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.historialMenu.add_command(label="Modificar", command=self.historial)
+		self.historialMenu.add_command(label="Modificar", command=self.modificar_historial)
+		self.historialMenu.add_command(label="Borrar", command=self.borrar_historial)
 
 		# Submenú Llistats.
 		self.llistatsMenu=tk.Menu(self.barraMenu, tearoff=0)
@@ -148,13 +149,21 @@ class Aplicacio(tk.Frame):
 		falla.assignar_rifa_auto()
 
 
-	def historial(self): #funció que obre la finestra "Modificar" del menú "Historial"
+	def modificar_historial(self):
 		''' 
-		Crea una nova instància de la classe FinestraIntroduir
-		que obri la finestra "Introduir" del menú "Faller".
+		Crea una nova instància de la classe FinestraHistorial
+		que obri la finestra "Modificar" del menú "Historial".
 		'''
 		historial = FinestraHistorial(self)
 		historial.iniciar()
+
+
+	def borrar_historial(self):
+		'''
+		Crea una nova instància e la classe Falla per que borre l'historial de tots els fallers.
+		'''
+		falla=Falla()
+		falla.borrar_historial()
 
 
 	def MovimentsDia(self): #funció per a traure el llistat en pdf dels moviments del dia

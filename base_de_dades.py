@@ -159,7 +159,33 @@ class BaseDeDades:
             print("Error al leer el socio de la base de datos:", e)
             return None
 
+    
+    def llegir_fallers(self):
+        '''
+        Llig de la taula "faller" tots els fallers
+        i els afegeix a una llista d'objectes de la classe Faller.
 
+        Retorna:
+        --------
+        llista_fallers : llista
+            Llistat d'objectes de la classe Faller.
+        '''
+        try:
+            self.cursor.execute("SELECT * FROM faller")
+            resultat = self.cursor.fetchall()
+            llistat_fallers=[]
+            for valors in resultat:
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11])
+                llistat_fallers.append(faller)
+            return llistat_fallers
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+    
+    
     def llegir_fallers_adults(self):
         '''
         Llig de la taula "faller" tots aquells fallers amb 14 anys o més (categories 1 i 2)

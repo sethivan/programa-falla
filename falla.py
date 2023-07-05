@@ -137,16 +137,26 @@ class Falla():
     
 
     def nou_exercici(self):
-
-		#creem una cópia en fitxer binari del resultat de l'exercici
+        '''
+        Crea un nou exercici seguint els següents passos:
+        Es crea un arxiu binari amb la id de cada faller amb alta activa junt amb les dades
+        d'assignacions i pagaments finals.
+        Es modifica l'arxiu binari "exercici" amb l'any actual del sistema.
+        Es repasen les categories de tots els fallers no adults per vore si canvien de categoria.
+        Recuperem l'arxiu binari creat anteriorment de forma que assignem els deutes o sobrants
+        al nou exercici per a cada faller que no haja acabat l'exercici anterior a 0.
+        Finalment afegim l'estat de l'historial per a cada faller en el nou exercici depenent de
+        si va acabar l'exercici anterior donat d'alta o no.
+        '''
+		# Creem una cópia en fitxer binari del resultat de l'exercici.
         bd=BaseDeDades("falla.db")
         arxiu=Arxiu("exercici")
         llistat_fallers=bd.llegir_fallers_complets_per_alta(1)
         exercici_actual=arxiu.llegir_exercici_actual()
-        llista=[] #llista on anem a acumular els valors	de tots els fallers
+        llista=[]
         for faller in llistat_fallers:
-            valors=[] #llista on acumulem les dades de cada faller
-            quota_assignada=0 #resetejem a cada iteració per a que no s'acumulen
+            valors=[]
+            quota_assignada=0
             quota_pagada=0
             loteria_assignada=0
             loteria_pagada=0
@@ -176,13 +186,12 @@ class Falla():
             valors.append("{0:.2f}".format(total_pagaments))
             valors.append("{0:.2f}".format(total_assignacions-total_pagaments))
             llista.append(valors)
-        #falta crear la carpeta resums
-        arxiu=Arxiu("resum "+str(exercici_actual))
+        nom_arxiu="resums"+"/"+"resum "+str(exercici_actual)
+        arxiu=Arxiu(nom_arxiu)
         arxiu.crear_resum(llista)
-        messagebox.showinfo("Info", "Resum de l'any anterior guardat correctament")
+        messagebox.showinfo("Exercici nou", "Resum de l'any anterior guardat correctament")
 
-
-		#modifiquem l'arxiu binari exercici amb l'any actual del sistema
+		# Modifiquem l'arxiu binari "exercici" amb l'any actual del sistema.
         llista=[]
         arxiu=Arxiu("exercici")
         utils=Utils()
@@ -190,9 +199,9 @@ class Falla():
         dia_actual=int(data_actual[0])
         mes_actual=int(data_actual[1])
         any_actual=int(data_actual[2])
-        if mes_actual>3: #si s'obri exercici després de març, l'exercici es l'any següent
+        if mes_actual>3:
             any_exercici=any_actual+1
-        elif mes_actual<2: #si s'obri exercici abans de març, l'any coincideix amb l'exercici
+        elif mes_actual<2:
             any_exercici=any_actual
         elif mes_actual==3 and dia_actual>19:
             any_exercici=any_actual+1
@@ -200,10 +209,9 @@ class Falla():
             any_exercici=any_actual
         llista.append(any_exercici)
         arxiu.modificar_exercici_actual(llista)
-        messagebox.showinfo("Info", "Nou any assignat correctament")
-
+        messagebox.showinfo("Exercici nou", "Nou any assignat correctament")
         
-        #assignem la nova categoria a cada faller que haja canviat
+        # Assignem la nova categoria a cada faller que haja canviat.
         categoria=Categoria(0,0,"","")
         exercici_actual=arxiu.llegir_exercici_actual()
         for faller in llistat_fallers:
@@ -214,11 +222,11 @@ class Falla():
                     categoria=bd.llegir_categoria(categoria.id)
                     faller.categoria=categoria
                     bd.actualitzar_faller(faller)
-        messagebox.showinfo("Info", "Categories de fallers actualitzades")
+        messagebox.showinfo("Exercici nou", "Categories de fallers actualitzades")
 
-
-		#recuperem l'arxiu binari de l'exercici anterior i asignem els valors distints de 0 a l'exercici actual
-        arxiu=Arxiu("resum "+str(exercici_actual-1))
+		# Recuperem l'arxiu binari de l'exercici anterior i assignem els valors distints de 0 a l'exercici actual.
+        nom_arxiu="resums"+"/"+"resum "+str(exercici_actual-1)
+        arxiu=Arxiu(nom_arxiu)
         llista=arxiu.llegir_resum()
         data=data_actual[0] + "-" + data_actual[1] + "-" + data_actual[2]
         for valor in llista:
@@ -226,5 +234,48 @@ class Falla():
                 faller=bd.llegir_faller(valor[0])
                 moviment=Moviment(0, data, valor[9], 1, 1, exercici_actual, "any anterior", 0, faller)
                 bd.crear_moviment(moviment)
-        messagebox.showinfo("Info", "Deutes i sobrants de l'exercici anterior actualitzats")
-        messagebox.showinfo("Info", "El canvi d'exercici s'ha realitzat correctament")
+        bd.tancar_conexio()
+        messagebox.showinfo("Exercici nou", "Deutes i sobrants de l'exercici anterior actualitzats")
+
+        # Afegim a cada faller l'historial de l'exercici nou.
+        llistat_fallers=bd.llegir_fallers()
+        for faller in llistat_fallers:
+            nom_arxiu="historials"+"/"+str(faller.id)
+            arxiu=Arxiu(nom_arxiu)
+            historial=arxiu.llegir_historial()
+            if faller.alta==1:
+                historial[exercici_actual]=["vocal", "Sants Patrons"]
+            else:
+                historial[exercici_actual]=["baixa", ""]
+            arxiu.modificar_historial(historial)
+        messagebox.showinfo("Exercici nou", "Historial faller actualitzat com a vocals. La resta de punts s'han d'assignar manualment")
+        messagebox.showinfo("Exercici nou", "El canvi d'exercici s'ha realitzat correctament")
+
+
+    def borrar_historial(self):
+        '''
+        Borra tots els arxius d'historial de tots els fallers i els reinicia com si l'exercici
+        actual fora el primer any de faller.
+        '''
+        valor=messagebox.askquestion("Borrar historial",
+                                     "Estàs segur que vols reiniciar els historials de tots els fallers?")
+        if valor=="yes":
+            bd=BaseDeDades("falla.db")
+            arxiu=Arxiu("exercici")
+            exercici_actual=arxiu.llegir_exercici_actual()
+            llistat_fallers=bd.llegir_fallers()
+            for faller in llistat_fallers:
+                exercici=faller.calcular_primer_exercici(faller.naixement)
+                historial={}
+                while exercici < exercici_actual:
+                    historial[exercici]=["baixa", ""]
+                    exercici=exercici+1
+                if faller.alta==1:
+                    historial[exercici_actual]=["vocal", "Sants Patrons"]
+                else:
+                    historial[exercici_actual]=["baixa", ""]
+                nom_arxiu="historials"+"/"+str(faller.id)
+                arxiu=Arxiu(nom_arxiu)
+                arxiu.crear_historial(historial)
+            bd.tancar_conexio()
+            messagebox.showinfo("Borrar historial", "L'historial de tots els fallers s'ha reiniciat correctament")
