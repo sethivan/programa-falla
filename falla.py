@@ -151,7 +151,7 @@ class Falla():
 		# Creem una cópia en fitxer binari del resultat de l'exercici.
         bd=BaseDeDades("falla.db")
         arxiu=Arxiu("exercici")
-        llistat_fallers=bd.llegir_fallers_complets_per_alta(1)
+        llistat_fallers=bd.llegir_fallers_per_alta(1)
         exercici_actual=arxiu.llegir_exercici_actual()
         llista=[]
         for faller in llistat_fallers:

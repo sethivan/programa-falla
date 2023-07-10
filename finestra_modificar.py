@@ -142,7 +142,7 @@ class FinestraModificar(tk.Toplevel):
 		'''
 		bd=BaseDeDades("falla.db")
 		self.id=id
-		faller=bd.llegir_faller_complet(id)
+		faller=bd.llegir_faller(id)
 		self.nom.set(faller.nom)
 		self.cognoms.set(faller.cognoms)
 		self.sexe.set(faller.sexe)
@@ -176,7 +176,7 @@ class FinestraModificar(tk.Toplevel):
 		'''
 		bd=BaseDeDades("falla.db")
 		self.combo_box_familia.configure(state="normal")
-		faller=bd.llegir_faller_complet(self.id)
+		faller=bd.llegir_faller(self.id)
 		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 		llista=[]
 		for faller in llistat_fallers:
@@ -205,7 +205,7 @@ class FinestraModificar(tk.Toplevel):
 		'''
 		bd=BaseDeDades("falla.db")
 		cadena=self.combo_box_familia.get()
-		llistat_fallers=bd.llegir_fallers_amb_familia_per_cognom(cadena)
+		llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
 		llista=[]
 		self.identificadors=[]
 		for faller in llistat_fallers:
@@ -235,7 +235,7 @@ class FinestraModificar(tk.Toplevel):
 		bd=BaseDeDades("falla.db")
 		categoria=Categoria(0,0,"","")
 		exercici_actual=arxiu.llegir_exercici_actual()
-		faller=bd.llegir_faller_complet(self.id)
+		faller=bd.llegir_faller(self.id)
 		try:
 			edat=faller.calcular_edat(self.naixement.get(), exercici_actual)
 		except ValueError:
@@ -275,7 +275,7 @@ class FinestraModificar(tk.Toplevel):
 						bd.actualitzar_faller(faller)
 						bd.eliminar_familia(self.id_familia)
 						llistat_fallers=[]
-						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+						llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 						faller.familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(faller.familia)
 					# Si estava en familia i canvia de familia.
@@ -284,13 +284,13 @@ class FinestraModificar(tk.Toplevel):
 						bd.actualitzar_faller(faller)
 						# Actualitzem familia vella
 						llistat_fallers=[]
-						llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
+						llistat_fallers=bd.llegir_fallers_per_familia(self.id_familia)
 						familia=Familia(self.id_familia,0,0)
 						familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(familia)
 						# Actualitzem familia nova
 						llistat_fallers=[]
-						llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+						llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 						faller.familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(faller.familia)
 				# Si estava en familia i passa a estar sol	
@@ -302,7 +302,7 @@ class FinestraModificar(tk.Toplevel):
 					bd.actualitzar_faller(faller)
 					# Actualitzem familia vella
 					llistat_fallers=[]
-					llistat_fallers=bd.llegir_fallers_complets_per_familia(self.id_familia)
+					llistat_fallers=bd.llegir_fallers_per_familia(self.id_familia)
 					familia=Familia(self.id_familia,0,0)
 					familia.calcular_descompte(llistat_fallers)
 					bd.actualitzar_familia(familia)

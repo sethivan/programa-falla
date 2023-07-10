@@ -15,42 +15,53 @@ class BaseDeDades:
 
 
     def crear_taules(self):
-        
-        #taula faller
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Socio
+        '''
+        Crea totes les taules necessàries per al correcte funcionament de la base de dades.
+        '''
+        # Taula faller.
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS faller
                             (id INTEGER PRIMARY KEY,
-                            nombre TEXT NOT NULL,
-                            apellido TEXT NOT NULL,
-                            fecha_nacimiento TEXT NOT NULL,
-                            dni TEXT NOT NULL,
+                            nom TEXT NOT NULL,
+                            cognoms TEXT NOT NULL,
+                            naixement TEXT NOT NULL,
+                            sexe INTEGER NOT NULL,
+                            dni TEXT,
+                            adreça TEXT,
+                            telefon TEXT,
                             alta INTEGER NOT NULL,
-                            id_familia INTEGER NOT NULL,
-                            id_categoria INTEGER NOT NULL,
-                            FOREIGN KEY (id_familia) REFERENCES Familia(id),
-                            FOREIGN KEY (id_categoria) REFERENCES Categoria(id))''')
+                            idfamilia INTEGER NOT NULL,
+                            idcategoria INTEGER NOT NULL,
+                            correu TEXT,
+                            FOREIGN KEY (idfamilia) REFERENCES familia(id),
+                            FOREIGN KEY (idcategoria) REFERENCES categoria(id))''')
 
-        #taula familia
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Familia
+        # Taula familia.
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS familia
                             (id INTEGER PRIMARY KEY,
-                            descuento REAL NOT NULL)''')
+                            descompte INTEGER NOT NULL,
+                            domiciliacio INTEGER NOT NULL)''')
 
-        #taula categoria
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Categoria
+        # Taula categoria.
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS categoria
                             (id INTEGER PRIMARY KEY,
-                            cuota REAL NOT NULL,
-                            descripcion TEXT NOT NULL)''')
+                            quota REAL NOT NULL,
+                            nom TEXT NOT NULL,
+                            descripcio TEXT NOT NULL)''')
 
-        #taula moviments
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Movimientos
+        # Taula moviments.
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS moviments
                             (id INTEGER PRIMARY KEY,
-                            fecha TEXT NOT NULL,
-                            cantidad REAL NOT NULL,
-                            tipo TEXT NOT NULL,
-                            concepto TEXT NOT NULL,
-                            id_socio INTEGER NOT NULL,
-                            FOREIGN KEY (id_socio) REFERENCES Socio(id))''')
+                            data TEXT NOT NULL,
+                            quantitat REAL NOT NULL,
+                            tipo INTEGER NOT NULL,
+                            concepte INTEGER NOT NULL,
+                            exercici INTEGER NOT NULL,
+                            idfaller INTEGER NOT NULL,
+                            descripcio TEXT,
+                            rebut INTEGER,
+                            FOREIGN KEY (idfaller) REFERENCES faller(id))''')
 
-        self.conexion.commit()
+        self.conexio.commit()
     
 
     def tancar_conexio(self):
@@ -58,7 +69,7 @@ class BaseDeDades:
         self.conexio.close()
 
 
-    # Mètodes per a operacions CRUD en la taula faller
+    # Mètodes per a operacions CRUD en la taula faller.
 
     def crear_faller(self, faller):
         '''
@@ -90,34 +101,6 @@ class BaseDeDades:
         Retorna:
         --------
         faller : Faller
-            Objecte de la classe Faller.
-        '''
-        query_params=(id,)
-        try:
-            self.cursor.execute("SELECT * FROM faller WHERE id=?", query_params)
-            resultat = self.cursor.fetchone()
-            if resultat is not None:
-                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11])
-                return faller
-            else:
-                return None
-        except (sqlite3.Error, TypeError, ValueError) as e:
-            print("Error al llegir la familia de la base de dades:", e)
-            return None
-
-
-    def llegir_faller_complet(self, id):
-        '''
-        Llig de la taula "faller" aquell faller amb l'id que se li passa per paràmetre.
-
-        Paràmetres:
-        -----------
-        id : integer
-            Identificador del faller.
-
-        Retorna:
-        --------
-        faller : Faller
             Objecte de la classe Faller complet amb els atributs "familia" i "categoria".
         '''
         query_params=(id,)
@@ -133,7 +116,7 @@ class BaseDeDades:
             else:
                 return None
         except (sqlite3.Error, TypeError, ValueError) as e:
-            print("Error al leer el socio de la base de datos:", e)
+            print("Error al llegir el faller de la base de dades:", e)
             return None
         
 
@@ -147,16 +130,18 @@ class BaseDeDades:
             Objecte de la classe Faller.
         '''
         try:
-            self.cursor.execute("SELECT * FROM faller ORDER BY id DESC LIMIT 1")
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id ORDER BY faller.id DESC LIMIT 1")
             resultat = self.cursor.fetchone()
             if resultat is not None:
                 # Crear objecte Faller a partir de la fila obtinguda a la base de dades
-                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11])
+                familia= Familia(resultat[12], resultat[13], resultat[14])
+                categoria= Categoria(resultat[15], resultat[16], resultat[17], resultat[18])
+                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
                 return faller
             else:
                 return None
         except (sqlite3.Error, TypeError, ValueError) as e:
-            print("Error al leer el socio de la base de datos:", e)
+            print("Error al llegir el faller de la base de dades:", e)
             return None
 
     
@@ -171,11 +156,13 @@ class BaseDeDades:
             Llistat d'objectes de la classe Faller.
         '''
         try:
-            self.cursor.execute("SELECT * FROM faller")
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id")
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11])
+                familia= Familia(valors[12], valors[13], valors[14])
+                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -197,11 +184,13 @@ class BaseDeDades:
             Llistat d'objectes de la classe Faller.
         '''
         try:
-            self.cursor.execute("SELECT * FROM faller WHERE alta=1 and (idcategoria=1 or idcategoria=2) ORDER BY cognoms")
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.alta=1 and (faller.idcategoria=1 or faller.idcategoria=2) ORDER BY faller.cognoms")
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11])
+                familia= Familia(valors[12], valors[13], valors[14])
+                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -230,45 +219,13 @@ class BaseDeDades:
         valor="%" + cadena + "%"
         query_params=(valor,)
         try:
-            self.cursor.execute("SELECT * FROM faller WHERE cognoms LIKE ?", query_params)
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.cognoms LIKE ?", query_params)
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11])
-                llistat_fallers.append(faller)
-            return llistat_fallers
-        except sqlite3.Error as e:
-            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
-            return None
-        except ConnectionError as e:
-            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
-            return None
-        
-
-    def llegir_fallers_amb_familia_per_cognom(self, cadena):
-        '''
-        Llig de la taula "faller" en combinació de la taula "familia" tots aquells fallers amb un cognom que conté la cadena
-        passada per paràmetre.
-
-        Paràmetres:
-        -----------
-        cadena : string
-            Cadena de caràcters a la que s'ha de pareixer el cognom dels fallers.
-
-        Retorna:
-        --------
-        llistat_fallers : llista
-            Llistat d'objectes de la classe Faller amb l'atribut "familia" inclós.
-        '''
-        valor="%" + cadena + "%"
-        query_params=(valor,)
-        try:
-            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id WHERE faller.cognoms LIKE ?", query_params)
-            resultat = self.cursor.fetchall()
-            llistat_fallers=[]
-            for valors in resultat:
-                familia = Familia(valors[12], valors[13], valors[14])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia=familia)
+                familia= Familia(valors[12], valors[13], valors[14])
+                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -296,75 +253,10 @@ class BaseDeDades:
         '''
         query_params=(id_familia,)
         try:
-            self.cursor.execute("SELECT * FROM faller WHERE idfamilia=?", query_params)
-            resultat = self.cursor.fetchall()
-            llistat_fallers=[]
-            for valors in resultat:
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11])
-                llistat_fallers.append(faller)
-            return llistat_fallers
-        except sqlite3.Error as e:
-            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
-            return None
-        except ConnectionError as e:
-            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
-            return None
-        
-
-    def llegir_fallers_amb_categoria_per_familia(self, id_familia):
-        '''
-        Llig de la taula "faller" en combinació de la taula "categoria" tots aquells fallers amb l'identificador de familia
-        passat per paràmetre.
-
-        Paràmetres:
-        -----------
-        id_familia : integer
-            Identificador de la familia del faller.
-
-        Retorna:
-        --------
-        llistat_fallers : llista
-            Llistat d'objectes de la classe Faller amb l'atribut "categoria" inclós.
-        '''
-        query_params=(id_familia,)
-        try:
-            self.cursor.execute("SELECT * FROM faller INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.idfamilia=?", query_params)
-            resultat = self.cursor.fetchall()
-            llistat_fallers=[]
-            for valors in resultat:
-                categoria = Categoria(valors[12], valors[13], valors[14], valors[15])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], categoria=categoria)
-                llistat_fallers.append(faller)
-            return llistat_fallers
-        except sqlite3.Error as e:
-            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
-            return None
-        except ConnectionError as e:
-            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
-            return None
-        
-
-    def llegir_fallers_complets_per_familia(self, id_familia):
-        '''
-        Llig de la taula "faller" aquell faller amb l'id que se li passa per paràmetre.
-
-        Paràmetres:
-        -----------
-        id_familia : integer
-            Identificador de la familia del faller.
-
-        Retorna:
-        --------
-        llistat_fallers : llista
-            Llistat d'objectes de la classe Faller amb els atributs "familia" i "categoria" inclosos.
-        '''
-        query_params=(id_familia,)
-        try:
             self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.idfamilia=?", query_params)
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                # Crear objecte Faller a partir de la fila obtinguda a la base de dades
                 familia= Familia(valors[12], valors[13], valors[14])
                 categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
@@ -378,7 +270,7 @@ class BaseDeDades:
             return None
         
         
-    def llegir_fallers_complets_per_alta(self, alta):
+    def llegir_fallers_per_alta(self, alta):
         '''
         Llig de la taula "faller" tots aquells fallers amb l'estat d'alta del faller
         passat per paràmetre.

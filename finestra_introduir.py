@@ -204,7 +204,7 @@ class FinestraIntroduir(tk.Toplevel):
 		'''
 		bd=BaseDeDades("falla.db")
 		cadena=self.combo_box_familiar_faller.get()
-		llistat_fallers=bd.llegir_fallers_amb_familia_per_cognom(cadena)
+		llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
 		llista=[] # Llista on anem a acumular els valors.
 		self.identificadors=[]
 		for faller in llistat_fallers:
@@ -265,7 +265,7 @@ class FinestraIntroduir(tk.Toplevel):
 						categoria
 					)
 					bd.crear_faller(faller)
-					llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(
+					llistat_fallers=bd.llegir_fallers_per_familia(
 						self.identificador_familia
 					)
 					familia.calcular_descompte(llistat_fallers)

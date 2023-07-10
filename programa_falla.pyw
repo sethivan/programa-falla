@@ -11,10 +11,15 @@ Desenvolupat per Ivan Mas Presentación 2020.
 
 import tkinter as tk
 from tkinter import messagebox
+import os
 
 from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
+
+from arxiu import Arxiu
+from utils import Utils
+from base_de_dades import BaseDeDades
 
 from falla import Falla
 
@@ -101,6 +106,40 @@ class Aplicacio(tk.Frame):
 		self.barraMenu.add_cascade(label="Llistats", menu=self.llistatsMenu)
 		self.barraMenu.add_cascade(label="Exercici", menu=self.exerciciMenu)
 		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
+
+		# Comprovació que s'efectua cada vegada que es fica en marxa el programa.
+		self.arrancar()
+
+
+	def arrancar(self):
+		'''
+		Comprova si existeixen els arxius necessaris per a que funcione el programa i en cas de que falten, els crea.
+		Si es crea algún arxiu, avisa a l'usuari de que ho ha fet per a que prenga les mesures necessàries.
+		'''
+		if not os.path.exists("exercici"):
+			llista=[]
+			arxiu=Arxiu("exercici")
+			utils=Utils()
+			data_actual=utils.calcular_data_actual()
+			dia_actual=int(data_actual[0])
+			mes_actual=int(data_actual[1])
+			any_actual=int(data_actual[2])
+			if mes_actual>3:
+				any_exercici=any_actual+1
+			elif mes_actual<2:
+				any_exercici=any_actual
+			elif mes_actual==3 and dia_actual>19:
+				any_exercici=any_actual+1
+			elif mes_actual==3 and dia_actual<=19:
+				any_exercici=any_actual
+			llista.append(any_exercici)
+			arxiu.modificar_exercici_actual(llista)
+			messagebox.showwarning("Avís", "No hi havia cap arxiu amb l'informació de l'exercici i s'ha creat un nou")
+		if not os.path.exists("falla.db"):
+			bd=BaseDeDades("falla.db")
+			bd.crear_taules()
+			bd.tancar_conexio()
+			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")
 	
 	
 	def gestionar(self):

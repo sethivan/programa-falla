@@ -452,7 +452,7 @@ class FinestraGestionar(tk.Toplevel):
 		bd=BaseDeDades("falla.db")
 		id=self.id.get()
 		exercici_actual=arxiu.llegir_exercici_actual()
-		faller=bd.llegir_faller_complet(id)
+		faller=bd.llegir_faller(id)
 		nom_arxiu="historials"+"/"+str(faller.id)
 		arxiu=Arxiu(nom_arxiu)
 		historial=arxiu.llegir_historial()
@@ -472,7 +472,7 @@ class FinestraGestionar(tk.Toplevel):
 				faller.alta=1
 				bd.actualitzar_faller(faller)
 				historial[exercici_actual]=["vocal", "Sants Patrons"]				
-		llistat_fallers=bd.llegir_fallers_amb_categoria_per_familia(faller.familia.id)
+		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 		faller.familia.calcular_descompte(llistat_fallers)
 		bd.actualitzar_familia(faller.familia)
 		arxiu.modificar_historial(historial)
@@ -533,7 +533,7 @@ class FinestraGestionar(tk.Toplevel):
 		Ompli el combobox amb tots els familiars del faller.
 		'''
 		bd=BaseDeDades("falla.db")
-		faller=bd.llegir_faller_complet(self.id.get())
+		faller=bd.llegir_faller(self.id.get())
 		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 		llista=[]
 		self.identificadors=[]
@@ -563,7 +563,7 @@ class FinestraGestionar(tk.Toplevel):
 		arxiu=Arxiu("exercici")
 		falla=Falla()
 		quota=0
-		faller=bd.llegir_faller_complet(id)
+		faller=bd.llegir_faller(id)
 
 		# Omplim els camps de dades personals.
 		self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
@@ -654,7 +654,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.deute_total.set("{0:.2f}".format((quota_final+loteria_assignada+rifa_assignada)-(quota_pagada+loteria_pagada+rifa_pagada)) + " €")
 
 		# Omplim els camps d'assignacions i pagaments de la familia completa del faller.
-		llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+		llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 		membres=0
 		for faller in llistat_fallers:
 			if faller.alta==1:
@@ -997,8 +997,8 @@ class FinestraGestionar(tk.Toplevel):
 			if float(self.pagar_quota_familia.get())==0 and float(self.pagar_loteria_familia.get())==0 and float(self.pagar_rifa_familia.get())==0:
 				messagebox.showwarning("Error", "No es pot fer un pagament de 0 euros")						
 			else:
-				faller=bd.llegir_faller_complet(self.id.get())
-				llistat_fallers=bd.llegir_fallers_complets_per_familia(faller.familia.id)
+				faller=bd.llegir_faller(self.id.get())
+				llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
 				#falla.llegir_fallers("familia", faller.familia.id)
 				membres=0
 				idfaller=[]
