@@ -225,6 +225,7 @@ class FinestraHistorial(tk.Toplevel):
 		self.infantil.set(anysinfantil)
 		self.punts.set(punts)
 		self.adult.set(anysadult)
+		bd.tancar_conexio()
 
 
 	def modificar(self):

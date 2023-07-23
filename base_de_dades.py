@@ -497,6 +497,21 @@ class BaseDeDades:
 
     # Mètodes per a operacions CRUD en la taula categoria.
         
+    def crear_categoria(self, categoria):
+        '''
+        Escriu a la base de dades la categoria que se li passa com a paràmetre a la taula "moviment".
+
+        Paràmetres:
+        -----------
+        categoria : Categoria
+            Objecte de la classe Moviment.
+        '''
+        dades=categoria.quota, categoria.nom, categoria.descripcio
+        self.cursor.execute("INSERT INTO categoria VALUES (null, ?, ?, ?)",(dades))
+        self.conexio.commit()
+    
+    
+    
     def llegir_categoria(self, id):
         '''
         Llig de la taula "categoria" aquella categoria amb l'id que se li passa per paràmetre.
@@ -523,4 +538,22 @@ class BaseDeDades:
         except (sqlite3.Error, TypeError, ValueError) as e:
             print("Error al llegir la categoria de la base de dades:", e)
             return None
+        
 
+    def actualitzar_categoria(self, categoria):
+
+        '''
+        Actualitza la taula "categoria" amb l'objecte de la classe Categoria que se li passa per paràmetre.
+
+        Paràmetres:
+        -----------
+        categoria : Categoria
+            Objecte de la classe Categoria.
+        '''
+        dades=categoria.quota, categoria.nom, categoria.descripcio, categoria.id
+        try:
+            self.cursor.execute("UPDATE categoria SET quota=?, nom=?, descripcio=? WHERE id=?", (dades))
+        except sqlite3.Error:
+            messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
+        else:
+            self.conexio.commit()

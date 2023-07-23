@@ -16,12 +16,14 @@ import os
 from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
+from finestra_categories import FinestraCategories
 
 from arxiu import Arxiu
 from utils import Utils
 from base_de_dades import BaseDeDades
 
 from falla import Falla
+from categoria import Categoria
 
 
 class Aplicacio(tk.Frame):
@@ -59,6 +61,10 @@ class Aplicacio(tk.Frame):
 		# Submenú Arxiu.
 		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
 		self.arxiuMenu.add_command(label="Eixir", command=self.eixir)
+
+		# Submenú Categoria.
+		self.categoriaMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
+		self.categoriaMenu.add_command(label="Modificar", command=self.modificar_categoria)
 
 		# Submenú Faller.
 		self.fallerMenu=tk.Menu(self.barraMenu, tearoff=0)
@@ -99,6 +105,7 @@ class Aplicacio(tk.Frame):
 
 		# Afegim tots els submenús a la barra.
 		self.barraMenu.add_cascade(label="Arxiu", menu=self.arxiuMenu)
+		self.barraMenu.add_cascade(label="Categoria", menu=self.categoriaMenu)
 		self.barraMenu.add_cascade(label="Faller", menu=self.fallerMenu)
 		self.barraMenu.add_cascade(label="Loteria", menu=self.loteriaMenu)
 		self.barraMenu.add_cascade(label="Rifa", menu=self.rifaMenu)
@@ -138,8 +145,27 @@ class Aplicacio(tk.Frame):
 		if not os.path.exists("falla.db"):
 			bd=BaseDeDades("falla.db")
 			bd.crear_taules()
+			categoria=Categoria(0, 475, "adult", "major de 18 anys")
+			bd.crear_categoria(categoria)
+			categoria=Categoria(0, 300, "cadet", "entre 14 i 17 anys")
+			bd.crear_categoria(categoria)
+			categoria=Categoria(0, 200, "juvenil", "entre 10 i 13 anys")
+			bd.crear_categoria(categoria)
+			categoria=Categoria(0, 125, "infantil", "entre 5 i 9 anys")
+			bd.crear_categoria(categoria)
+			categoria=Categoria(0, 50, "bebè", "menor de 5 anys")
+			bd.crear_categoria(categoria)
 			bd.tancar_conexio()
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")
+	
+	
+	def modificar_categoria(self):
+		''' 
+		Crea una nova instància de la classe FinestraGestionar
+		que obri la finestra "Gestionar" del menú "Faller".
+		'''
+		modificar_categoria=FinestraCategories(self)
+		modificar_categoria.iniciar()
 	
 	
 	def gestionar(self):

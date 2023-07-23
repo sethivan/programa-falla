@@ -476,6 +476,7 @@ class FinestraGestionar(tk.Toplevel):
 		faller.familia.calcular_descompte(llistat_fallers)
 		bd.actualitzar_familia(faller.familia)
 		arxiu.modificar_historial(historial)
+		bd.tancar_conexio()
 		self.entry_id.focus() # Fica el foco en el camp id.
 		self.buscar_per_id('<Return>') # Refresca les dades fent la cerca de nou amb el id del faller.
 
@@ -491,15 +492,19 @@ class FinestraGestionar(tk.Toplevel):
 		bd=BaseDeDades("falla.db")
 		id=self.id.get()
 		faller=bd.llegir_ultim_faller()
-		if faller.id < int(self.id.get()): # Si el id que fiquem es major que el de l'últim faller.
-			messagebox.showwarning("Error", "No existeix un faller amb eixa id")
-			if self.id_anterior==0: # Si es la primera cerca.
-				self.id.set("")
+		try:
+			if faller.id < int(self.id.get()): # Si el id que fiquem es major que el de l'últim faller.
+				messagebox.showwarning("Error", "No existeix un faller amb eixa id")
+				if self.id_anterior==0: # Si es la primera cerca.
+					self.id.set("")
+				else:
+					self.id.set(self.id_anterior) # Fiquem el id que hem buscat anteriorment.
 			else:
-				self.id.set(self.id_anterior) # Fiquem el id que hem buscat anteriorment.
-		else:
-			self.id_anterior=id # Guardem l'ultima cerca per si apareix un error en la següent.
-			self.omplir_dades(id)
+				self.id_anterior=id # Guardem l'ultima cerca per si apareix un error en la següent.
+				self.omplir_dades(id)
+		except:
+			messagebox.showinfo("Info", "Encara no tens fallers a la base de dades")
+		bd.tancar_conexio()
 		
 
 	def desplegar_faller(self):
@@ -516,6 +521,7 @@ class FinestraGestionar(tk.Toplevel):
 			self.identificadors=self.identificadors+[faller.id]
 			llista=llista + [(faller.cognoms + ", " + faller.nom)]
 		self.combo_box_faller["values"]=llista # Insertem cada valor en el desplegable.
+		bd.tancar_conexio()
 
 	
 	def seleccionar_faller(self, event):
@@ -541,6 +547,7 @@ class FinestraGestionar(tk.Toplevel):
 			self.identificadors=self.identificadors+[faller.id]
 			llista=llista + [(faller.cognoms + ", " + faller.nom)]
 		self.combo_box_familia["values"]=llista
+		bd.tancar_conexio()
 
 
 	def seleccionar_familia(self, event):
@@ -730,6 +737,7 @@ class FinestraGestionar(tk.Toplevel):
 				self.tree_moviments.insert("","end", text=moviment.id, values=(moviment.data, "{0:.2f}".format(moviment.quantitat) + " €", "", concepte, moviment.descripcio))
 			elif moviment.tipo==2:
 				self.tree_moviments.insert("","end", text=moviment.id, values=(moviment.data, "", "{0:.2f}".format(moviment.quantitat) + " €", concepte, moviment.descripcio))
+		bd.tancar_conexio()
 
 		
 	def fer_seleccio(self, event, entry):
@@ -935,8 +943,9 @@ class FinestraGestionar(tk.Toplevel):
 					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
 					#elRebut=Informe()
 					#elRebut.Rebut(0,self.fallerCombo.get(), pagquo, paglot, pagrif, self.quotaString.get()[:-2], self.quotapagString.get()[:-2], self.loteriaString.get()[:-2], self.loteriapagString.get()[:-2], self.rifaString.get()[:-2], self.rifapagString.get()[:-2])			
+		bd.tancar_conexio()
 
-
+	
 	def PagarFam(self):
 
 		bd=BaseDeDades("falla.db")
@@ -1112,7 +1121,8 @@ class FinestraGestionar(tk.Toplevel):
 				#if opcio=="1":
 					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
 					#elRebut.Rebut(1,self.fallerCombo.get(), pagquofam, paglotfam, pagriffam, self.quotafamString.get()[:-2], self.quotapagadafamString.get()[:-2], self.loteriafamString.get()[:-2], self.loteriapagadafamString.get()[:-2], self.rifafamString.get()[:-2], self.rifapagadafamString.get()[:-2])
-
+		bd.tancar_conexio()
+	
 	
 	def assignar(self):
 		'''
@@ -1138,3 +1148,4 @@ class FinestraGestionar(tk.Toplevel):
 			except ValueError:
 				messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 				self.total_assignacio.set(0)
+		bd.tancar_conexio()
