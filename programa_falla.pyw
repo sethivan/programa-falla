@@ -12,6 +12,7 @@ Desenvolupat per Ivan Mas Presentación 2020.
 import tkinter as tk
 from tkinter import messagebox
 import os
+import platform
 
 from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
@@ -49,9 +50,13 @@ class Aplicacio(tk.Frame):
         """
 		super().__init__(master) # Heretem de la classe Frame.
 		self.master=master
-		self.master.state('zoomed') # La finestra s'obri maximitzada.
+		sistema_operatiu=platform.system()
+		if sistema_operatiu=='Windows':
+			self.master.state('zoomed') # La finestra s'obri maximitzada.
+			self.master.iconbitmap("escut.ico")
+		elif sistema_operatiu=='Linux':
+			self.master.attributes('-zoomed', True)
 		self.master.title("Falla Sants Patrons")
-		self.master.iconbitmap("escut.ico")
 		self.pack()
 		
 		# Barra de menú.

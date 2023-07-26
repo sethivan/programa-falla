@@ -11,8 +11,8 @@ from falla import Falla
 from moviment import Moviment
 from finestra_modificar import FinestraModificar
 #from informe import *
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
+#from reportlab.pdfgen import canvas
+#from reportlab.lib.pagesizes import A4
 
 
 class FinestraGestionar(tk.Toplevel):
