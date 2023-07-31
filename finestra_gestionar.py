@@ -89,7 +89,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.modificar_oberta=0 # Atribut amb què controlem l'obertura de la finestra FinestraModificar.
 		self.id_anterior=0 # Atribut on guardem el id anteriorment buscat per a retornar-lo en cas d'error.
 		
-		# Frames en els que dividim la finestra
+		# Frames en els que dividim la finestra.
 		label_frame_exercici=LabelFrame(self, text="Exercici")
 		label_frame_exercici.grid(row=0, column=0, columnspan=1, pady=5, ipadx=20, ipady=2)
 
@@ -120,7 +120,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.entry_exercici=tk.Entry(label_frame_exercici, width=10, state="disabled", disabledforeground="black", textvariable=self.exercici)
 		self.entry_exercici.pack()
 
-		# Frame "Buscar faller"
+		# Frame "Buscar faller".
 		self.button_alta=tk.Button(label_frame_buscar, state="disabled", width=15, text="Donar d'alta", command=self.canviar_estat)
 		self.button_alta.grid(row=0, column=0, padx=5, sticky="w"+"e")
 		

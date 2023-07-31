@@ -163,7 +163,21 @@ class Faller():
 
 
 	def calcular_edat(self, naixement, exercici):
-        
+		'''
+		A partir de la data de naixement i l'exercici actual calculem l'edat del faller a data 19 de març del present exercici.
+
+		Paràmetres:
+		-----------
+		naixement : string
+			La data de naixement del faller.
+		exercici : int
+			L'exercici actual.
+		
+		Retorna:
+        --------
+        edat : int
+            L'edat del faller a data 19 de març del present exercici.
+		'''
 		naixement_faller=datetime.strptime(naixement, '%d-%m-%Y')
 		any_naixement=datetime.strftime(naixement_faller, '%Y')
 		mes_naixement=datetime.strftime(naixement_faller, '%m')
@@ -178,7 +192,19 @@ class Faller():
 	
 
 	def calcular_primer_exercici(self, naixement):
+		'''
+		A partir de la data de naixement calculem quin podria haver segut el seu primer exercici.
 
+		Paràmetres:
+		-----------
+		naixement : string
+			La data de naixement del faller.
+		
+		Retorna:
+        --------
+        exercici : int
+            Primer possible exercici del faller.
+		'''
 		naixement_faller=datetime.strptime(naixement, '%d-%m-%Y')
 		any_naixement=datetime.strftime(naixement_faller,'%Y')
 		mes_naixement=datetime.strftime(naixement_faller, '%m')
@@ -188,110 +214,3 @@ class Faller():
 		else:
 			exercici=int(any_naixement)
 		return exercici
-
-     
-
-'''
-
-
-
-	def BuscarQuotaFaller(self, num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM categoria INNER JOIN faller ON categoria.id=faller.idcategoria WHERE faller.id=?", query_params)
-		resultat=elCursor.fetchall()
-		for valors in resultat:
-			self.quota=valors[1]
-		laConexio.commit()
-		laConexio.close()
-
-
-	def AltaFaller(self,num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("UPDATE faller SET alta=1 WHERE id=?", query_params)
-		laConexio.commit()
-		laConexio.close()
-
-
-	def BuscarFallerAlta(self, num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM faller WHERE alta=? ORDER BY cognoms", query_params)
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
-
-
-	def BaixaFaller(self,num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("UPDATE faller SET alta=0 WHERE id=?", query_params)
-		laConexio.commit()
-		laConexio.close()
-
-
-	def ModificarFaller(self, num, nom, cognoms, naixement, sexe, dni, adresa, telefon, categ, correu):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		dades=nom, cognoms, naixement, sexe, dni, adresa, telefon, categ, correu, num
-		elCursor.execute("UPDATE faller SET nom=?, cognoms=?, naixement=?, sexe=?, dni=?, adreça=?, telefon=?, idcategoria=?, correu=? WHERE id=?",(dades))
-		laConexio.commit()
-		laConexio.close()
-
-
-	def ModificarFamilia(self, num, fam):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		dades=fam, num
-		elCursor.execute("UPDATE faller SET idfamilia=? WHERE id=?",(dades))
-		laConexio.commit()
-		laConexio.close()
-
-
-	def ModificarCategoria(self, num, cat):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		dades=cat, num
-		elCursor.execute("UPDATE faller SET idcategoria=? WHERE id=?",(dades))
-		laConexio.commit()
-		laConexio.close()
-
-
-	def RecuperarUltimFaller(self):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		elCursor.execute("SELECT * FROM faller ORDER BY id DESC LIMIT 1")
-		resultat=elCursor.fetchall()
-		for valors in resultat:
-			self.id=valors[0]
-			self.familia=valors[9]
-		laConexio.commit()
-		laConexio.close()
-
-
-	def BuscarFallerPerCategoria(self, num):
-
-		laConexio=sqlite3.connect("falla.db")
-		elCursor=laConexio.cursor()
-		query_params=(num,)
-		elCursor.execute("SELECT * FROM faller WHERE idcategoria=?", query_params)
-		resultat=elCursor.fetchall()
-		laConexio.commit()
-		laConexio.close()
-		return(resultat)
-
-'''

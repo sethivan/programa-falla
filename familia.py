@@ -44,7 +44,14 @@ class Familia():
 
 	
 	def calcular_descompte(self, llistat_fallers):
-		#falta controlar errors. Per exemple si falta la categoria
+		'''
+		A partir del llistat de fallers d'una mateixa familia calculem el descompte segons els membres actius.
+
+		Paràmetres:
+		-----------
+		llistat_fallers : llista
+			Llistat de fallers que pertanyen a la mateixa familia.
+		'''
 		membres=0
 		maxima=False
 		for faller in llistat_fallers:
@@ -60,7 +67,19 @@ class Familia():
 			self.descompte=0
 
 	def calcular_membres(self, llistat_fallers):
+		'''
+		A partir del llistat de fallers d'una mateixa familia calculem els membres actius.
 
+		Paràmetres:
+		-----------
+		llistat_fallers : llista
+			Llistat de fallers que pertanyen a la mateixa familia.
+
+		Retorna:
+        --------
+        membres : int
+            Membres actius de la familia.
+		'''
 		membres=0
 		for faller in llistat_fallers:
 			if faller.alta==1:

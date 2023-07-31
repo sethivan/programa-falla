@@ -166,8 +166,8 @@ class Aplicacio(tk.Frame):
 	
 	def modificar_categoria(self):
 		''' 
-		Crea una nova instància de la classe FinestraGestionar
-		que obri la finestra "Gestionar" del menú "Faller".
+		Crea una nova instància de la classe FinestraCategories
+		que obri la finestra "Modificar" del menú "Categoria".
 		'''
 		modificar_categoria=FinestraCategories(self)
 		modificar_categoria.iniciar()

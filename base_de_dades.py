@@ -541,7 +541,6 @@ class BaseDeDades:
         
 
     def actualitzar_categoria(self, categoria):
-
         '''
         Actualitza la taula "categoria" amb l'objecte de la classe Categoria que se li passa per paràmetre.
 

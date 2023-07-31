@@ -8,7 +8,14 @@ class Utils():
 
 
     def calcular_data_actual(self):
+        '''
+		Llegim la data actual del sistema i la tornem en format llista.
 
+		Retorna:
+        --------
+        data_final : llista
+            Llistat amb el dia, mes i any actuals.
+		'''
         data=datetime.now()
         any_actual=datetime.strftime(data,'%Y')
         mes_actual=datetime.strftime(data,'%m')
@@ -17,6 +24,5 @@ class Utils():
         data_final.append(dia_actual)
         data_final.append(mes_actual)
         data_final.append(any_actual)
-        #data_final=dia_actual + "-" + mes_actual + "-" + any_actual
         return data_final
 

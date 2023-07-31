@@ -42,17 +42,27 @@ class FinestraHistorial(tk.Toplevel):
 		self.any_inici=tk.StringVar()
 		self.any_final=tk.StringVar()
 
-		self.identificadors=[]
+		self.identificadors=[] # Atribut per guardar els id_faller del llistat del combo.
 
+		# Frames en els que dividim la finestra.
 		label_frame_buscar=LabelFrame(self, text="Buscar faller")
 		label_frame_buscar.grid(row=0, column=0, ipadx=2, ipady=2)
 
+		label_frame_totals=LabelFrame(self, text="Totals")
+		label_frame_totals.grid(row=2, column=0, ipadx=2, ipady=2)
+
+		label_frame_modificar=LabelFrame(self, text="Modificar")
+		label_frame_modificar.grid(row=3, column=0, ipadx=2, ipady=2)
+
+		# Widgets per a cada frame.
+
+		# Frame "Buscar".
 		self.label_nom=ttk.Label(label_frame_buscar, text="Nom")
 		self.label_nom.grid(row=0, column=0, padx=2)
 
-		self.combo_box_faller=ttk.Combobox(label_frame_buscar, width=30, postcommand=self.dropdown_opened_historial)
+		self.combo_box_faller=ttk.Combobox(label_frame_buscar, width=30, postcommand=self.desplegar_historial)
 		self.combo_box_faller.grid(row=0, column=1)
-		self.combo_box_faller.bind("<<ComboboxSelected>>", self.selection_changed_historial)
+		self.combo_box_faller.bind("<<ComboboxSelected>>", self.seleccionar_historial)
 
 		self.label_id=ttk.Label(label_frame_buscar, text="Id")
 		self.label_id.grid(row=0, column=2, padx=2)
@@ -60,6 +70,7 @@ class FinestraHistorial(tk.Toplevel):
 		self.entry_id=ttk.Entry(label_frame_buscar, state="disabled", textvariable=self.id)
 		self.entry_id.grid(row=0, column=3, padx=2)
 
+		# La taula no va associada a cap frame.
 		self.tree_historial=ttk.Treeview(self, height=10)
 		self.tree_historial["columns"]=("uno", "dos", "tres", "quatre")
 		self.tree_historial.column("#0", width=80)
@@ -73,16 +84,13 @@ class FinestraHistorial(tk.Toplevel):
 		self.tree_historial.heading("tres", text="anys")
 		self.tree_historial.heading("quatre", text="falla")
 		self.tree_historial.grid(row=1, column=0, padx=10, pady=5)
-		#self.tree_historial.bind("<<TreeviewSelect>>", self.item_selected)
 
 		self.scroll_taula=ttk.Scrollbar(self, command=self.tree_historial.yview)
 		self.scroll_taula.grid(row=1, column=1, sticky="nsew")
 
 		self.tree_historial.config(yscrollcommand=self.scroll_taula.set)
 
-		label_frame_totals=LabelFrame(self, text="Totals")
-		label_frame_totals.grid(row=2, column=0, ipadx=2, ipady=2)
-
+		# Frame "Totals".
 		self.label_infantil=ttk.Label(label_frame_totals, text="Anys d'infantil:")
 		self.label_infantil.grid(row=0, column=0, padx=2)
 
@@ -101,28 +109,28 @@ class FinestraHistorial(tk.Toplevel):
 		self.entry_adult=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.adult)
 		self.entry_adult.grid(row=0, column=5, padx=2)
 
-		label_frame_modificar=LabelFrame(self, text="Modificar")
-		label_frame_modificar.grid(row=3, column=0, ipadx=2, ipady=2)
-
+		# Frame "Modificar".
 		self.label_interval=ttk.Label(label_frame_modificar, text="Interval d'anys:")
 		self.label_interval.grid(row=1, column=0, padx=2)
 
-		self.entry_any_inici=ttk.Entry(label_frame_modificar, textvariable=self.any_inici)
+		self.entry_any_inici=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.any_inici)
 		self.entry_any_inici.grid(row=1, column=1, padx=2)
 
-		self.entry_any_final=ttk.Entry(label_frame_modificar, textvariable=self.any_final)
+		self.entry_any_final=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.any_final)
 		self.entry_any_final.grid(row=1, column=2, padx=2)
 
-		self.combo_box_carrec=ttk.Combobox(label_frame_modificar, width=20, state="readonly", values=["baixa", "vocal", "fallera major infantil", "president infantil", "directiu", "cort JFL", "fallera major", "president", "fallera major Alzira", "president JLF"])
+		self.combo_box_carrec=ttk.Combobox(label_frame_modificar, width=20, state="disabled", values=["baixa", "vocal", "fallera major infantil", "president infantil", "directiu", "cort JFL", "fallera major", "president", "fallera major Alzira", "president JLF"])
+		self.combo_box_carrec.current(1)
 		self.combo_box_carrec.grid(row=1, column=3)
 
 		self.label_falla=ttk.Label(label_frame_modificar, text="Falla:")
 		self.label_falla.grid(row=1, column=4, padx=2)
 
-		self.entry_falla=ttk.Entry(label_frame_modificar, textvariable=self.falla)
+		self.entry_falla=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.falla)
+		self.falla.set("Falla Sants Patrons")
 		self.entry_falla.grid(row=1, column=5, padx=2)
 
-		self.button_modificar=ttk.Button(label_frame_modificar, text="Modificar càrrec", command=self.modificar)
+		self.button_modificar=ttk.Button(label_frame_modificar, state="disabled", text="Modificar càrrec", command=self.modificar)
 		self.button_modificar.grid(row=1, column=6)
 
 
@@ -135,8 +143,11 @@ class FinestraHistorial(tk.Toplevel):
 		self.mainloop()
 	
 	
-	def dropdown_opened_historial(self):
-
+	def desplegar_historial(self):
+		'''
+		Controla el combobox comparant la cadena escrita amb la base de dades i mostrant els resultats en el combobox.
+		Utilitza l'atribut "self.identificadors" per a passar el identificador de faller a la funció "seleccionar_historial".
+		'''
 		bd=BaseDeDades("falla.db")
 		cadena=self.combo_box_faller.get()
 		llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
@@ -149,19 +160,23 @@ class FinestraHistorial(tk.Toplevel):
 		bd.tancar_conexio()
 
 
-	def selection_changed_historial(self, event):
-
+	def seleccionar_historial(self, event):
+		'''
+		Controla la selecció del combobox per a guardar el identificador del faller i omplir l'historial a partir d'aquest.
+		'''
 		index=self.combo_box_faller.current()
 		self.id.set(self.identificadors[index])
 		cadena=self.id.get()
 		self.identificadors=[]
-		self.OmplirHistorial(cadena)
+		self.omplir_historial(cadena)
 
 
-	def OmplirHistorial(self, num):
-
+	def omplir_historial(self, id):
+		'''
+		Ompli l'historial del faller a partir de l'id.
+		'''
 		bd=BaseDeDades("falla.db")
-		faller=bd.llegir_faller(num)
+		faller=bd.llegir_faller(id)
 		self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
 		self.tree_historial.delete(*self.tree_historial.get_children())
 		nom_arxiu="historials"+"/"+str(faller.id)
@@ -173,8 +188,8 @@ class FinestraHistorial(tk.Toplevel):
 		punts=0
 		anysinfantil=0
 		anysadult=0
-		anycadete=anyexercici+14 #afegim 14 anys a l'any del primer exercici per a treure el primer de cadet
-		while (anyexercici < anycadete) and (anyexercici <= exercici_actual): #traguem els anys de cadet
+		anycadete=anyexercici+14 # Afegim 14 anys a l'any del primer exercici per a treure el primer any de cadet.
+		while (anyexercici < anycadete) and (anyexercici <= exercici_actual): # Calculem els anys d'infantil.
 			llista=historial[anyexercici]
 			carrec=llista[0]
 			falla=llista[1]
@@ -187,7 +202,7 @@ class FinestraHistorial(tk.Toplevel):
 				self.tree_historial.insert("", "end", text=anyexercici, values=(carrec, 0, 2, falla))
 				anysinfantil=anysinfantil+2
 			anyexercici=anyexercici+1
-		while anyexercici <= exercici_actual: #traguem els punts i anys d'adult
+		while anyexercici <= exercici_actual: # Calculem els punts i anys d'adult.
 			llista=historial[anyexercici]
 			carrec=llista[0]
 			falla=llista[1]
@@ -222,26 +237,41 @@ class FinestraHistorial(tk.Toplevel):
 					self.tree_historial.insert("", "end", text=anyexercici, values=(carrec, 12, 0, falla))
 					punts=punts+12
 			anyexercici=anyexercici+1
+		# Omplim les dades finals calculades.
 		self.infantil.set(anysinfantil)
 		self.punts.set(punts)
 		self.adult.set(anysadult)
+		# Fiquem en marxa els camps i botons per a poder modificar l'historial.
+		self.entry_any_inici.config(state="normal")
+		self.entry_any_final.config(state="normal")
+		self.combo_box_carrec.config(state="readonly")
+		self.entry_falla.config(state="normal")
+		self.button_modificar.config(state="normal")
 		bd.tancar_conexio()
 
 
 	def modificar(self):
-
+		'''
+		Modifica l'historial del faller amb les dades del formulari.
+		'''
 		nom_arxiu="historials"+"/"+self.id.get()
 		arxiu=Arxiu(nom_arxiu)
-		anyinici=int(self.any_inici.get())
-		anyfinal=int(self.any_final.get())
-		carrec=self.combo_box_carrec.get()
-		falla=self.falla.get()
-		historial=arxiu.llegir_historial()
-		while anyinici<=anyfinal:
-			llista=[carrec, falla]
-			historial[anyinici]=llista
-			anyinici=anyinici+1
-		arxiu.modificar_historial(historial)
-		cadena=self.id.get()
-		self.OmplirHistorial(cadena)
+		try:
+			anyinici=int(self.any_inici.get())
+			anyfinal=int(self.any_final.get())
+		except ValueError:
+			messagebox.showwarning("Error", "Has d'escriure un any vàlid")
+		else:
+			carrec=self.combo_box_carrec.get()
+			falla=self.falla.get()
+			historial=arxiu.llegir_historial()
+			if anyfinal<anyinici:
+				messagebox.showwarning("Error", "L'any inicial ha de ser menor o igual a l'any final")
+			while anyinici<=anyfinal:
+				llista=[carrec, falla]
+				historial[anyinici]=llista
+				anyinici=anyinici+1
+			arxiu.modificar_historial(historial)
+			cadena=self.id.get()
+			self.omplir_historial(cadena)
 		
