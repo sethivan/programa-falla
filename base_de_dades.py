@@ -269,6 +269,42 @@ class BaseDeDades:
             messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
             return None
         
+
+    def llegir_fallers_per_familia_i_alta(self, id_familia, alta):
+        '''
+        Llig de la taula "faller" tots aquells fallers amb l'identificador de familia
+        passat per paràmetre.
+
+        Paràmetres:
+        -----------
+        id_familia : integer
+            Identificador de la familia del faller.
+        alta : integer
+            Identificador de l'estat d'alta del faller.
+
+        Retorna:
+        --------
+        llistat_fallers : llista
+            Llistat d'objectes de la classe Faller.
+        '''
+        dades=id_familia, alta
+        try:
+            self.cursor.execute("SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.idfamilia=? and faller.alta=?", (dades))
+            resultat = self.cursor.fetchall()
+            llistat_fallers=[]
+            for valors in resultat:
+                familia= Familia(valors[12], valors[13], valors[14])
+                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                llistat_fallers.append(faller)
+            return llistat_fallers
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+        
         
     def llegir_fallers_per_alta(self, alta):
         '''
@@ -456,7 +492,7 @@ class BaseDeDades:
         moviment : Moviment
             Objecte de la classe Moviment.
         '''
-        dades=moviment.data, moviment.quantitat, moviment.tipo, moviment.concepte, moviment.exercici, moviment.faller.id, moviment.descripcio, 0
+        dades=moviment.data, moviment.quantitat, moviment.tipo, moviment.concepte, moviment.exercici, moviment.faller.id, moviment.descripcio, moviment.rebut
         self.cursor.execute("INSERT INTO moviment VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?)",(dades))
         self.conexio.commit()
     

@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
 from tkinter import LabelFrame
+import platform
 
 from base_de_dades import BaseDeDades
 from arxiu import Arxiu
@@ -16,9 +17,11 @@ class FinestraModificar(tk.Toplevel):
 
 		super().__init__(master)
 		self.master=master
+		sistema_operatiu=platform.system()
+		if sistema_operatiu=='Windows':
+			self.iconbitmap("escut.ico")
 		self.resizable(0,0)
 		self.title("Modificar Dades del Faller")
-		self.iconbitmap("escut.ico")
 
 		self.nom=tk.StringVar()
 		self.cognoms=tk.StringVar()

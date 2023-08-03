@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
 from tkinter import LabelFrame
+import platform
+from reportlab.lib.pagesizes import A4
 
 from arxiu import Arxiu
 from base_de_dades import BaseDeDades
@@ -9,10 +11,8 @@ from utils import Utils
 
 from falla import Falla
 from moviment import Moviment
+from informe import Informe
 from finestra_modificar import FinestraModificar
-#from informe import *
-#from reportlab.pdfgen import canvas
-#from reportlab.lib.pagesizes import A4
 
 
 class FinestraGestionar(tk.Toplevel):
@@ -30,9 +30,11 @@ class FinestraGestionar(tk.Toplevel):
 		'''
 		super().__init__(master)
 		self.master=master
+		sistema_operatiu=platform.system()
+		if sistema_operatiu=='Windows':
+			self.iconbitmap("escut.ico")
 		self.resizable(0,0)
 		self.title("Gestionar Faller")
-		self.iconbitmap("escut.ico")
 
 		self.exercici=tk.StringVar()
 		self.id=tk.StringVar()
@@ -268,7 +270,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.radio_button_banc.grid(row=5, column=3)
 		self.radio_button_caixa.select()
 
-		self.button_pagar=tk.Button(label_frame_moviments, state="disabled", text="Pagar", command=self.Pagar)
+		self.button_pagar=tk.Button(label_frame_moviments, state="disabled", text="Pagar", command=self.pagar)
 		self.button_pagar.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
 		# Frame "Moviments de la familia".
@@ -353,7 +355,7 @@ class FinestraGestionar(tk.Toplevel):
 		self.radio_button_familia_banc.grid(row=5, column=3)
 		self.radio_button_familia_caixa.select()
 
-		self.button_pagar_familia=tk.Button(label_frame_moviments_familia, state="disabled", text="Pagar", command=self.PagarFam)
+		self.button_pagar_familia=tk.Button(label_frame_moviments_familia, state="disabled", text="Pagar", command=self.pagar_familia)
 		self.button_pagar_familia.grid(row=5, column=4, padx=5, sticky="w"+"e")
 
 		# Frame "Assignar".
@@ -860,14 +862,17 @@ class FinestraGestionar(tk.Toplevel):
 			self.pagar_total_familia.set("{0:.2f}".format(pagar_quota_familia+pagar_loteria_familia+pagar_rifa_familia) + " €")
 		
 	
-	def Pagar(self):
-
+	def pagar(self):
+		'''
+		A partir de les quantitats indicades s'efectua el pagament de forma que es crea un moviment que es guarda a la base de dades
+		i es crea un rebut en cas de que aquest moviment s'efectue per caixa.
+		'''
 		arxiu=Arxiu('exercici')
 		bd=BaseDeDades('falla.db')
 		utils=Utils()
-		pagquo=0
-		paglot=0
-		pagrif=0
+		pagament_quota=0
+		pagament_loteria=0
+		pagament_rifa=0
 		if self.pagar_quota.get()=="":
 			self.pagar_quota.set(0)
 		if self.pagar_loteria.get()=="":
@@ -875,33 +880,32 @@ class FinestraGestionar(tk.Toplevel):
 		if self.pagar_rifa.get()=="":
 			self.pagar_rifa.set(0)
 		try:
-			pagquo=float(self.pagar_quota.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
+			pagament_quota=float(self.pagar_quota.get()) # Guardem en variables les quantitats a pagar per a mostrar-les al rebut.
 		except ValueError:
-			pagquo=0
+			pagament_quota=0
 			self.pagar_quota.set(0)
-			self.pagar_total.set("{0:.2f}".format(paglot+pagrif) + " €")
+			self.pagar_total.set("{0:.2f}".format(pagament_loteria+pagament_rifa) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			paglot=float(self.pagar_loteria.get())
+			pagament_loteria=float(self.pagar_loteria.get())
 		except ValueError:
-			paglot=0
+			pagament_loteria=0
 			self.pagar_loteria.set(0)
-			self.pagar_total.set("{0:.2f}".format(pagquo+pagrif) + " €")
+			self.pagar_total.set("{0:.2f}".format(pagament_quota+pagament_rifa) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			pagrif=float(self.pagar_rifa.get())
+			pagament_rifa=float(self.pagar_rifa.get())
 		except ValueError:
-			pagrif=0
+			pagament_rifa=0
 			self.pagar_rifa.set(0)
-			self.pagar_total.set("{0:.2f}".format(paglot+pagrif) + " €")
+			self.pagar_total.set("{0:.2f}".format(pagament_quota+pagament_loteria) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
-		opcio=self.forma_pagament.get() #guardem l'opció triada per a la descripció de la base de dades
+		opcio=self.forma_pagament.get() # Guardem l'opció triada per a la descripció de la base de dades.
 		descripcio=""
 		if opcio=="1":
 			descripcio="pagat en caixa"
 		if opcio=="2":
 			descripcio="pagat pel banc"
-			#desc="domiciliació"
 		valor=messagebox.askquestion("Pagar","Estàs segur que vols fer el pagament?")
 		if valor=="yes":
 			if self.pagar_quota.get()=="":
@@ -913,49 +917,47 @@ class FinestraGestionar(tk.Toplevel):
 			if float(self.pagar_quota.get())==0 and float(self.pagar_loteria.get())==0 and float(self.pagar_rifa.get())==0:
 				messagebox.showwarning("Error", "No es pot fer un pagament de 0 euros")
 			else:
-				rebut=0
-				#if opcio=="1":
-					#busquem el número que li pertocarà al rebut
-					#elRebut=Informe()
-					#numrebut=elRebut.AsignarNumRebut()
+				numero_rebut=0 # Per si el moviment es pel banc.
+				if opcio=="1":
+					# Busquem el número de rebut que li haurem d'asignar al nou rebut.
+					rebut=Informe()
+					numero_rebut=rebut.assignar_numero_rebut()
 				exercici_actual=arxiu.llegir_exercici_actual()
 				data=utils.calcular_data_actual()
 				data_actual=data[0] + "-" + data[1] + "-" + data[2]
-				#id=self.idString.get()
 				faller=bd.llegir_faller(self.id.get())
-				#inserta a la base de dades cada moviment realitzat
+				# Inserta a la base de dades cada moviment realitzat.
 				if float(self.pagar_quota.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
-					#elMoviment.InsertarPagament(float(self.pagarquotaString.get()), 1, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				if float(self.pagar_loteria.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
-					#elMoviment.InsertarPagament(float(self.pagarloteriaString.get()), 2, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
 				if float(self.pagar_rifa.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, rebut, faller)
+					moviment=Moviment(0, data_actual, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
-					#elMoviment.InsertarPagament(float(self.pagarrifaString.get()), 3, elMoviment.exercici, float(self.idString.get()), desc, numrebut)
-				#netegem les dades i refresquem per a vore el quadre de pagaments actualitzat
+				# Netegem les dades i refresquem per a vore el quadre de pagaments actualitzat.
 				self.entry_id.focus()
 				self.buscar_per_id('<Return>')
-				#if opcio=="1":
-					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
-					#elRebut=Informe()
-					#elRebut.Rebut(0,self.fallerCombo.get(), pagquo, paglot, pagrif, self.quotaString.get()[:-2], self.quotapagString.get()[:-2], self.loteriaString.get()[:-2], self.loteriapagString.get()[:-2], self.rifaString.get()[:-2], self.rifapagString.get()[:-2])			
+				if opcio=="1":
+					# Creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior.
+					rebut.crear_rebut(0,self.combo_box_faller.get(), pagament_quota, pagament_loteria, pagament_rifa, self.quota_assignada.get()[:-2], self.quota_pagada.get()[:-2], self.loteria_assignada.get()[:-2], self.loteria_pagada.get()[:-2], self.rifa_assignada.get()[:-2], self.rifa_pagada.get()[:-2])			
 		bd.tancar_conexio()
 
 	
-	def PagarFam(self):
-
+	def pagar_familia(self):
+		'''
+		A partir de les quantitats indicades s'efectua el pagament de forma que es crea un moviment per cada membre actiu de la familia
+		fins que s'esgota la quantitat a pagar. Aquest moviment es guarda a la base de dades
+		i es crea un rebut en cas de que aquest moviment s'efectue per caixa.
+		'''
 		bd=BaseDeDades("falla.db")
 		falla=Falla()
 		arxiu=Arxiu("exercici")
 		utils=Utils()
-
-		pagquofam=0
-		paglotfam=0
-		pagriffam=0
+		pagament_quota_familiar=0
+		pagament_loteria_familiar=0
+		pagament_rifa_familiar=0
 		if self.pagar_quota_familia.get()=="":
 			self.pagar_quota_familia.set("0")
 		if self.pagar_loteria_familia.get()=="":
@@ -963,31 +965,31 @@ class FinestraGestionar(tk.Toplevel):
 		if self.pagar_rifa_familia.get()=="":
 			self.pagar_rifa_familia.set("0")
 		try:
-			pagquofam=float(self.pagar_quota_familia.get()) #guardem en variables les quantitats a pagar per a mostrar-les al rebut
+			pagament_quota_familiar=float(self.pagar_quota_familia.get()) # Guardem en variables les quantitats a pagar per a mostrar-les al rebut.
 			if float(self.pagar_quota_familia.get())<0:
-				pagquofam=0
+				pagament_quota_familiar=0
 		except ValueError:
-			pagquofam=0
+			pagament_quota_familiar=0
 			self.pagar_quota_familia.set(0)
-			self.pagar_total_familia.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
+			self.pagar_total_familia.set("{0:.2f}".format(pagament_loteria_familiar+pagament_rifa_familiar) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			paglotfam=float(self.pagar_loteria_familia.get())
+			pagament_loteria_familiar=float(self.pagar_loteria_familia.get())
 			if float(self.pagar_loteria_familia.get())<0:
-				paglotfam=0
+				pagament_loteria_familiar=0
 		except ValueError:
-			paglotfam=0
+			pagament_loteria_familiar=0
 			self.pagar_loteria_familia.set(0)
-			self.pagar_total_familia.set("{0:.2f}".format(pagquofam+pagriffam) + " €")
+			self.pagar_total_familia.set("{0:.2f}".format(pagament_quota_familiar+pagament_rifa_familiar) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		try:
-			pagriffam=float(self.pagar_rifa_familia.get())
+			pagament_rifa_familiar=float(self.pagar_rifa_familia.get())
 			if float(self.pagar_rifa_familia.get())<0:
-				pagriffam=0
+				pagament_rifa_familiar=0
 		except ValueError:
-			pagriffam=0
+			pagament_rifa_familiar=0
 			self.pagar_rifa_familia.set(0)
-			self.pagar_total_familia.set("{0:.2f}".format(paglotfam+pagriffam) + " €")
+			self.pagar_total_familia.set("{0:.2f}".format(pagament_quota_familiar+pagament_loteria_familiar) + " €")
 			messagebox.showwarning("Error", "Has d'escriure un valor vàlid")
 		opcio=self.forma_pagament_familia.get()
 		descripcio=""
@@ -1007,32 +1009,26 @@ class FinestraGestionar(tk.Toplevel):
 				messagebox.showwarning("Error", "No es pot fer un pagament de 0 euros")						
 			else:
 				faller=bd.llegir_faller(self.id.get())
-				llistat_fallers=bd.llegir_fallers_per_familia(faller.familia.id)
-				#falla.llegir_fallers("familia", faller.familia.id)
-				membres=0
-				idfaller=[]
-				for faller in llistat_fallers:
-					if faller.alta==1: #si el faller está actiu
-						membres=membres + 1
-						idfaller=idfaller+[faller.id] #afegim a la llista el id
-				quota=0 #les iniciem a 0 perquè després s'autoacumulen
-				quotaassignada=0
-				quotapagada=0
-				loteriaassignada=0
-				loteriapagada=0
-				rifaassignada=0
-				rifapagada=0
-				difquota=0
-				difloteria=0
-				difrifa=0
-				pagamentquota=float(self.pagar_quota_familia.get()) #guardem els continguts en variables
-				pagamentloteria=float(self.pagar_loteria_familia.get())
-				pagamentrifa=float(self.pagar_rifa_familia.get())
-				rebut=0
-				#if opcio=="1":
-					#busquem el número que li pertocarà al rebut
-					#elRebut=Informe()
-					#numrebut=elRebut.AsignarNumRebut()
+				llistat_fallers=bd.llegir_fallers_per_familia_i_alta(faller.familia.id, 1)
+				membres=len(llistat_fallers)
+				quota=0
+				quota_assignada=0
+				quota_pagada=0
+				loteria_assignada=0
+				loteria_pagada=0
+				rifa_assignada=0
+				rifa_pagada=0
+				diferencia_quota=0
+				diferencia_loteria=0
+				diferencia_rifa=0
+				pagament_quota=float(self.pagar_quota_familia.get()) # Guardem els continguts en variables per a utilitzar-los més fàcilment.
+				pagament_loteria=float(self.pagar_loteria_familia.get())
+				pagament_rifa=float(self.pagar_rifa_familia.get())
+				numero_rebut=0 # Per si el pagament es pel banc
+				if opcio=="1":
+					# Busquem el número de rebut que li haurem d'assignar al nou rebut.
+					rebut=Informe()
+					numero_rebut=rebut.assignar_numero_rebut()
 				exercici_actual=arxiu.llegir_exercici_actual()
 				data=utils.calcular_data_actual()
 				data_actual=data[0] + "-" + data[1] + "-" + data[2]
@@ -1042,85 +1038,68 @@ class FinestraGestionar(tk.Toplevel):
 					quota=quota+quota_base-descompte
 					llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
 					# Assignem cada element de la llista a una variable per a que siga més fàcil d'identificar.
-					quotaassignada=quotaassignada+llista_assignacions_pagaments[0]
-					quotapagada=quotapagada+llista_assignacions_pagaments[1]
-					loteriaassignada=loteriaassignada+llista_assignacions_pagaments[2]
-					loteriapagada=loteriapagada+llista_assignacions_pagaments[3]
-					rifaassignada=rifaassignada+llista_assignacions_pagaments[4]
-					rifapagada=rifapagada+llista_assignacions_pagaments[5]
-					quotafinal=quota+quotaassignada
-				#for val in idfaller: #per a cada id de la llista calculem la quota, el descompte i els moviments d'assignació
-					#elFaller.BuscarQuotaFaller(str(val))
-					#laFamilia.BuscarDescompteFamilia(str(val))
-					#quota=elFaller.quota-(laFamilia.descompte*elFaller.quota/100)
-					#elMoviment.quotaasignada=0 #com que es va acumulant, s'ha de ficar a 0 en cada iteració
-					#elMoviment.quotapagada=0
-					#elMoviment.loteriaasignada=0
-					#elMoviment.loteriapagada=0
-					#elMoviment.rifaasignada=0
-					#elMoviment.rifapagada=0
-					#elMoviment.BuscarMoviments(str(val),str(elMoviment.exercici))
-					#quotaasignada=elMoviment.quotaasignada
-					#quotapagada=elMoviment.quotapagada
-					difquota=quotafinal-quotapagada
-					if pagamentquota!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+					quota_assignada=quota_assignada+llista_assignacions_pagaments[0]
+					quota_pagada=quota_pagada+llista_assignacions_pagaments[1]
+					loteria_assignada=loteria_assignada+llista_assignacions_pagaments[2]
+					loteria_pagada=loteria_pagada+llista_assignacions_pagaments[3]
+					rifa_assignada=rifa_assignada+llista_assignacions_pagaments[4]
+					rifa_pagada=rifa_pagada+llista_assignacions_pagaments[5]
+
+					# Pagament de quotes.
+					quota_final=quota+quota_assignada
+					diferencia_quota=quota_final-quota_pagada
+					if pagament_quota!=0 and membres==1:
+						moviment=Moviment(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentquota, 1, elMoviment.exercici, val, desc, numrebut)
-						pagamentquota=0
-					if pagamentquota!=0 and pagamentquota<=difquota and membres!=1:
-						moviment=Moviment(0, data_actual, pagamentquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+						pagament_quota=0
+					if pagament_quota!=0 and pagament_quota<=diferencia_quota and membres!=1:
+						moviment=Moviment(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentquota, 1, elMoviment.exercici, val, desc, numrebut)
-						pagamentquota=0
-					if pagamentquota!=0 and pagamentquota>difquota and membres!=1:
-						if difquota!=0: #per a que no cree moviments a 0
-							moviment=Moviment(0, data_actual, difquota, 2, 1, exercici_actual, descripcio, rebut, faller)
+						pagament_quota=0
+					if pagament_quota!=0 and pagament_quota>diferencia_quota and membres!=1:
+						if diferencia_quota!=0: #per a que no cree moviments a 0
+							moviment=Moviment(0, data_actual, diferencia_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(difquota, 1, elMoviment.exercici, val, desc, numrebut)
-						pagamentquota=pagamentquota-difquota
-					#loteriaasignada=elMoviment.loteriaasignada
-					#loteriapagada=elMoviment.loteriapagada
-					difloteria=loteriaassignada-loteriapagada
-					if pagamentloteria!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+						pagament_quota=pagament_quota-diferencia_quota
+
+					# Pagament de loteries.
+					diferencia_loteria=loteria_assignada-loteria_pagada
+					if pagament_loteria!=0 and membres==1:
+						moviment=Moviment(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentloteria, 2, elMoviment.exercici, val, desc, numrebut)
-					if pagamentloteria!=0 and pagamentloteria<=difloteria and membres!=1:
-						moviment=Moviment(0, data_actual, pagamentloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+					if pagament_loteria!=0 and pagament_loteria<=diferencia_loteria and membres!=1:
+						moviment=Moviment(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentloteria, 2, elMoviment.exercici, val, desc, numrebut)
-						pagamentloteria=0
-					if pagamentloteria!=0 and pagamentloteria>difloteria and membres!=1:
-						if difloteria!=0:
-							moviment=Moviment(0, data_actual, difloteria, 2, 2, exercici_actual, descripcio, rebut, faller)
+						pagament_loteria=0
+					if pagament_loteria!=0 and pagament_loteria>diferencia_loteria and membres!=1:
+						if diferencia_loteria!=0:
+							moviment=Moviment(0, data_actual, diferencia_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
-							#elMoviment.InsertarPagament(difloteria, 2, elMoviment.exercici, val, desc, numrebut)
-						pagamentloteria=pagamentloteria-difloteria
-					#rifaasignada=elMoviment.rifaasignada
-					#rifapagada=elMoviment.rifapagada
-					difrifa=rifaassignada-rifapagada
-					if pagamentrifa!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+						pagament_loteria=pagament_loteria-diferencia_loteria
+					
+					# Pagament de rifes.
+					diferencia_rifa=rifa_assignada-rifa_pagada
+					if pagament_rifa!=0 and membres==1:
+						moviment=Moviment(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentrifa, 3, elMoviment.exercici, val, desc, numrebut)
-					if pagamentrifa!=0 and pagamentrifa<=difrifa and membres!=1:
-						moviment=Moviment(0, data_actual, pagamentrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+					if pagament_rifa!=0 and pagament_rifa<=diferencia_rifa and membres!=1:
+						moviment=Moviment(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
-						#elMoviment.InsertarPagament(pagamentrifa, 3, elMoviment.exercici, val, desc, numrebut)
-						pagamentrifa=0
-					if pagamentrifa!=0 and pagamentrifa>difrifa and membres!=1:
-						if difrifa!=0:
-							moviment=Moviment(0, data_actual, difrifa, 2, 3, exercici_actual, descripcio, rebut, faller)
+						pagament_rifa=0
+					if pagament_rifa!=0 and pagament_rifa>diferencia_rifa and membres!=1:
+						if diferencia_rifa!=0:
+							moviment=Moviment(0, data_actual, diferencia_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
-							#elMoviment.InsertarPagament(difrifa, 3, elMoviment.exercici, val, desc, numrebut)
-						pagamentrifa=pagamentrifa-difrifa
-					membres=membres-1
+						pagament_rifa=pagament_rifa-diferencia_rifa
+
+					membres=membres-1 # Següent iteració.
+
+				# Netegem les dades i refresquem per a vore el quadre de pagaments actualitzat.
 				self.entry_id.focus()
 				self.buscar_per_id('<Return>')
-				#if opcio=="1":
-					#creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior
-					#elRebut.Rebut(1,self.fallerCombo.get(), pagquofam, paglotfam, pagriffam, self.quotafamString.get()[:-2], self.quotapagadafamString.get()[:-2], self.loteriafamString.get()[:-2], self.loteriapagadafamString.get()[:-2], self.rifafamString.get()[:-2], self.rifapagadafamString.get()[:-2])
+				if opcio=="1":
+					# Creem el rebut a partir de les dades de les variables dels pagaments i el quadre actualitzat amb el resutat final llevant els 2 últims caràcters ( €) als valors que necessiten un càlcul posterior.
+					rebut.crear_rebut(0,self.combo_box_faller.get(), pagament_quota_familiar, pagament_loteria_familiar, pagament_rifa_familiar, self.quota_assignada_familia.get()[:-2], self.quota_pagada_familia.get()[:-2], self.loteria_assignada_familia.get()[:-2], self.loteria_pagada_familia.get()[:-2], self.rifa_assignada_familia.get()[:-2], self.rifa_pagada_familia.get()[:-2])
 		bd.tancar_conexio()
 	
 	

@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import platform
 
 from base_de_dades import BaseDeDades
 
@@ -18,9 +19,11 @@ class FinestraCategories(tk.Toplevel):
 		'''
         super().__init__(master)
         self.master=master
+        sistema_operatiu=platform.system()
+        if sistema_operatiu=='Windows':
+            self.iconbitmap("escut.ico")
         self.resizable(0,0)
         self.title("Modificar Categories")
-        self.iconbitmap("escut.ico")
 
         self.quota_adult=tk.StringVar()
         self.quota_cadet=tk.StringVar()
