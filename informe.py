@@ -5,6 +5,10 @@ from reportlab.lib.pagesizes import A4, landscape
 import os
 import errno
 import os.path as path
+import subprocess
+import platform
+
+from base_de_dades import BaseDeDades
 
 
 class Informe():
@@ -103,57 +107,57 @@ class Informe():
 		#entrem a la carpeta rebuts per a obrir l'arxiu pdf i tornem a la ruta original
 		ruta=os.getcwd()
 		os.chdir("rebuts")
-		os.startfile(str(pos)+".pdf")
+		arxiu=str(pos)+".pdf"
+		sistema_operatiu=platform.system()
+		if sistema_operatiu=='Windows':
+			os.startfile(arxiu)
+		elif sistema_operatiu=='Linux':
+			ruta_completa=os.path.join(os.path.dirname(__file__), arxiu)
+			subprocess.run(["xdg-open", ruta_completa])
 		os.chdir(ruta)
 
-'''
-	def MovimentsDia(self):
 
-		#traguem la data actual per a utilitzar-la a l'informe
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		elMoviment=Moviment()
-		elMoviment.ExerciciActual()
-		elFaller=Faller()
-		pag=1
-		#intentem crear la carpeta moviments dia si no està creada
+	def llistat_moviments(self, data, efectiu, banc):
+
+		bd=BaseDeDades("falla.db")
+		pagina=0
 		try:
 			os.mkdir("moviments dia")
 		except OSError as e:
 			if e.errno!=errno.EEXIST:
 				raise
-		arxiu="moviments dia"+"/"+str(datafinal)
-		#creem el full i tot el contingut
+		arxiu="moviments dia"+"/"+str(data)
+		# Creem el full i tot el contingut.
 		w,h=A4
 		c=canvas.Canvas(arxiu+".pdf", pagesize=A4)
-		resmov=elMoviment.MovimentsDia() #recuperem els moviments
+		if efectiu==1 and banc==1:
+			llistat_moviments=bd.llegir_moviments_per_data_tipo(data, 2)
+		elif efectiu==1 and banc==0:
+			llistat_moviments=bd.llegir_moviments_per_data_tipo_descripcio(data, 2, "pagat en caixa")
+		else:
+			llistat_moviments=bd.llegir_moviments_per_data_tipo_descripcio(data, 2, "pagat pel banc")
 		i=0
 		total=0
 		c.drawString(50, h-30, "FALLER")
 		c.drawString(300, h-30, "CONCEPTE")
 		c.drawString(w-100, h-30, "QUANTITAT")
-		for val in resmov: #distingim el concepte del moviment
-			if val[3]==2: #tipo igual a pagament
-				elFaller.BuscarFallerPerId(val[6])
-				c.drawString(50, h-i-60, elFaller.nom + " " + elFaller.cognoms)
-				if val[4]==1:
-					concepte="quota"
-				if val[4]==2:
-					concepte="loteria"
-				if val[4]==3:
-					concepte="rifa"
-				c.drawString(300, h-i-60, concepte)			
-				c.drawString(w-100, h-i-60, "{0:.2f}".format(val[2]) + " €")
-				i=i+20
-				total=total+val[2]
-			if i==500:
-				pag=pag+1
+		for moviment in llistat_moviments:
+			c.drawString(50, h-i-60, moviment.faller.nom + " " + moviment.faller.cognoms)
+			if moviment.concepte==1:
+				concepte="quota"
+			if moviment.concepte==2:
+				concepte="loteria"
+			if moviment.concepte==3:
+				concepte="rifa"
+			c.drawString(300, h-i-60, concepte)
+			c.drawString(w-100, h-i-60, "{0:.2f}".format(moviment.quantitat) + " €")
+			i=i+20
+			total=total+moviment.quantitat
+			if i==700:
+				pagina=pagina+1
 				c.drawString(20, 20, "moviments del dia")
-				c.drawString((w/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(w-80, 20, datafinal)
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data)
 				c.showPage() #mostrem la pàgina feta
 				c.drawString(50, h-30, "FALLER") #primera linea de la pàgina següent
 				c.drawString(300, h-30, "CONCEPTE")
@@ -162,17 +166,18 @@ class Informe():
 		c.drawString(300, h-i-80, "TOTAL")
 		c.drawString(w-100, h-i-80, "{0:.2f}".format(total) + " €")
 		c.drawString(20, 20, "moviments del dia")
-		c.drawString((w/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(w-80, 20, datafinal)
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina+1))
+		c.drawString(w-80, 20, data)
 		c.showPage()
 		c.save()
 		#entrem a la carpeta rebuts per a obrir l'arxiu pdf i tornem a la ruta original
 		ruta=os.getcwd()
 		os.chdir("moviments dia")
-		os.startfile(str(datafinal)+".pdf")
+		#os.startfile(str(data)+".pdf")
 		os.chdir(ruta)
 
 
+'''
 	def LlistatGeneral(self):
 
 		#traguem la data actual per a utilitzar-la a l'informe

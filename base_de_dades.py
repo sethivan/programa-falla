@@ -497,7 +497,7 @@ class BaseDeDades:
         self.conexio.commit()
     
 
-    def llegir_moviments(self, id_faller, exercici):
+    def llegir_moviments(self, id_faller, exercici):#REPASAAAAAAAAAAAAAAAAAAAR
         '''
         Llig de la taula "moviments" tots aquells moviments amb l'identificador de faller i l'exercici
         passats per paràmetre.
@@ -511,7 +511,7 @@ class BaseDeDades:
 
         Retorna:
         --------
-        llistat_moviments : llista
+        llistat_moviments : list
             Llistat d'objectes de la classe Moviment.
         '''
         query_params=(id_faller, exercici,)
@@ -521,6 +521,44 @@ class BaseDeDades:
             llistat_moviments=[]
             for valors in resultat:
                 moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8])
+                llistat_moviments.append(moviment)
+            return llistat_moviments
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+        
+
+    def llegir_moviments_per_data_tipo(self, data, tipo):
+        query_params=(data, tipo,)
+        try:
+            self.cursor.execute("SELECT * FROM moviment INNER JOIN faller ON moviment.idfaller=faller.id WHERE moviment.data=? and moviment.tipo=?", query_params)
+            resultat=self.cursor.fetchall()
+            llistat_moviments=[]
+            for valors in resultat:
+                faller=Faller(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
+                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
+                llistat_moviments.append(moviment)
+            return llistat_moviments
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+    
+    
+    def llegir_moviments_per_data_tipo_descripcio(self, data, tipo, descripcio):
+        query_params=(data, tipo, descripcio)
+        try:
+            self.cursor.execute("SELECT * FROM moviment INNER JOIN faller ON moviment.idfaller=faller.id WHERE moviment.data=? and moviment.tipo=? and moviment.descripcio=?", query_params)
+            resultat=self.cursor.fetchall()
+            llistat_moviments=[]
+            for valors in resultat:
+                faller=Faller(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
+                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
                 llistat_moviments.append(moviment)
             return llistat_moviments
         except sqlite3.Error as e:

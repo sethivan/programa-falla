@@ -18,6 +18,7 @@ from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
 from finestra_categories import FinestraCategories
+from finestra_llistats import FinestraLlistats
 
 from arxiu import Arxiu
 from utils import Utils
@@ -240,7 +241,8 @@ class Aplicacio(tk.Frame):
 
 		#elInforme=Informe()
 		#elInforme.MovimentsDia()
-		pass
+		llistat = FinestraLlistats(self)
+		llistat.iniciar()
 
 
 	def LlistatGeneral(self): #funció per a traure el llistat en pdf dels comptes actualitzats dels fallers

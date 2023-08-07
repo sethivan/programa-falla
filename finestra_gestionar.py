@@ -16,8 +16,16 @@ from finestra_modificar import FinestraModificar
 
 
 class FinestraGestionar(tk.Toplevel):
-	
+	'''
+	Esta classe representa una nova finestra que depén de la finestra principal.
 
+	Atributs:
+	---------
+	master : tk.Tk o tk.Toplevel
+		La instància principal de l'aplicació o de la finestra que crea esta nova finestra.
+	'''
+	
+	
 	def __init__(self, master=None):
 		'''
 		Inicialitza una nova instància de la classe FinestraIntroduir.
