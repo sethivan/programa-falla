@@ -6,11 +6,11 @@ a la base de dades.
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
-from tkinter import LabelFrame
 import platform
 
 from base_de_dades import BaseDeDades
 from arxiu import Arxiu
+from utils import Utils
 
 from categoria import Categoria
 from faller import Faller
@@ -46,6 +46,9 @@ class FinestraIntroduir(tk.Toplevel):
 			self.iconbitmap("escut.ico")
 		self.resizable(0,0)
 		self.title("Introduir Faller")
+		utils=Utils()
+		utils.definir_estil_global()
+		self.configure(bg="#eae9e7", pady=5, padx=5)
 
 		self.nom=tk.StringVar()
 		self.cognoms=tk.StringVar()
@@ -61,80 +64,83 @@ class FinestraIntroduir(tk.Toplevel):
 		self.identificador_familia=0 # Atribut on guardem el valor final de l'id_familia.
 		
 		# Frames en els que dividim la finestra.
-		label_frame_dades=LabelFrame(self, text="Introduir dades")
-		label_frame_dades.grid(row=0, column=0, columnspan=4, ipadx=2, ipady=2)
+		label_estil_dades=ttk.Label(self, text="Introduir dades", style="Titol.TLabel")
+		label_frame_dades=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_dades)
+		label_frame_dades.grid(row=0, column=0, padx=5, pady=5, ipadx=5, ipady=5)
 
-		label_frame_familiar=LabelFrame(self, text="Buscar familiar del faller")
-		label_frame_familiar.grid(row=1, column=0, columnspan=4, ipadx=2, ipady=2)
+		label_estil_familiar=ttk.Label(self, text="Buscar familiar del faller", style="Titol.TLabel")
+		label_frame_familiar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_familiar)
+		label_frame_familiar.grid(row=1, column=0, padx=5, pady=5, ipadx=5, ipady=5)
 
 		# Widgets per a cada frame.
 
 		# Frame "Introduir dades".
-		self.label_nom=tk.Label(label_frame_dades, text="Nom:")
-		self.label_nom.grid(row=0, column=0, sticky="e")
+		self.label_nom=ttk.Label(label_frame_dades, text="Nom:", style="Etiqueta.TLabel")
+		self.label_nom.grid(row=0, column=0, padx=5, sticky="e")
 
-		self.entry_nom=tk.Entry(label_frame_dades, textvariable=self.nom)
+		self.entry_nom=ttk.Entry(label_frame_dades, textvariable=self.nom)
 		self.entry_nom.grid(row=0, column=1)
 		self.entry_nom.focus()
 
-		self.label_cognoms=tk.Label(label_frame_dades, text="Cognoms:")
-		self.label_cognoms.grid(row=0, column=2, sticky="e")
+		self.label_cognoms=ttk.Label(label_frame_dades, text="Cognoms:", style="Etiqueta.TLabel")
+		self.label_cognoms.grid(row=0, column=2, padx=5, sticky="e")
 
-		self.entry_cognoms=tk.Entry(label_frame_dades, textvariable=self.cognoms)
+		self.entry_cognoms=ttk.Entry(label_frame_dades, textvariable=self.cognoms)
 		self.entry_cognoms.grid(row=0, column=3)
 
-		self.label_sexe=tk.Label(label_frame_dades, text="Sexe:")
-		self.label_sexe.grid(row=1, column=0, sticky="e")
+		self.label_sexe=ttk.Label(label_frame_dades, text="Sexe:", style="Etiqueta.TLabel")
+		self.label_sexe.grid(row=1, column=0, padx=5, sticky="e")
 
-		self.radio_button_masculi=tk.Radiobutton(
+		self.radio_button_masculi=ttk.Radiobutton(
 			label_frame_dades,
 			text="M",
+			style="Radio.TRadiobutton",
 			variable=self.sexe,
 			value=1
 		)
-		self.radio_button_femeni=tk.Radiobutton(
+		self.radio_button_femeni=ttk.Radiobutton(
 			label_frame_dades,
 			text="F",
+			style="Radio.TRadiobutton",
 			variable=self.sexe,
 			value=2
 		)
 		self.radio_button_masculi.grid(row=1, column=1, sticky="w")
 		self.radio_button_femeni.grid(row=1, column=1)
-		self.radio_button_masculi.select() # Seleccionem masculí com a predeterminat.
 
-		self.label_naixement=tk.Label(label_frame_dades, text="Data de naixement:")
-		self.label_naixement.grid(row=1, column=2, sticky="e")
+		self.label_naixement=ttk.Label(label_frame_dades, text="Data de naixement:", style="Etiqueta.TLabel")
+		self.label_naixement.grid(row=1, column=2, padx=5, sticky="e")
 
-		self.entry_naixement=tk.Entry(label_frame_dades, textvariable=self.naixement)
+		self.entry_naixement=ttk.Entry(label_frame_dades, textvariable=self.naixement)
 		self.entry_naixement.grid(row=1, column=3)
 
-		self.label_dni=tk.Label(label_frame_dades, text="DNI:")
-		self.label_dni.grid(row=2, column=0, sticky="e")
+		self.label_dni=ttk.Label(label_frame_dades, text="DNI:", style="Etiqueta.TLabel")
+		self.label_dni.grid(row=2, column=0, padx=5, sticky="e")
 
-		self.entry_dni=tk.Entry(label_frame_dades, textvariable=self.dni)
+		self.entry_dni=ttk.Entry(label_frame_dades, textvariable=self.dni)
 		self.entry_dni.grid(row=2, column=1)
 
-		self.label_adresa=tk.Label(label_frame_dades, text="Adreça:")
-		self.label_adresa.grid(row=2, column=2, sticky="e")
+		self.label_adresa=ttk.Label(label_frame_dades, text="Adreça:", style="Etiqueta.TLabel")
+		self.label_adresa.grid(row=2, column=2, padx=5, sticky="e")
 
-		self.entry_adresa=tk.Entry(label_frame_dades, textvariable=self.adresa)
+		self.entry_adresa=ttk.Entry(label_frame_dades, textvariable=self.adresa)
 		self.entry_adresa.grid(row=2, column=3)
 
-		self.label_telefon=tk.Label(label_frame_dades, text="Telèfon:")
-		self.label_telefon.grid(row=3, column=0, sticky="e")
+		self.label_telefon=ttk.Label(label_frame_dades, text="Telèfon:", style="Etiqueta.TLabel")
+		self.label_telefon.grid(row=3, column=0, padx=5, sticky="e")
 
-		self.entry_telefon=tk.Entry(label_frame_dades, textvariable=self.telefon)
+		self.entry_telefon=ttk.Entry(label_frame_dades, textvariable=self.telefon)
 		self.entry_telefon.grid(row=3, column=1)
 
-		self.label_correu=tk.Label(label_frame_dades, text="Correu electrònic:")
-		self.label_correu.grid(row=3, column=2, sticky="e")
+		self.label_correu=ttk.Label(label_frame_dades, text="Correu electrònic:", style="Etiqueta.TLabel")
+		self.label_correu.grid(row=3, column=2, padx=5, sticky="e")
 
-		self.entry_correu=tk.Entry(label_frame_dades, textvariable=self.correu)
+		self.entry_correu=ttk.Entry(label_frame_dades, textvariable=self.correu)
 		self.entry_correu.grid(row=3, column=3)
 
 		# Frame "Buscar familiar del faller".
-		self.label_nom_familiar=tk.Label(label_frame_familiar, text="Cognoms i nom:")
-		self.label_nom_familiar.grid(row=0, column=0)
+		self.label_nom_familiar=ttk.Label(label_frame_familiar, text="Cognoms i nom:", style="Etiqueta.TLabel")
+		self.label_nom_familiar.grid(row=0, column=0, padx=5, sticky="e")
 
 		self.combo_box_familiar_faller=ttk.Combobox(
 			label_frame_familiar, 
@@ -145,36 +151,39 @@ class FinestraIntroduir(tk.Toplevel):
 		self.combo_box_familiar_faller.bind("<<ComboboxSelected>>", self.seleccionar_familia)
 		self.combo_box_familiar_faller.configure(state="disabled")
 
-		self.label_opcio_familiar=tk.Label(label_frame_familiar, text="Familiar en la falla:")
-		self.label_opcio_familiar.grid(row=1, column=0, sticky="e")
+		self.label_opcio_familiar=ttk.Label(label_frame_familiar, text="Familiar en la falla:", style="Etiqueta.TLabel")
+		self.label_opcio_familiar.grid(row=1, column=0, padx=5, sticky="e")
 
-		self.radio_button_familiar_si=tk.Radiobutton(
+		self.radio_button_familiar_si=ttk.Radiobutton(
 			label_frame_familiar, 
-			text="Si", 
-			variable=self.familia, 
-			value=1, 
+			text="Si",
+			style="Radio.TRadiobutton",
+			variable=self.familia,
+			value=1,
 			command=self.habilitar_familia
 		)
-		self.radio_button_familiar_no=tk.Radiobutton(
+		self.radio_button_familiar_no=ttk.Radiobutton(
 			label_frame_familiar, 
-			text="No", 
+			text="No",
+			style="Radio.TRadiobutton",
 			variable=self.familia, 
 			value=2, 
 			command=self.deshabilitar_familia
 		)
 		self.radio_button_familiar_si.grid(row=1, column=1, sticky="w")
 		self.radio_button_familiar_no.grid(row=1, column=1)
-		self.radio_button_familiar_no.select() # Seleccionem "no" com a predeterminat.
 
 		#Botó "Introduir".
-		self.button_introduir=tk.Button(self, text="Introduir", command=self.introduir_faller)
-		self.button_introduir.grid(row=3, column=0, padx=5)
+		self.button_introduir=ttk.Button(self, text="Introduir", style="Boto.TButton", command=self.introduir_faller)
+		self.button_introduir.grid(row=3, column=0, padx=5, pady=5)
 
 
 	def iniciar(self):
 		'''
 		Inicia la nova finestra.
 		'''
+		self.sexe.set(1)
+		self.familia.set(1)
 		self.grab_set() # Manté el foco en la finestra.
 		self.transient(self.master) # Manté la finestra sempre per damunt de la principal.
 		self.mainloop()

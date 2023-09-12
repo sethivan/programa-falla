@@ -10,9 +10,11 @@ Desenvolupat per Ivan Mas Presentación 2020.
 '''
 
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 import os
 import platform
+from PIL import Image, ImageTk
 
 from finestra_introduir import FinestraIntroduir
 from finestra_gestionar import FinestraGestionar
@@ -51,14 +53,16 @@ class Aplicacio(tk.Frame):
         """
 		super().__init__(master) # Heretem de la classe Frame.
 		self.master=master
-		sistema_operatiu=platform.system()
-		if sistema_operatiu=='Windows':
+		self.sistema_operatiu=platform.system()
+		if self.sistema_operatiu=='Windows':
 			self.master.state('zoomed') # La finestra s'obri maximitzada.
 			self.master.iconbitmap("escut.ico")
-		elif sistema_operatiu=='Linux':
+		elif self.sistema_operatiu=='Linux':
 			self.master.attributes('-zoomed', True)
 		self.master.title("Falla Sants Patrons")
-		self.pack()
+		utils=Utils()
+		utils.definir_estil_global()
+		self.master.configure(bg="#ffffff", pady=5, padx=5)
 		
 		# Barra de menú.
 		self.barraMenu=tk.Menu() # Guardem el menú en una variable.
@@ -119,6 +123,49 @@ class Aplicacio(tk.Frame):
 		self.barraMenu.add_cascade(label="Llistats", menu=self.llistatsMenu)
 		self.barraMenu.add_cascade(label="Exercici", menu=self.exerciciMenu)
 		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
+
+		# Frames en els que dividim la finestra.
+		#image=Image.open("escut.jpg")
+		#image_tk=ImageTk.PhotoImage(image)
+		#label_image=tk.Label(self.master, image=image_tk)
+		#label_image.grid(row=0, column=0, rowspan=4)
+
+		label_estil_categoria=ttk.Label(self.master, text="Categoria", style="Titol.TLabel")
+		label_frame_categoria=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_categoria)
+		label_frame_categoria.grid(row=0, column=1, ipadx=2, ipady=2)
+
+		label_estil_faller=ttk.Label(self.master, text="Faller", style="Titol.TLabel")
+		label_frame_faller=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_faller)
+		label_frame_faller.grid(row=1, column=1, ipadx=2, ipady=2)
+
+		label_estil_loteria=ttk.Label(self.master, text="Loteria", style="Titol.TLabel")
+		label_frame_loteria=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_loteria)
+		label_frame_loteria.grid(row=2, column=1, ipadx=2, ipady=2)
+
+		label_estil_rifa=ttk.Label(self.master, text="Rifa", style="Titol.TLabel")
+		label_frame_rifa=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_rifa)
+		label_frame_rifa.grid(row=3, column=1, ipadx=2, ipady=2)
+
+		# Widgets per a cada frame.
+
+		# Frame Categoria.
+		self.button_modificar=ttk.Button(label_frame_categoria, text="Modificar categoria", style="Boto.TButton", command=self.modificar_categoria)
+		self.button_modificar.grid(row=0, column=0, padx=5, pady=5)
+
+		# Frame Faller.
+		self.button_introduir=ttk.Button(label_frame_faller, text="Introduir faller", style="Boto.TButton", command=self.introduir)
+		self.button_introduir.grid(row=0, column=0, padx=5, pady=5)
+
+		self.button_gestionar=ttk.Button(label_frame_faller, text="Gestionar faller", style="Boto.TButton", command=self.gestionar)
+		self.button_gestionar.grid(row=1, column=0, padx=5, pady=5)
+
+		# Frame Loteria.
+		self.button_loteria=ttk.Button(label_frame_loteria, text="Assignar loteria", style="Boto.TButton", command=self.AssignarLoteria)
+		self.button_loteria.grid(row=0, column=0, padx=5, pady=5)
+
+		# Frame Rifa.
+		self.button_rifa=ttk.Button(label_frame_rifa, text="Assignar rifa", style="Boto.TButton", command=self.assignar_rifa)
+		self.button_rifa.grid(row=0, column=0, padx=5, pady=5)
 
 		# Comprovació que s'efectua cada vegada que es fica en marxa el programa.
 		self.arrancar()

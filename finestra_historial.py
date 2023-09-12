@@ -1,11 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
-from tkinter import LabelFrame
 import platform
 
 from base_de_dades import BaseDeDades
 from arxiu import Arxiu
+from utils import Utils
 
 
 class FinestraHistorial(tk.Toplevel):
@@ -36,6 +36,9 @@ class FinestraHistorial(tk.Toplevel):
 			self.iconbitmap("escut.ico")
 		self.resizable(0,0)
 		self.title("Introduir Faller")
+		utils=Utils()
+		utils.definir_estil_global()
+		self.configure(bg="#eae9e7", pady=5, padx=5)
 
 		self.id=tk.StringVar()
 		self.infantil=tk.StringVar()
@@ -48,26 +51,29 @@ class FinestraHistorial(tk.Toplevel):
 		self.identificadors=[] # Atribut per guardar els id_faller del llistat del combo.
 
 		# Frames en els que dividim la finestra.
-		label_frame_buscar=LabelFrame(self, text="Buscar faller")
+		label_estil_buscar=ttk.Label(self, text="Buscar faller", style="Titol.TLabel")
+		label_frame_buscar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_buscar)
 		label_frame_buscar.grid(row=0, column=0, ipadx=2, ipady=2)
 
-		label_frame_totals=LabelFrame(self, text="Totals")
+		label_estil_totals=ttk.Label(self, text="Totals", style="Titol.TLabel")
+		label_frame_totals=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_totals)
 		label_frame_totals.grid(row=2, column=0, ipadx=2, ipady=2)
 
-		label_frame_modificar=LabelFrame(self, text="Modificar")
+		label_estil_modificar=ttk.Label(self, text="Modificar", style="Titol.TLabel")
+		label_frame_modificar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_modificar)
 		label_frame_modificar.grid(row=3, column=0, ipadx=2, ipady=2)
 
 		# Widgets per a cada frame.
 
 		# Frame "Buscar".
-		self.label_nom=ttk.Label(label_frame_buscar, text="Nom")
+		self.label_nom=ttk.Label(label_frame_buscar, text="Nom", style="Etiqueta.TLabel")
 		self.label_nom.grid(row=0, column=0, padx=2)
 
 		self.combo_box_faller=ttk.Combobox(label_frame_buscar, width=30, postcommand=self.desplegar_historial)
 		self.combo_box_faller.grid(row=0, column=1)
 		self.combo_box_faller.bind("<<ComboboxSelected>>", self.seleccionar_historial)
 
-		self.label_id=ttk.Label(label_frame_buscar, text="Id")
+		self.label_id=ttk.Label(label_frame_buscar, text="Id", style="Etiqueta.TLabel")
 		self.label_id.grid(row=0, column=2, padx=2)
 
 		self.entry_id=ttk.Entry(label_frame_buscar, state="disabled", textvariable=self.id)
@@ -94,26 +100,26 @@ class FinestraHistorial(tk.Toplevel):
 		self.tree_historial.config(yscrollcommand=self.scroll_taula.set)
 
 		# Frame "Totals".
-		self.label_infantil=ttk.Label(label_frame_totals, text="Anys d'infantil:")
+		self.label_infantil=ttk.Label(label_frame_totals, text="Anys d'infantil:", style="Etiqueta.TLabel")
 		self.label_infantil.grid(row=0, column=0, padx=2)
 
 		self.entry_infantil=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.infantil)
 		self.entry_infantil.grid(row=0, column=1, padx=2)
 
-		self.label_punts=ttk.Label(label_frame_totals, text="Punts:")
+		self.label_punts=ttk.Label(label_frame_totals, text="Punts:", style="Etiqueta.TLabel")
 		self.label_punts.grid(row=0, column=2, padx=2)
 
 		self.entry_punts=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.punts)
 		self.entry_punts.grid(row=0, column=3, padx=2)
 
-		self.label_adult=ttk.Label(label_frame_totals, text="Anys d'adult:")
+		self.label_adult=ttk.Label(label_frame_totals, text="Anys d'adult:", style="Etiqueta.TLabel")
 		self.label_adult.grid(row=0, column=4, padx=2)
 
 		self.entry_adult=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.adult)
 		self.entry_adult.grid(row=0, column=5, padx=2)
 
 		# Frame "Modificar".
-		self.label_interval=ttk.Label(label_frame_modificar, text="Interval d'anys:")
+		self.label_interval=ttk.Label(label_frame_modificar, text="Interval d'anys:", style="Etiqueta.TLabel")
 		self.label_interval.grid(row=1, column=0, padx=2)
 
 		self.entry_any_inici=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.any_inici)
@@ -126,14 +132,14 @@ class FinestraHistorial(tk.Toplevel):
 		self.combo_box_carrec.current(1)
 		self.combo_box_carrec.grid(row=1, column=3)
 
-		self.label_falla=ttk.Label(label_frame_modificar, text="Falla:")
+		self.label_falla=ttk.Label(label_frame_modificar, text="Falla:", style="Etiqueta.TLabel")
 		self.label_falla.grid(row=1, column=4, padx=2)
 
 		self.entry_falla=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.falla)
 		self.falla.set("Falla Sants Patrons")
 		self.entry_falla.grid(row=1, column=5, padx=2)
 
-		self.button_modificar=ttk.Button(label_frame_modificar, state="disabled", text="Modificar càrrec", command=self.modificar)
+		self.button_modificar=ttk.Button(label_frame_modificar, state="disabled", text="Modificar càrrec", style="Boto.TButton", command=self.modificar)
 		self.button_modificar.grid(row=1, column=6)
 
 
