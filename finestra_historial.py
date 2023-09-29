@@ -38,7 +38,7 @@ class FinestraHistorial(tk.Toplevel):
 		self.title("Introduir Faller")
 		utils=Utils()
 		utils.definir_estil_global()
-		self.configure(bg="#eae9e7", pady=5, padx=5)
+		self.configure(bg="#ffffff", pady=5, padx=5)
 
 		self.id=tk.StringVar()
 		self.infantil=tk.StringVar()
@@ -53,15 +53,18 @@ class FinestraHistorial(tk.Toplevel):
 		# Frames en els que dividim la finestra.
 		label_estil_buscar=ttk.Label(self, text="Buscar faller", style="Titol.TLabel")
 		label_frame_buscar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_buscar)
-		label_frame_buscar.grid(row=0, column=0, ipadx=2, ipady=2)
+		label_frame_buscar.grid(row=0, column=0, ipadx=3, ipady=5, pady=5)
+
+		label_frame_taula=tk.LabelFrame(self, borderwidth=0, background="#ffffff")
+		label_frame_taula.grid(row=1, column=0, padx=10, pady=10)
 
 		label_estil_totals=ttk.Label(self, text="Totals", style="Titol.TLabel")
 		label_frame_totals=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_totals)
-		label_frame_totals.grid(row=2, column=0, ipadx=2, ipady=2)
+		label_frame_totals.grid(row=2, column=0, ipady=5, pady=5)
 
 		label_estil_modificar=ttk.Label(self, text="Modificar", style="Titol.TLabel")
 		label_frame_modificar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_modificar)
-		label_frame_modificar.grid(row=3, column=0, ipadx=2, ipady=2)
+		label_frame_modificar.grid(row=3, column=0, ipadx=3, ipady=5, pady=5)
 
 		# Widgets per a cada frame.
 
@@ -79,68 +82,74 @@ class FinestraHistorial(tk.Toplevel):
 		self.entry_id=ttk.Entry(label_frame_buscar, state="disabled", textvariable=self.id)
 		self.entry_id.grid(row=0, column=3, padx=2)
 
-		# La taula no va associada a cap frame.
-		self.tree_historial=ttk.Treeview(self, height=10)
+		# Frame "Taula".
+		self.tree_historial=ttk.Treeview(label_frame_taula, height=10)
 		self.tree_historial["columns"]=("uno", "dos", "tres", "quatre")
 		self.tree_historial.column("#0", width=80)
 		self.tree_historial.column("uno", width=80)
 		self.tree_historial.column("dos", width=80)
 		self.tree_historial.column("tres", width=80)
-		self.tree_historial.column("quatre", width=80)
+		self.tree_historial.column("quatre", width=120)
 		self.tree_historial.heading("#0", text="exercici")
 		self.tree_historial.heading("uno", text="càrrec")
 		self.tree_historial.heading("dos", text="punts")
 		self.tree_historial.heading("tres", text="anys")
 		self.tree_historial.heading("quatre", text="falla")
-		self.tree_historial.grid(row=1, column=0, padx=10, pady=5)
+		self.tree_historial.grid(row=1, column=0)
 
-		self.scroll_taula=ttk.Scrollbar(self, command=self.tree_historial.yview)
+		self.scroll_taula=ttk.Scrollbar(label_frame_taula, command=self.tree_historial.yview)
 		self.scroll_taula.grid(row=1, column=1, sticky="nsew")
 
 		self.tree_historial.config(yscrollcommand=self.scroll_taula.set)
 
 		# Frame "Totals".
-		self.label_infantil=ttk.Label(label_frame_totals, text="Anys d'infantil:", style="Etiqueta.TLabel")
-		self.label_infantil.grid(row=0, column=0, padx=2)
+		self.label_infantil=ttk.Label(label_frame_totals, text="Anys d'infantil", style="Etiqueta.TLabel")
+		self.label_infantil.grid(row=0, column=0, padx=5, pady=2, sticky="w")
 
-		self.entry_infantil=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.infantil)
-		self.entry_infantil.grid(row=0, column=1, padx=2)
+		self.entry_infantil=ttk.Entry(label_frame_totals, style="Entrada.TEntry", state="disabled", textvariable=self.infantil)
+		self.entry_infantil.grid(row=1, column=0, padx=5, sticky="w")
 
-		self.label_punts=ttk.Label(label_frame_totals, text="Punts:", style="Etiqueta.TLabel")
-		self.label_punts.grid(row=0, column=2, padx=2)
+		self.label_punts=ttk.Label(label_frame_totals, text="Punts", style="Etiqueta.TLabel")
+		self.label_punts.grid(row=0, column=1, padx=5, pady=2, sticky="w")
 
-		self.entry_punts=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.punts)
-		self.entry_punts.grid(row=0, column=3, padx=2)
+		self.entry_punts=ttk.Entry(label_frame_totals, style="Entrada.TEntry", state="disabled", textvariable=self.punts)
+		self.entry_punts.grid(row=1, column=1, padx=5, sticky="w")
 
-		self.label_adult=ttk.Label(label_frame_totals, text="Anys d'adult:", style="Etiqueta.TLabel")
-		self.label_adult.grid(row=0, column=4, padx=2)
+		self.label_adult=ttk.Label(label_frame_totals, text="Anys d'adult", style="Etiqueta.TLabel")
+		self.label_adult.grid(row=0, column=2, padx=5, pady=2, sticky="w")
 
-		self.entry_adult=ttk.Entry(label_frame_totals, state="disabled", textvariable=self.adult)
-		self.entry_adult.grid(row=0, column=5, padx=2)
+		self.entry_adult=ttk.Entry(label_frame_totals, style="Entrada.TEntry", state="disabled", textvariable=self.adult)
+		self.entry_adult.grid(row=1, column=2, padx=5, sticky="w")
 
 		# Frame "Modificar".
-		self.label_interval=ttk.Label(label_frame_modificar, text="Interval d'anys:", style="Etiqueta.TLabel")
-		self.label_interval.grid(row=1, column=0, padx=2)
+		self.label_inicial=ttk.Label(label_frame_modificar, text="Any inicial", style="Etiqueta.TLabel")
+		self.label_inicial.grid(row=0, column=0, padx=5, pady=2, sticky="w")
 
 		self.entry_any_inici=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.any_inici)
-		self.entry_any_inici.grid(row=1, column=1, padx=2)
+		self.entry_any_inici.grid(row=1, column=0, padx=5, sticky="w")
+
+		self.label_final=ttk.Label(label_frame_modificar, text="Any final", style="Etiqueta.TLabel")
+		self.label_final.grid(row=2, column=0, padx=5, pady=2, sticky="w")
 
 		self.entry_any_final=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.any_final)
-		self.entry_any_final.grid(row=1, column=2, padx=2)
+		self.entry_any_final.grid(row=3, column=0, padx=5, sticky="w")
+
+		self.label_carrec=ttk.Label(label_frame_modificar, text="Càrrec", style="Etiqueta.TLabel")
+		self.label_carrec.grid(row=0, column=1, padx=5, pady=2, sticky="w")
 
 		self.combo_box_carrec=ttk.Combobox(label_frame_modificar, width=20, state="disabled", values=["baixa", "vocal", "fallera major infantil", "president infantil", "directiu", "cort JFL", "fallera major", "president", "fallera major Alzira", "president JLF"])
 		self.combo_box_carrec.current(1)
-		self.combo_box_carrec.grid(row=1, column=3)
+		self.combo_box_carrec.grid(row=1, column=1, padx=5, sticky="w")
 
-		self.label_falla=ttk.Label(label_frame_modificar, text="Falla:", style="Etiqueta.TLabel")
-		self.label_falla.grid(row=1, column=4, padx=2)
+		self.label_falla=ttk.Label(label_frame_modificar, text="Falla", style="Etiqueta.TLabel")
+		self.label_falla.grid(row=2, column=1, padx=5, pady=2, sticky="w")
 
 		self.entry_falla=ttk.Entry(label_frame_modificar, state="disabled", textvariable=self.falla)
-		self.falla.set("Falla Sants Patrons")
-		self.entry_falla.grid(row=1, column=5, padx=2)
+		self.falla.set("Sants Patrons")
+		self.entry_falla.grid(row=3, column=1, padx=5, sticky="w")
 
-		self.button_modificar=ttk.Button(label_frame_modificar, state="disabled", text="Modificar càrrec", style="Boto.TButton", command=self.modificar)
-		self.button_modificar.grid(row=1, column=6)
+		self.button_modificar=ttk.Button(label_frame_modificar, state="disabled", text="Modificar historial", style="Boto.TButton", command=self.modificar)
+		self.button_modificar.grid(row=2, column=2, rowspan=2, padx=5, sticky="s")
 
 
 	def iniciar(self):

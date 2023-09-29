@@ -17,6 +17,7 @@ class Utils():
         self.estil.configure(".", font=("Ubuntu", 10))
         self.estil.configure("Marc.TFrame", background="#ffffff", relief="groove")
         self.estil.configure("Titol.TLabel", background="#ffffff", foreground="#e95420", font=("Ubuntu", 11))
+        self.estil.configure("Portada.TLabel", background="#ffffff", foreground="#e95420", font=("Ubuntu", 40))
         self.estil.configure("Etiqueta.TLabel", background="#ffffff")
         self.estil.map("Entrada.TEntry", foreground=[('disabled','black')])
         self.estil.configure("Check.TCheckbutton", background="#ffffff")

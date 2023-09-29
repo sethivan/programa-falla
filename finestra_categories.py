@@ -36,7 +36,7 @@ class FinestraCategories(tk.Toplevel):
         self.title("Modificar Categories")
         utils=Utils()
         utils.definir_estil_global()
-        self.configure(bg="#eae9e7", pady=5, padx=5)
+        self.configure(bg="#ffffff", pady=5, padx=5)
 
         self.quota_adult=tk.StringVar()
         self.quota_cadet=tk.StringVar()

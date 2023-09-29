@@ -37,7 +37,7 @@ class FinestraLlistats(tk.Toplevel):
         self.title("Llistats")
         utils=Utils()
         utils.definir_estil_global()
-        self.configure(bg="#eae9e7", pady=5, padx=5)
+        self.configure(bg="#ffffff", pady=5, padx=5)
 
         self.data_moviments_dia=tk.StringVar()
         self.efectiu=tk.IntVar()
@@ -60,7 +60,7 @@ class FinestraLlistats(tk.Toplevel):
         # Frames en els que dividim la finestra.
         label_estil_moviments_dia=ttk.Label(self, text="Moviments dia", style="Titol.TLabel")
         label_frame_moviments_dia=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_moviments_dia)
-        label_frame_moviments_dia.grid(row=0, column=0, padx=5, pady=5, ipadx=5, ipady=5)
+        label_frame_moviments_dia.grid(row=0, column=0, padx=5, pady=5, ipadx=2, ipady=3)
 
         label_estil_fallers=ttk.Label(self, text="Llistat fallers", style="Titol.TLabel")
         label_frame_fallers=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_fallers)
@@ -68,12 +68,12 @@ class FinestraLlistats(tk.Toplevel):
 
         label_estil_altres_llistats=ttk.Label(self, text="Altres llistats", style="Titol.TLabel")
         label_frame_altres_llistats=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_altres_llistats)
-        label_frame_altres_llistats.grid(row=2, column=0, padx=5, ipadx=5, pady=5, ipady=5)
+        label_frame_altres_llistats.grid(row=2, column=0, padx=5, pady=5, ipadx=2, ipady=3)
 
         # Widgets per a cada frame.
 
         # Frame "Moviments dia".
-        self.label_data_moviments_dia=ttk.Label(label_frame_moviments_dia, text="Data: ", style="Etiqueta.TLabel")
+        self.label_data_moviments_dia=ttk.Label(label_frame_moviments_dia, text="Data", style="Etiqueta.TLabel")
         self.label_data_moviments_dia.grid(row=0, column=0, padx=5, pady=5)
 
         self.entry_data_moviments_dia=ttk.Entry(label_frame_moviments_dia, width=10, textvariable=self.data_moviments_dia)
@@ -89,66 +89,66 @@ class FinestraLlistats(tk.Toplevel):
 
         # Frame "Llistat fallers".
         self.check_button_nom_complet=ttk.Checkbutton(label_frame_fallers, text="Nom complet", style="Check.TCheckbutton", variable=self.nom_complet)
-        self.check_button_nom_complet.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_nom_complet.grid(row=0, column=0, padx=5, pady=2, sticky="w")
 
         self.check_button_dni=ttk.Checkbutton(label_frame_fallers, text="DNI", style="Check.TCheckbutton", variable=self.dni)
-        self.check_button_dni.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_dni.grid(row=1, column=0, padx=5, pady=2, sticky="w")
 
         self.check_button_adresa=ttk.Checkbutton(label_frame_fallers, text="Adreça", style="Check.TCheckbutton", variable=self.adresa)
-        self.check_button_adresa.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_adresa.grid(row=2, column=0, padx=5, pady=2, sticky="w")
 
         self.check_button_telefon=ttk.Checkbutton(label_frame_fallers, text="Telèfon", style="Check.TCheckbutton", variable=self.telefon)
-        self.check_button_telefon.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_telefon.grid(row=3, column=0, padx=5, pady=2, sticky="w")
 
         self.check_button_data_naixement=ttk.Checkbutton(label_frame_fallers, text="Data de naixement", style="Check.TCheckbutton", variable=self.data_naixement)
-        self.check_button_data_naixement.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_data_naixement.grid(row=4, column=0, padx=5, pady=2, sticky="w")
 
         self.check_button_correu_electronic=ttk.Checkbutton(label_frame_fallers, text="Correu electrònic", style="Check.TCheckbutton", variable=self.correu_electronic)
-        self.check_button_correu_electronic.grid(row=5, column=0, padx=5, pady=5, sticky="w")
+        self.check_button_correu_electronic.grid(row=5, column=0, padx=5, pady=2, sticky="w")
 
         self.radio_button_complet=ttk.Radiobutton(label_frame_fallers, text="Complet", style="Radio.TRadiobutton", variable=self.opcio, value=1, command=self.deshabilitar_opcions)
         self.radio_button_categories=ttk.Radiobutton(label_frame_fallers, text="Per categories", style="Radio.TRadiobutton", variable=self.opcio, value=2, command=self.habilitar_categories)
         self.radio_button_edats=ttk.Radiobutton(label_frame_fallers, text="Per edats", style="Radio.TRadiobutton", variable=self.opcio, value=3, command=self.habilitar_edats)
-        self.radio_button_complet.grid(row=2, column=2, padx=5, pady=5, sticky="w")
-        self.radio_button_categories.grid(row=0, column=1, padx=5, pady=5, sticky="w")
-        self.radio_button_edats.grid(row=0, column=2, padx=5, pady=5, sticky="w")
+        self.radio_button_complet.grid(row=0, column=3, padx=5, pady=2, sticky="w")
+        self.radio_button_categories.grid(row=0, column=1, padx=5, pady=2, sticky="w")
+        self.radio_button_edats.grid(row=0, column=2, padx=5, pady=2, sticky="w")
 
         self.check_button_adult=ttk.Checkbutton(label_frame_fallers, state="disabled", text="Adult", style="Check.TCheckbutton", variable=self.adult)
-        self.check_button_adult.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        self.check_button_adult.grid(row=1, column=1, padx=5, sticky="w")
 
         self.check_button_cadet=ttk.Checkbutton(label_frame_fallers, state="disabled", text="Cadet", style="Check.TCheckbutton", variable=self.cadet)
-        self.check_button_cadet.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+        self.check_button_cadet.grid(row=2, column=1, padx=5, sticky="w")
 
         self.check_button_juvenil=ttk.Checkbutton(label_frame_fallers, state="disabled", text="Juvenil", style="Check.TCheckbutton", variable=self.juvenil)
-        self.check_button_juvenil.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.check_button_juvenil.grid(row=3, column=1, padx=5, sticky="w")
 
         self.check_button_infantil=ttk.Checkbutton(label_frame_fallers, state="disabled", text="Infantil", style="Check.TCheckbutton", variable=self.infantil)
-        self.check_button_infantil.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.check_button_infantil.grid(row=4, column=1, padx=5, sticky="w")
 
         self.check_button_bebe=ttk.Checkbutton(label_frame_fallers, state="disabled", text="Bebè", style="Check.TCheckbutton", variable=self.bebe)
-        self.check_button_bebe.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+        self.check_button_bebe.grid(row=5, column=1, padx=5, sticky="w")
 
-        self.label_edat_inicial=ttk.Label(label_frame_fallers, text="edat inicial:", style="Etiqueta.TLabel")
-        self.label_edat_inicial.grid(row=1, column=2, padx=5, sticky="e")
+        self.label_edat_inicial=ttk.Label(label_frame_fallers, text="edat inicial", style="Etiqueta.TLabel")
+        self.label_edat_inicial.grid(row=1, column=2, padx=5, sticky="w")
 
         self.entry_edat_inicial=ttk.Entry(label_frame_fallers, width=5, state="disabled", textvariable=self.edat_inicial)
-        self.entry_edat_inicial.grid(row=1, column=3, sticky="w")
+        self.entry_edat_inicial.grid(row=2, column=2, padx=5, sticky="w")
 
-        self.label_edat_final=ttk.Label(label_frame_fallers, text="edat final:", style="Etiqueta.TLabel")
-        self.label_edat_final.grid(row=1, column=4, padx=5, sticky="e")
+        self.label_edat_final=ttk.Label(label_frame_fallers, text="edat final", style="Etiqueta.TLabel")
+        self.label_edat_final.grid(row=3, column=2, padx=5, sticky="w")
 
         self.entry_edat_final=ttk.Entry(label_frame_fallers, width=5, state="disabled", textvariable=self.edat_final)
-        self.entry_edat_final.grid(row=1, column=5, sticky="w")
+        self.entry_edat_final.grid(row=4, column=2, padx=5, sticky="w")
 
         self.button_fallers=ttk.Button(label_frame_fallers, text="Llistat fallers", style="Boto.TButton", command=self.crear_llistat_fallers)
-        self.button_fallers.grid(row=5, column=4, columnspan=2)
+        self.button_fallers.grid(row=4, column=3, rowspan=2, sticky="s")
 
         # Frame "Altres llistats"
         self.button_general=ttk.Button(label_frame_altres_llistats, text="Llistat general", style="Boto.TButton", command=self.crear_llistat_general)
-        self.button_general.grid(row=0, column=0, padx=5, pady=5)
+        self.button_general.grid(row=0, column=0, padx=5, pady=3)
 
         self.button_altes_baixes=ttk.Button(label_frame_altres_llistats, text="Llistat altes i baixes", style="Boto.TButton", command=self.crear_llistat_altes_baixes)
-        self.button_altes_baixes.grid(row=0, column=1, padx=5, pady=5)
+        self.button_altes_baixes.grid(row=0, column=1, padx=5, pady=3)
 
 
     def iniciar(self):

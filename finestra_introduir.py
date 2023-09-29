@@ -48,7 +48,7 @@ class FinestraIntroduir(tk.Toplevel):
 		self.title("Introduir Faller")
 		utils=Utils()
 		utils.definir_estil_global()
-		self.configure(bg="#eae9e7", pady=5, padx=5)
+		self.configure(bg="#ffffff", pady=5, padx=5)
 
 		self.nom=tk.StringVar()
 		self.cognoms=tk.StringVar()
@@ -66,30 +66,30 @@ class FinestraIntroduir(tk.Toplevel):
 		# Frames en els que dividim la finestra.
 		label_estil_dades=ttk.Label(self, text="Introduir dades", style="Titol.TLabel")
 		label_frame_dades=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_dades)
-		label_frame_dades.grid(row=0, column=0, padx=5, pady=5, ipadx=5, ipady=5)
+		label_frame_dades.grid(row=0, column=0, padx=5, pady=5, ipadx=4, ipady=5)
 
 		label_estil_familiar=ttk.Label(self, text="Buscar familiar del faller", style="Titol.TLabel")
 		label_frame_familiar=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_familiar)
-		label_frame_familiar.grid(row=1, column=0, padx=5, pady=5, ipadx=5, ipady=5)
+		label_frame_familiar.grid(row=1, column=0, padx=5, pady=5, ipady=5)
 
 		# Widgets per a cada frame.
 
 		# Frame "Introduir dades".
-		self.label_nom=ttk.Label(label_frame_dades, text="Nom:", style="Etiqueta.TLabel")
-		self.label_nom.grid(row=0, column=0, padx=5, sticky="e")
+		self.label_nom=ttk.Label(label_frame_dades, text="Nom", style="Etiqueta.TLabel")
+		self.label_nom.grid(row=0, column=0, padx=7, pady=2, sticky="w")
 
 		self.entry_nom=ttk.Entry(label_frame_dades, textvariable=self.nom)
-		self.entry_nom.grid(row=0, column=1)
+		self.entry_nom.grid(row=1, column=0, padx=7)
 		self.entry_nom.focus()
 
-		self.label_cognoms=ttk.Label(label_frame_dades, text="Cognoms:", style="Etiqueta.TLabel")
-		self.label_cognoms.grid(row=0, column=2, padx=5, sticky="e")
+		self.label_cognoms=ttk.Label(label_frame_dades, text="Cognoms", style="Etiqueta.TLabel")
+		self.label_cognoms.grid(row=0, column=1, pady=2, sticky="w")
 
-		self.entry_cognoms=ttk.Entry(label_frame_dades, textvariable=self.cognoms)
-		self.entry_cognoms.grid(row=0, column=3)
+		self.entry_cognoms=ttk.Entry(label_frame_dades, width=30, textvariable=self.cognoms)
+		self.entry_cognoms.grid(row=1, column=1)
 
-		self.label_sexe=ttk.Label(label_frame_dades, text="Sexe:", style="Etiqueta.TLabel")
-		self.label_sexe.grid(row=1, column=0, padx=5, sticky="e")
+		self.label_sexe=ttk.Label(label_frame_dades, text="Sexe", style="Etiqueta.TLabel")
+		self.label_sexe.grid(row=2, column=0, padx=7, pady=5, sticky="w")
 
 		self.radio_button_masculi=ttk.Radiobutton(
 			label_frame_dades,
@@ -105,54 +105,42 @@ class FinestraIntroduir(tk.Toplevel):
 			variable=self.sexe,
 			value=2
 		)
-		self.radio_button_masculi.grid(row=1, column=1, sticky="w")
-		self.radio_button_femeni.grid(row=1, column=1)
+		self.radio_button_masculi.grid(row=3, column=0, padx=7, sticky="w")
+		self.radio_button_femeni.grid(row=3, column=0)
 
-		self.label_naixement=ttk.Label(label_frame_dades, text="Data de naixement:", style="Etiqueta.TLabel")
-		self.label_naixement.grid(row=1, column=2, padx=5, sticky="e")
+		self.label_naixement=ttk.Label(label_frame_dades, text="Data de naixement", style="Etiqueta.TLabel")
+		self.label_naixement.grid(row=2, column=1, pady=5, sticky="w")
 
-		self.entry_naixement=ttk.Entry(label_frame_dades, textvariable=self.naixement)
-		self.entry_naixement.grid(row=1, column=3)
+		self.entry_naixement=ttk.Entry(label_frame_dades, width=30, textvariable=self.naixement)
+		self.entry_naixement.grid(row=3, column=1)
 
-		self.label_dni=ttk.Label(label_frame_dades, text="DNI:", style="Etiqueta.TLabel")
-		self.label_dni.grid(row=2, column=0, padx=5, sticky="e")
+		self.label_dni=ttk.Label(label_frame_dades, text="DNI", style="Etiqueta.TLabel")
+		self.label_dni.grid(row=4, column=0, padx=7, pady=2, sticky="w")
 
 		self.entry_dni=ttk.Entry(label_frame_dades, textvariable=self.dni)
-		self.entry_dni.grid(row=2, column=1)
+		self.entry_dni.grid(row=5, column=0, padx=7)
 
-		self.label_adresa=ttk.Label(label_frame_dades, text="Adreça:", style="Etiqueta.TLabel")
-		self.label_adresa.grid(row=2, column=2, padx=5, sticky="e")
+		self.label_adresa=ttk.Label(label_frame_dades, text="Adreça", style="Etiqueta.TLabel")
+		self.label_adresa.grid(row=4, column=1, pady=2, sticky="w")
 
-		self.entry_adresa=ttk.Entry(label_frame_dades, textvariable=self.adresa)
-		self.entry_adresa.grid(row=2, column=3)
+		self.entry_adresa=ttk.Entry(label_frame_dades, width=30, textvariable=self.adresa)
+		self.entry_adresa.grid(row=5, column=1)
 
-		self.label_telefon=ttk.Label(label_frame_dades, text="Telèfon:", style="Etiqueta.TLabel")
-		self.label_telefon.grid(row=3, column=0, padx=5, sticky="e")
+		self.label_telefon=ttk.Label(label_frame_dades, text="Telèfon", style="Etiqueta.TLabel")
+		self.label_telefon.grid(row=6, column=0, padx=7, pady=2, sticky="w")
 
 		self.entry_telefon=ttk.Entry(label_frame_dades, textvariable=self.telefon)
-		self.entry_telefon.grid(row=3, column=1)
+		self.entry_telefon.grid(row=7, column=0, padx=7)
 
-		self.label_correu=ttk.Label(label_frame_dades, text="Correu electrònic:", style="Etiqueta.TLabel")
-		self.label_correu.grid(row=3, column=2, padx=5, sticky="e")
+		self.label_correu=ttk.Label(label_frame_dades, text="Correu electrònic", style="Etiqueta.TLabel")
+		self.label_correu.grid(row=6, column=1, pady=2, sticky="w")
 
-		self.entry_correu=ttk.Entry(label_frame_dades, textvariable=self.correu)
-		self.entry_correu.grid(row=3, column=3)
+		self.entry_correu=ttk.Entry(label_frame_dades, width=30, textvariable=self.correu)
+		self.entry_correu.grid(row=7, column=1)
 
 		# Frame "Buscar familiar del faller".
-		self.label_nom_familiar=ttk.Label(label_frame_familiar, text="Cognoms i nom:", style="Etiqueta.TLabel")
-		self.label_nom_familiar.grid(row=0, column=0, padx=5, sticky="e")
-
-		self.combo_box_familiar_faller=ttk.Combobox(
-			label_frame_familiar, 
-			width=30, 
-			postcommand=self.desplegar_familia
-		)
-		self.combo_box_familiar_faller.grid(row=0, column=1)
-		self.combo_box_familiar_faller.bind("<<ComboboxSelected>>", self.seleccionar_familia)
-		self.combo_box_familiar_faller.configure(state="disabled")
-
-		self.label_opcio_familiar=ttk.Label(label_frame_familiar, text="Familiar en la falla:", style="Etiqueta.TLabel")
-		self.label_opcio_familiar.grid(row=1, column=0, padx=5, sticky="e")
+		self.label_opcio_familiar=ttk.Label(label_frame_familiar, text="Familiar en la falla?", style="Etiqueta.TLabel")
+		self.label_opcio_familiar.grid(row=0, column=0, padx=5, pady=2, sticky="w")
 
 		self.radio_button_familiar_si=ttk.Radiobutton(
 			label_frame_familiar, 
@@ -170,8 +158,20 @@ class FinestraIntroduir(tk.Toplevel):
 			value=2, 
 			command=self.deshabilitar_familia
 		)
-		self.radio_button_familiar_si.grid(row=1, column=1, sticky="w")
-		self.radio_button_familiar_no.grid(row=1, column=1)
+		self.radio_button_familiar_si.grid(row=1, column=0, padx=5, sticky="w")
+		self.radio_button_familiar_no.grid(row=1, column=0)
+
+		self.label_nom_familiar=ttk.Label(label_frame_familiar, text="Cognoms i nom", style="Etiqueta.TLabel")
+		self.label_nom_familiar.grid(row=2, column=0, padx=5, pady=2, sticky="w")
+
+		self.combo_box_familiar_faller=ttk.Combobox(
+			label_frame_familiar, 
+			width=30, 
+			postcommand=self.desplegar_familia
+		)
+		self.combo_box_familiar_faller.grid(row=3, column=0, padx=5)
+		self.combo_box_familiar_faller.bind("<<ComboboxSelected>>", self.seleccionar_familia)
+		self.combo_box_familiar_faller.configure(state="disabled")
 
 		#Botó "Introduir".
 		self.button_introduir=ttk.Button(self, text="Introduir", style="Boto.TButton", command=self.introduir_faller)
@@ -183,7 +183,7 @@ class FinestraIntroduir(tk.Toplevel):
 		Inicia la nova finestra.
 		'''
 		self.sexe.set(1)
-		self.familia.set(1)
+		self.familia.set(2)
 		self.grab_set() # Manté el foco en la finestra.
 		self.transient(self.master) # Manté la finestra sempre per damunt de la principal.
 		self.mainloop()

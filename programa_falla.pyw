@@ -65,107 +65,124 @@ class Aplicacio(tk.Frame):
 		self.master.configure(bg="#ffffff", pady=5, padx=5)
 		
 		# Barra de menú.
-		self.barraMenu=tk.Menu() # Guardem el menú en una variable.
-		self.master.config(menu=self.barraMenu) # Construïm el menú.
+		self.barra_menu=tk.Menu() # Guardem el menú en una variable.
+		self.master.config(menu=self.barra_menu) # Construïm el menú.
 
-		# Submenú Arxiu.
-		self.arxiuMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
-		self.arxiuMenu.add_command(label="Eixir", command=self.eixir)
-
-		# Submenú Categoria.
-		self.categoriaMenu=tk.Menu(self.barraMenu, tearoff=0) # Creem els elements i subelements.
-		self.categoriaMenu.add_command(label="Modificar", command=self.modificar_categoria)
+		# Submenú Inici.
+		self.menu_inici=tk.Menu(self.barra_menu, tearoff=0) # Creem els elements i subelements.
+		self.menu_inici.add_command(label="Nou exercici", command=self.nou_exercici)
+		self.menu_inici.add_command(label="Modificar categories", command=self.modificar_categories)
+		self.menu_inici.add_command(label="Eixir", command=self.eixir)
 
 		# Submenú Faller.
-		self.fallerMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.fallerMenu.add_command(label="Gestionar", command=self.gestionar, accelerator="Ctrl+G")
-		# Bindegem el submenú "Gestionar".
+		self.menu_faller=tk.Menu(self.barra_menu, tearoff=0)
+		self.menu_faller.add_command(label="Introduir", command=self.introduir_faller, accelerator="Ctrl+I")
+		self.master.bind_all("<Control-i>", self.event_introduir)
+		self.menu_faller.add_command(label="Gestionar", command=self.gestionar_faller, accelerator="Ctrl+G")
 		self.master.bind_all("<Control-g>", self.EventGestionar)
-		self.fallerMenu.add_command(label="Introduir", command=self.introduir, accelerator="Ctrl+I")
-		self.master.bind_all("<Control-i>", self.event_introduir) # Bindegem el submenú "Introduir".
-
-		# Submenú Loteria.
-		self.loteriaMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.loteriaMenu.add_command(label="Assignar", command=self.AssignarLoteria)
-
-		# Submenú Rifa.
-		self.rifaMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.rifaMenu.add_command(label="Assignar", command=self.assignar_rifa)
-
+		
 		# Submenú Historial.
-		self.historialMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.historialMenu.add_command(label="Modificar", command=self.modificar_historial)
-		self.historialMenu.add_command(label="Borrar", command=self.borrar_historial)
+		self.menu_historial=tk.Menu(self.barra_menu, tearoff=0)
+		self.menu_historial.add_command(label="Modificar", command=self.modificar_historial)
+		self.menu_historial.add_command(label="Borrar", command=self.borrar_historial)
+
+		# Submenú Sortejos.
+		self.menu_sortejos=tk.Menu(self.barra_menu, tearoff=0)
+		self.menu_sortejos.add_command(label="Assignar rifa", command=self.assignar_rifa)
+		self.menu_sortejos.add_command(label="Assignar loteria", command=self.AssignarLoteria)
 
 		# Submenú Llistats.
-		self.llistatsMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.llistatsMenu.add_command(label="Moviments", command=self.MovimentsDia)
-		self.llistatsMenu.add_command(label="General", command=self.LlistatGeneral)
-		self.llistatsMenu.add_command(label="Fallers", command=self.LlistatFallers)
-		self.llistatsMenu.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
-		self.llistatsMenu.add_command(label="Rifes", command=self.LlistatRifes)
-
-		# Submenú Exercici.
-		self.exerciciMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.exerciciMenu.add_command(label="Nou", command=self.nou_exercici)
+		self.menu_imprimir=tk.Menu(self.barra_menu, tearoff=0)
+		self.menu_imprimir.add_command(label="Moviments", command=self.MovimentsDia)
+		self.menu_imprimir.add_command(label="General", command=self.LlistatGeneral)
+		self.menu_imprimir.add_command(label="Fallers", command=self.LlistatFallers)
+		self.menu_imprimir.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
+		self.menu_imprimir.add_command(label="Rifes", command=self.LlistatRifes)
 
 		# Submenú Ajuda.
-		self.ajudaMenu=tk.Menu(self.barraMenu, tearoff=0)
-		self.ajudaMenu.add_command(label="Info", command=self.info)
+		self.menu_ajuda=tk.Menu(self.barra_menu, tearoff=0)
+		self.menu_ajuda.add_command(label="Info", command=self.info)
 
 		# Afegim tots els submenús a la barra.
-		self.barraMenu.add_cascade(label="Arxiu", menu=self.arxiuMenu)
-		self.barraMenu.add_cascade(label="Categoria", menu=self.categoriaMenu)
-		self.barraMenu.add_cascade(label="Faller", menu=self.fallerMenu)
-		self.barraMenu.add_cascade(label="Loteria", menu=self.loteriaMenu)
-		self.barraMenu.add_cascade(label="Rifa", menu=self.rifaMenu)
-		self.barraMenu.add_cascade(label="Historial", menu=self.historialMenu)
-		self.barraMenu.add_cascade(label="Llistats", menu=self.llistatsMenu)
-		self.barraMenu.add_cascade(label="Exercici", menu=self.exerciciMenu)
-		self.barraMenu.add_cascade(label="Ajuda", menu=self.ajudaMenu)
+		self.barra_menu.add_cascade(label="Inici", menu=self.menu_inici)
+		self.barra_menu.add_cascade(label="Faller", menu=self.menu_faller)
+		self.barra_menu.add_cascade(label="Historial", menu=self.menu_historial)
+		self.barra_menu.add_cascade(label="Sortejos", menu=self.menu_sortejos)
+		self.barra_menu.add_cascade(label="Imprimir", menu=self.menu_imprimir)
+		self.barra_menu.add_cascade(label="Ajuda", menu=self.menu_ajuda)
 
 		# Frames en els que dividim la finestra.
-		#image=Image.open("escut.jpg")
-		#image_tk=ImageTk.PhotoImage(image)
-		#label_image=tk.Label(self.master, image=image_tk)
-		#label_image.grid(row=0, column=0, rowspan=4)
-
-		label_estil_categoria=ttk.Label(self.master, text="Categoria", style="Titol.TLabel")
-		label_frame_categoria=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_categoria)
-		label_frame_categoria.grid(row=0, column=1, ipadx=2, ipady=2)
+		label_frame_portada=tk.LabelFrame(self.master, borderwidth=0, background="#ffffff")
+		label_frame_portada.grid(row=0, column=0, padx=20, pady=10, ipady=2, rowspan=3)
+		
+		label_estil_inici=ttk.Label(self.master, text="Inici", style="Titol.TLabel")
+		label_frame_inici=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_inici)
+		label_frame_inici.grid(row=0, column=1, padx=20, pady=10, ipady=2, sticky="n")
 
 		label_estil_faller=ttk.Label(self.master, text="Faller", style="Titol.TLabel")
 		label_frame_faller=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_faller)
-		label_frame_faller.grid(row=1, column=1, ipadx=2, ipady=2)
+		label_frame_faller.grid(row=1, column=1, padx=20, pady=10, ipady=2, sticky="n")
 
-		label_estil_loteria=ttk.Label(self.master, text="Loteria", style="Titol.TLabel")
-		label_frame_loteria=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_loteria)
-		label_frame_loteria.grid(row=2, column=1, ipadx=2, ipady=2)
+		label_estil_historial=ttk.Label(self.master, text="Historial", style="Titol.TLabel")
+		label_frame_historial=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_historial)
+		label_frame_historial.grid(row=2, column=1, padx=20, pady=10, ipady=2, sticky="n")
 
-		label_estil_rifa=ttk.Label(self.master, text="Rifa", style="Titol.TLabel")
-		label_frame_rifa=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_rifa)
-		label_frame_rifa.grid(row=3, column=1, ipadx=2, ipady=2)
+		label_estil_sortejos=ttk.Label(self.master, text="Sortejos", style="Titol.TLabel")
+		label_frame_sortejos=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_sortejos)
+		label_frame_sortejos.grid(row=0, column=2, padx=20, pady=10, ipady=2, sticky="n")
+
+		label_estil_imprimir=ttk.Label(self.master, text="Imprimir", style="Titol.TLabel")
+		label_frame_imprimir=ttk.LabelFrame(self.master, style="Marc.TFrame", labelwidget=label_estil_imprimir)
+		label_frame_imprimir.grid(row=1, column=2, padx=20, pady=10, ipady=2, sticky="n")
 
 		# Widgets per a cada frame.
 
-		# Frame Categoria.
-		self.button_modificar=ttk.Button(label_frame_categoria, text="Modificar categoria", style="Boto.TButton", command=self.modificar_categoria)
-		self.button_modificar.grid(row=0, column=0, padx=5, pady=5)
+		# Frame portada.
+		self.label_falla=ttk.Label(label_frame_portada, text="Falla", style="Portada.TLabel")
+		self.label_falla.grid(row=0, column=0, padx=2)
+
+		self.label_sants=ttk.Label(label_frame_portada, text="Sants", style="Portada.TLabel")
+		self.label_sants.grid(row=1, column=0, padx=2)
+
+		self.label_patrons=ttk.Label(label_frame_portada, text="Patrons", style="Portada.TLabel")
+		self.label_patrons.grid(row=2, column=0, padx=2)
+
+		logo=Image.open("escut.jpg")
+		self.image=ImageTk.PhotoImage(logo)
+		self.label_image=tk.Label(label_frame_portada, image=self.image, borderwidth=0)
+		self.label_image.grid(row=3, column=0)
+
+		# Frame Inici.
+		self.button_nou_exercici=ttk.Button(label_frame_inici, width=20, text="Nou exercici", style="Boto.TButton", command=self.nou_exercici)
+		self.button_nou_exercici.grid(row=0, column=0, padx=5, pady=5)
+		
+		self.button_modificar_categories=ttk.Button(label_frame_inici, width=20, text="Modificar categories", style="Boto.TButton", command=self.modificar_categories)
+		self.button_modificar_categories.grid(row=1, column=0, padx=5, pady=5)
 
 		# Frame Faller.
-		self.button_introduir=ttk.Button(label_frame_faller, text="Introduir faller", style="Boto.TButton", command=self.introduir)
-		self.button_introduir.grid(row=0, column=0, padx=5, pady=5)
+		self.button_introduir_faller=ttk.Button(label_frame_faller, width=20, text="Introduir faller", style="Boto.TButton", command=self.introduir_faller)
+		self.button_introduir_faller.grid(row=0, column=0, padx=5, pady=5)
 
-		self.button_gestionar=ttk.Button(label_frame_faller, text="Gestionar faller", style="Boto.TButton", command=self.gestionar)
-		self.button_gestionar.grid(row=1, column=0, padx=5, pady=5)
+		self.button_gestionar_faller=ttk.Button(label_frame_faller, width=20, text="Gestionar faller", style="Boto.TButton", command=self.gestionar_faller)
+		self.button_gestionar_faller.grid(row=1, column=0, padx=5, pady=5)
 
-		# Frame Loteria.
-		self.button_loteria=ttk.Button(label_frame_loteria, text="Assignar loteria", style="Boto.TButton", command=self.AssignarLoteria)
-		self.button_loteria.grid(row=0, column=0, padx=5, pady=5)
-
-		# Frame Rifa.
-		self.button_rifa=ttk.Button(label_frame_rifa, text="Assignar rifa", style="Boto.TButton", command=self.assignar_rifa)
+		# Frame Sortejos.
+		self.button_rifa=ttk.Button(label_frame_sortejos, width=20, text="Assignar rifa", style="Boto.TButton", command=self.assignar_rifa)
 		self.button_rifa.grid(row=0, column=0, padx=5, pady=5)
+
+		self.button_loteria=ttk.Button(label_frame_sortejos, width=20, text="Assignar loteria", style="Boto.TButton", command=self.AssignarLoteria)
+		self.button_loteria.grid(row=1, column=0, padx=5, pady=5)
+
+		# Frame Historial.
+		self.button_modificar_historial=ttk.Button(label_frame_historial, width=20, text="Modificar historial", style="Boto.TButton", command=self.modificar_historial)
+		self.button_modificar_historial.grid(row=0, column=0, padx=5, pady=5)
+
+		self.button_borrar_historial=ttk.Button(label_frame_historial, width=20, text="Borrar historial", style="Boto.TButton", command=self.borrar_historial)
+		self.button_borrar_historial.grid(row=1, column=0, padx=5, pady=5)
+
+		#Frame Imprimir.
+		self.button_llistats=ttk.Button(label_frame_imprimir, width=20, text="Llistats", style="Boto.TButton", command=self.MovimentsDia)
+		self.button_llistats.grid(row=0, column=0, padx=5, pady=5)
 
 		# Comprovació que s'efectua cada vegada que es fica en marxa el programa.
 		self.arrancar()
@@ -212,45 +229,45 @@ class Aplicacio(tk.Frame):
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")
 	
 	
-	def modificar_categoria(self):
+	def modificar_categories(self):
 		''' 
 		Crea una nova instància de la classe FinestraCategories
 		que obri la finestra "Modificar" del menú "Categoria".
 		'''
-		modificar_categoria=FinestraCategories(self)
-		modificar_categoria.iniciar()
+		modificar_categories=FinestraCategories(self)
+		modificar_categories.iniciar()
 	
 	
-	def gestionar(self):
+	def gestionar_faller(self):
 		''' 
 		Crea una nova instància de la classe FinestraGestionar
 		que obri la finestra "Gestionar" del menú "Faller".
 		'''
-		gestionar=FinestraGestionar(self)
-		gestionar.iniciar()
+		gestionar_faller=FinestraGestionar(self)
+		gestionar_faller.iniciar()
 
 
 	def EventGestionar(self, event):
 		'''
 		Bindeig del submenú "Gestionar".
 		'''
-		self.gestionar()
+		self.gestionar_faller()
 	
 
-	def introduir(self):
+	def introduir_faller(self):
 		''' 
 		Crea una nova instància de la classe FinestraIntroduir
 		que obri la finestra "Introduir" del menú "Faller".
 		'''
-		introduir = FinestraIntroduir(self)
-		introduir.iniciar()
+		introduir_faller = FinestraIntroduir(self)
+		introduir_faller.iniciar()
 
 	
 	def event_introduir(self, event):
 		'''
 		Bindeig del submenú "Introduir".
 		'''
-		self.introduir()
+		self.introduir_faller()
 
 
 	def AssignarLoteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
