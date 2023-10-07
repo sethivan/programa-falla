@@ -28,6 +28,7 @@ from base_de_dades import BaseDeDades
 
 from falla import Falla
 from categoria import Categoria
+from informe import Informe
 
 
 class Aplicacio(tk.Frame):
@@ -332,9 +333,8 @@ class Aplicacio(tk.Frame):
 
 	def LlistatRifes(self): #funció per a traure el llistat en pdf d'aquells fallers a qui els correpon rifa
 
-		#elInforme=Informe()
-		#elInforme.FallersAmbRifa()
-		pass
+		informe=Informe()
+		informe.FallersAmbRifa()
 		
 
 	def nou_exercici(self): #funció per a crear un nou exercici faller

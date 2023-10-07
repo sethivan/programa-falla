@@ -2,13 +2,18 @@ from datetime import date
 from datetime import datetime
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
+from tkinter import messagebox
 import os
 import errno
 import os.path as path
 import subprocess
 import platform
+import pickle
 
 from base_de_dades import BaseDeDades
+from utils import Utils
+from arxiu import Arxiu
+from falla import Falla
 
 
 class Informe():
@@ -19,63 +24,101 @@ class Informe():
 
 
 	def assignar_numero_rebut(self):
+		'''
+		Busca a la carpeta "rebuts" quin és l'últim rebut creat i retorna el número següent.
 
-		#intentem crear la carpeta rebuts si no està creada
+		Retorna:
+		--------
+		index : integer.
+			Número de rebut disponible per a ser assignat.
+		'''
+		# Intentem crear la carpeta rebuts si no està creada.
 		try:
 			os.mkdir("rebuts")
 		except OSError as e:
 			if e.errno!=errno.EEXIST:
 				raise
-		#asignem un nom d'arxiu amb un sumatori des de l'arxiu número 1
-		pos=1
-		arxiu="rebuts"+"/"+str(pos)
+		# Assignem com a nom d'arxiu el següent número a l'últim creat.
+		index=1
+		arxiu="rebuts"+"/"+str(index)
 		while path.exists(arxiu+".pdf"):
-			pos=pos+1
-			arxiu="rebuts"+"/"+str(pos)
-		return(pos)
+			index=index+1
+			arxiu="rebuts"+"/"+str(index)
+		return(index)
 
 
-	def crear_rebut(self, familiar, nom, pagquota, pagloteria, pagrifa, quota, quopag, loteria, lotpag, rifa, rifapag):
+	def crear_rebut(self, familiar, nom, pagament_quota, pagament_loteria, pagament_rifa, quota_assignada, quota_pagada, loteria_assignada, loteria_pagada, rifa_assignada, rifa_pagada):
+		'''
+		Crea un .pdf amb la informació de pagament del faller en format rebut.
 
-		#traguem la data actual per a utilitzar-la al rebut
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		#pagament total
-		pagament=pagquota+pagloteria+pagrifa
-		#pagaments per separat per concepte
-		quodif=float(quota)-float(quopag)
-		lotdif=float(loteria)-float(lotpag)
-		rifadif=float(rifa)-float(rifapag)
-		#asignacions totals i pagaments totals
-		totalasig=float(quota)+float(loteria)+float(rifa)
-		totalpag=float(quopag)+float(lotpag)+float(rifapag)
-		total=quodif+lotdif+rifadif
-		#intentem crear la carpeta rebuts si no està creada
+		Paràmetres:
+		-----------
+		familiar : boolean.
+			Indica si el pagament ha segut personal o familiar.
+		nom : string.
+			Nom complet del faller.
+		pagament_quota : real.
+			Quantitat pagada pel faller en concepte de quota en el moviment actual.
+		pagament_loteria : real.
+			Quantitat pagada pel faller en concepte de loteria en el moviment actual.
+		pagament_rifa : real.
+			Quantitat pagada pel faller en concepte de rifa en el moviment actual.
+		quota_assignada : real.
+			Quantitat total assignada al faller en concepte de quota.
+		quota_pagada : real.
+			Quantitat total pagada pel faller en concepte de quota.
+		loteria_assignada : real.
+			Quantitat total assignada al faller en concepte de loteria.
+		loteria_pagada : real.
+			Quantitat total pagada pel faller en concepte de loteria.
+		rifa_assignada : real.
+			Quantitat total assignada al faller en concepte de rifa.
+		rifa_pagada : real.
+			Quantitat total pagada pel faller en concepte de rifa.
+		'''
+		# Traguem la data actual per a utilitzar-la al rebut.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		# Calculem el pagament total.
+		pagament_total=pagament_quota+pagament_loteria+pagament_rifa
+		# Calculem els deutes per concepte.
+		deute_quota=float(quota_assignada)-float(quota_pagada)
+		deute_loteria=float(loteria_assignada)-float(loteria_pagada)
+		deute_rifa=float(rifa_assignada)-float(rifa_pagada)
+		# Calculem els totals.
+		total_assignat=float(quota_assignada)+float(loteria_assignada)+float(rifa_assignada)
+		total_pagat=float(quota_pagada)+float(loteria_pagada)+float(rifa_pagada)
+		deute_total=deute_quota + deute_loteria + deute_rifa
+		# Intentem crear la carpeta rebuts si no està creada.
 		try:
 			os.mkdir("rebuts")
 		except OSError as e:
 			if e.errno!=errno.EEXIST:
 				raise
-		#asignem un nom d'arxiu amb un sumatori des de l'arxiu número 1
-		pos=1
-		arxiu="rebuts"+"/"+str(pos)
-		while path.exists(arxiu+".pdf"):
-			pos=pos+1
-			arxiu="rebuts"+"/"+str(pos)
-		#creem el full i tot el contingut
+		# Assignem com a nom d'arxiu el següent número a l'últim creat.
+		index=self.assignar_numero_rebut()
+		#index=1
+		#arxiu="rebuts"+"/"+str(index)
+		#while path.exists(arxiu+".pdf"):
+			#index=index+1
+			#arxiu="rebuts"+"/"+str(index)
+		arxiu="rebuts"+"/"+str(index)
+
+		# Creem el full i tot el contingut.
 		w,h=A4
 		c=canvas.Canvas(arxiu+".pdf", pagesize=A4)
+		# Encapçalament.
 		c.line(0,h-(h/3),w,h-(h/3))
 		c.line(0,h/3,w,h/3)
-		c.drawString(w-100, h-30, datafinal)
-		c.drawString(50, h-50, nom + " abona la quantitat de " + "{0:.2f}".format(pagament) + " €")
-		c.drawString(70, h-80, "{0:.2f}".format(pagquota) + " € en concepte de quota")
-		c.drawString(70, h-100, "{0:.2f}".format(pagloteria) + " € en concepte de loteria")
-		c.drawString(70, h-120, "{0:.2f}".format(pagrifa) + " € en concepte de rifa")
-		if familiar==0: #li passem per variable si ha fet el pagament individual o per bloc familiar
+		c.drawString(w-100, h-30, data_actual)
+		# Informació de la part superior.
+		c.drawString(50, h-50, nom + " abona la quantitat de " + "{0:.2f}".format(pagament_total) + " €")
+		c.drawString(70, h-80, "{0:.2f}".format(pagament_quota) + " € en concepte de quota")
+		c.drawString(70, h-100, "{0:.2f}".format(pagament_loteria) + " € en concepte de loteria")
+		c.drawString(70, h-120, "{0:.2f}".format(pagament_rifa) + " € en concepte de rifa")
+		# Informació de la taula.
+		if familiar==0: # Li passem per variable si ha fet el pagament individual o per bloc familiar.
 			c.drawString(50, h-150, "RESUM DEL PENDENT DE PAGAMENT:")
 		else:
 			c.drawString(50, h-150, "RESUM DEL PENDENT DE PAGAMENT DE LA FAMILIA COMPLETA:")
@@ -86,28 +129,28 @@ class Informe():
 		c.drawString(208, h-180, "Pagat")
 		c.drawString(272, h-180, "Pendent")
 		c.drawString(55, h-200, "Quota:")
-		c.drawString(130, h-200, quota + " €")
-		c.drawString(200, h-200, quopag + " €")
-		c.drawString(270, h-200, "{0:.2f}".format(quodif) + " €")
+		c.drawString(130, h-200, quota_assignada + " €")
+		c.drawString(200, h-200, quota_pagada + " €")
+		c.drawString(270, h-200, "{0:.2f}".format(deute_quota) + " €")
 		c.drawString(55, h-220, "Loteria:")
-		c.drawString(130, h-220, loteria + " €")
-		c.drawString(200, h-220, lotpag + " €")
-		c.drawString(270, h-220, "{0:.2f}".format(lotdif) + " €")
+		c.drawString(130, h-220, loteria_assignada + " €")
+		c.drawString(200, h-220, loteria_pagada + " €")
+		c.drawString(270, h-220, "{0:.2f}".format(deute_loteria) + " €")
 		c.drawString(55, h-240, "Rifa:")
-		c.drawString(130, h-240, rifa + " €")
-		c.drawString(200, h-240, rifapag + " €")
-		c.drawString(270, h-240, "{0:.2f}".format(rifadif) + " €")
+		c.drawString(130, h-240, rifa_assignada + " €")
+		c.drawString(200, h-240, rifa_pagada + " €")
+		c.drawString(270, h-240, "{0:.2f}".format(deute_rifa) + " €")
 		c.drawString(55, h-260, "Totals:")
-		c.drawString(130, h-260, "{0:.2f}".format(totalasig) + " €")
-		c.drawString(200, h-260, "{0:.2f}".format(totalpag) + " €")
-		c.drawString(270, h-260, "{0:.2f}".format(total) + " €")
+		c.drawString(130, h-260, "{0:.2f}".format(total_assignat) + " €")
+		c.drawString(200, h-260, "{0:.2f}".format(total_pagat) + " €")
+		c.drawString(270, h-260, "{0:.2f}".format(deute_total) + " €")
 		c.drawImage("escut.jpg", 360, h-260, height=150, width=200)
 		c.showPage()
 		c.save()
-		#entrem a la carpeta rebuts per a obrir l'arxiu pdf i tornem a la ruta original
+		# Entrem a la carpeta "rebuts" per a obrir l'arxiu pdf i tornem a la ruta original.
 		ruta=os.getcwd()
 		os.chdir("rebuts")
-		arxiu=str(pos)+".pdf"
+		arxiu=str(index)+".pdf"
 		sistema_operatiu=platform.system()
 		if sistema_operatiu=='Windows':
 			os.startfile(arxiu)
@@ -118,7 +161,18 @@ class Informe():
 
 
 	def llistat_moviments(self, data, efectiu, banc):
+		'''
+		Crea un .pdf amb un llistat de tots els moviments de la data indicada segons el tipus de pagament.
 
+		Paràmetres:
+		-----------
+		data : string.
+			Data en la que volem llistar els moviments.
+		efectiu : boolean.
+			Marca si volem traure els moviments fets en efectiu .
+		banc : boolean.
+			Marca si volem traure els moviments fets pel banc.
+		'''
 		bd=BaseDeDades("falla.db")
 		pagina=0
 		try:
@@ -152,14 +206,14 @@ class Informe():
 			c.drawString(300, h-i-60, concepte)
 			c.drawString(w-100, h-i-60, "{0:.2f}".format(moviment.quantitat) + " €")
 			i=i+20
-			total=total+moviment.quantitat
+			total=total + moviment.quantitat
 			if i==700:
 				pagina=pagina+1
 				c.drawString(20, 20, "moviments del dia")
 				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
 				c.drawString(w-80, 20, data)
-				c.showPage() #mostrem la pàgina feta
-				c.drawString(50, h-30, "FALLER") #primera linea de la pàgina següent
+				c.showPage() # Mostrem la pàgina creada.
+				c.drawString(50, h-30, "FALLER") # Primera linea de la pàgina següent.
 				c.drawString(300, h-30, "CONCEPTE")
 				c.drawString(w-100, h-30, "QUANTITAT")
 				i=0
@@ -170,48 +224,54 @@ class Informe():
 		c.drawString(w-80, 20, data)
 		c.showPage()
 		c.save()
-		#entrem a la carpeta rebuts per a obrir l'arxiu pdf i tornem a la ruta original
+		# Entrem a la carpeta "moviments dia" per a obrir l'arxiu pdf i tornem a la ruta original.
 		ruta=os.getcwd()
 		os.chdir("moviments dia")
-		#os.startfile(str(data)+".pdf")
+		arxiu=str(data)+".pdf"
+		sistema_operatiu=platform.system()
+		if sistema_operatiu=='Windows':
+			os.startfile(arxiu)
+		elif sistema_operatiu=='Linux':
+			ruta_completa=os.path.join(os.path.dirname(__file__), arxiu)
+			subprocess.run(["xdg-open", ruta_completa])
 		os.chdir(ruta)
 
 
-'''
-	def LlistatGeneral(self):
-
-		#traguem la data actual per a utilitzar-la a l'informe
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		elFaller=Faller()
-		res=elFaller.BuscarFallerAlta(1)
-		elMoviment=Moviment()
-		elMoviment.ExerciciActual()
-		laFamilia=Familia()
-		sumquotafinal=0
-		sumquotapagada=0
-		sumloteriaasignada=0
-		sumloteriapagada=0
-		sumrifaasignada=0
-		sumrifapagada=0
-		pag=0
-		#intentem crear la carpeta llistat general si no està creada
+	def llistat_general(self):
+		'''
+		Crea un .pdf amb un llistat amb l'estat actual de comptes de tots els fallers actius
+		i, en conseqüència, de la falla al complet.
+		'''
+		# Traguem la data actual per a utilitzar-la al rebut.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_per_alta(1)
+		arxiu=Arxiu('exercici')
+		exercici_actual=arxiu.llegir_exercici_actual()
+		falla=Falla()
+		suma_quotes_assignades=0
+		suma_quotes_pagades=0
+		suma_loteries_assignades=0
+		suma_loteries_pagades=0
+		suma_rifes_assignades=0
+		suma_rifes_pagades=0
+		pagina=0
+		# Intentem crear la carpeta "llistat general" si no està creada.
 		try:
 			os.mkdir("llistat general")
 		except OSError as e:
 			if e.errno!=errno.EEXIST:
 				raise
-		arxiu="llistat general"+"/"+str(datafinal)
-		#creem el full i tot el contingut
+		arxiu="llistat general"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
 		w,h=A4
-		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) #el creem en horitzontal
+		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) # El creem en horitzontal.
 		c.setFont("Helvetica", 11)
 		i=0
-		fallers=0 #per a acumular el total de fallers
-		c.drawString(20, w-30, "ID") #la w és el segon parámetre ja que està en horitzontal
+		fallers=0 # Per a acumular el total de fallers.
+		c.drawString(20, w-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
 		c.drawString(50, w-30, "FALLER")
 		c.drawRightString(295, w-30, "QUOTA A.")
 		c.drawRightString(365, w-30, "QUOTA P.")
@@ -223,46 +283,53 @@ class Informe():
 		c.drawRightString(765, w-30, "TOTAL P.")
 		c.drawRightString(835, w-30, "DIFERÈNC.")
 		c.line(0, w-35, h, w-35)
-		for val in res:
-			elMoviment.quotaasignada=0 #resetejem a cada iteració per a que no s'acumulen
-			elMoviment.quotapagada=0
-			elMoviment.loteriaasignada=0
-			elMoviment.loteriapagada=0
-			elMoviment.rifaasignada=0
-			elMoviment.rifapagada=0
-			c.drawString(20, w-i-60, str(val[0]))
-			c.drawString(50, w-i-60, val[2] + ", " + val[1])
-			elFaller.BuscarQuotaFaller(val[0]) #busquem la quota corresponent al faller
-			laFamilia.BuscarDescompteFamilia(val[0]) #busquem el descompte familiar del faller
-			elMoviment.BuscarMoviments(val[0],str(elMoviment.exercici)) #busquem tots els moviments
-			quotafinal=elFaller.quota-(laFamilia.descompte*elFaller.quota/100)+elMoviment.quotaasignada
-			totalasig=quotafinal+elMoviment.loteriaasignada+elMoviment.rifaasignada
-			totalpag=elMoviment.quotapagada+elMoviment.loteriapagada+elMoviment.rifapagada
-			c.drawRightString(295, w-i-60, "{0:.2f}".format(quotafinal) + " €")
-			sumquotafinal=sumquotafinal+quotafinal
-			c.drawRightString(365, w-i-60, "{0:.2f}".format(elMoviment.quotapagada) + " €")
-			sumquotapagada=sumquotapagada+elMoviment.quotapagada
-			c.drawRightString(435, w-i-60, "{0:.2f}".format(elMoviment.loteriaasignada) + " €")
-			sumloteriaasignada=sumloteriaasignada+elMoviment.loteriaasignada
-			c.drawRightString(505, w-i-60, "{0:.2f}".format(elMoviment.loteriapagada) + " €")
-			sumloteriapagada=sumloteriapagada+elMoviment.loteriapagada
-			c.drawRightString(565, w-i-60, "{0:.2f}".format(elMoviment.rifaasignada) + " €")
-			sumrifaasignada=sumrifaasignada+elMoviment.rifaasignada
-			c.drawRightString(625, w-i-60, "{0:.2f}".format(elMoviment.rifapagada) + " €")
-			sumrifapagada=sumrifapagada+elMoviment.rifapagada
-			c.drawRightString(695, w-i-60, "{0:.2f}".format(totalasig) + " €")
-			c.drawRightString(765, w-i-60, "{0:.2f}".format(totalpag) + " €")
-			c.drawRightString(835, w-i-60, "{0:.2f}".format(totalasig-totalpag) + " €")
+		for faller in llistat_fallers:
+			quota_assignada=0 # Resetejem a cada iteració per a que no s'acumulen
+			quota_pagada=0
+			loteria_assignada=0
+			loteria_pagada=0
+			rifa_assignada=0
+			rifa_pagada=0
+			c.drawString(20, w-i-60, str(faller.id))
+			c.drawString(50, w-i-60, faller.cognoms + ", " + faller.nom)
+			quota_base=bd.llegir_quota_faller(faller.id)
+			descompte=(faller.familia.descompte*quota_base/100)
+			quota=quota_base-descompte
+			llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
+			quota_assignada=llista_assignacions_pagaments[0]
+			quota_pagada=llista_assignacions_pagaments[1]
+			loteria_assignada=llista_assignacions_pagaments[2]
+			loteria_pagada=llista_assignacions_pagaments[3]
+			rifa_assignada=llista_assignacions_pagaments[4]
+			rifa_pagada=llista_assignacions_pagaments[5]
+			quota_final=quota+quota_assignada
+			total_assignat=quota_final+loteria_assignada+rifa_assignada
+			total_pagat=quota_pagada+loteria_pagada+rifa_pagada
+			c.drawRightString(295, w-i-60, "{0:.2f}".format(quota_final) + " €")
+			suma_quotes_assignades=suma_quotes_assignades+quota_final
+			c.drawRightString(365, w-i-60, "{0:.2f}".format(quota_pagada) + " €")
+			suma_quotes_pagades=suma_quotes_pagades+quota_pagada
+			c.drawRightString(435, w-i-60, "{0:.2f}".format(loteria_assignada) + " €")
+			suma_loteries_assignades=suma_loteries_assignades+loteria_assignada
+			c.drawRightString(505, w-i-60, "{0:.2f}".format(loteria_pagada) + " €")
+			suma_loteries_pagades=suma_loteries_pagades+loteria_pagada
+			c.drawRightString(565, w-i-60, "{0:.2f}".format(rifa_assignada) + " €")
+			suma_rifes_assignades=suma_rifes_assignades+rifa_assignada
+			c.drawRightString(625, w-i-60, "{0:.2f}".format(rifa_pagada) + " €")
+			suma_rifes_pagades=suma_rifes_pagades+rifa_pagada
+			c.drawRightString(695, w-i-60, "{0:.2f}".format(total_assignat) + " €")
+			c.drawRightString(765, w-i-60, "{0:.2f}".format(total_pagat) + " €")
+			c.drawRightString(835, w-i-60, "{0:.2f}".format(total_assignat-total_pagat) + " €")
 			i=i+20
 			fallers=fallers+1
-			if i==500: #quan arribem a 25 fallers canviem de pàgina
-				pag=pag+1
+			if i==500: # Quan arribem a 25 fallers canviem de pàgina.
+				pagina=pagina+1
 				c.drawString(20, 20, "llistat general")
-				c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(h-80, 20, datafinal)
-				c.showPage() #mostrem la pàgina feta
+				c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(h-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
 				c.setFont("Helvetica", 11)
-				c.drawString(20, w-30, "ID") #primera línea de la següent pàgina
+				c.drawString(20, w-30, "ID") # Primera línea de la següent pàgina.
 				c.drawString(50, w-30, "FALLER")
 				c.drawRightString(295, w-30, "QUOTA A.")
 				c.drawRightString(365, w-30, "QUOTA P.")
@@ -278,30 +345,216 @@ class Informe():
 		c.line(0, w-i-60, h, w-i-60)
 		c.drawRightString(50,w-i-80, "TOTALS")
 		c.drawRightString(200,w-i-80, "FALLERS = " + str(fallers))
-		c.drawRightString(295,w-i-80, "{0:.2f}".format(sumquotafinal) + " €")
-		c.drawRightString(365,w-i-80, "{0:.2f}".format(sumquotapagada) + " €")
-		c.drawRightString(435,w-i-80, "{0:.2f}".format(sumloteriaasignada) + " €")
-		c.drawRightString(505,w-i-80, "{0:.2f}".format(sumloteriapagada) + " €")
-		c.drawRightString(565,w-i-80, "{0:.2f}".format(sumrifaasignada) + " €")
-		c.drawRightString(625,w-i-80, "{0:.2f}".format(sumrifapagada) + " €")
-		sumasignacions=sumquotafinal+sumloteriaasignada+sumrifaasignada
-		c.drawRightString(695,w-i-80, "{0:.2f}".format(sumasignacions) + " €")
-		sumpagats=sumquotapagada+sumloteriapagada+sumrifapagada
-		c.drawRightString(765,w-i-80, "{0:.2f}".format(sumpagats) + " €")
-		c.drawRightString(835,w-i-80, "{0:.2f}".format(sumasignacions-sumpagats) + " €")
-		pag=pag+1
+		c.drawRightString(295,w-i-80, "{0:.2f}".format(suma_quotes_assignades) + " €")
+		c.drawRightString(365,w-i-80, "{0:.2f}".format(suma_quotes_pagades) + " €")
+		c.drawRightString(435,w-i-80, "{0:.2f}".format(suma_loteries_assignades) + " €")
+		c.drawRightString(505,w-i-80, "{0:.2f}".format(suma_loteries_pagades) + " €")
+		c.drawRightString(565,w-i-80, "{0:.2f}".format(suma_rifes_assignades) + " €")
+		c.drawRightString(625,w-i-80, "{0:.2f}".format(suma_rifes_pagades) + " €")
+		total_assignacions=suma_quotes_assignades+suma_loteries_assignades+suma_rifes_assignades
+		c.drawRightString(695,w-i-80, "{0:.2f}".format(total_assignacions) + " €")
+		total_pagaments=suma_quotes_pagades+suma_loteries_pagades+suma_rifes_pagades
+		c.drawRightString(765,w-i-80, "{0:.2f}".format(total_pagaments) + " €")
+		c.drawRightString(835,w-i-80, "{0:.2f}".format(total_assignacions-total_pagaments) + " €")
+		pagina=pagina+1
 		c.drawString(20, 20, "llistat general")
-		c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(h-80, 20, datafinal)
-		c.showPage() #última pàgina
+		c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(h-80, 20, data_actual)
+		c.showPage() # Última pàgina.
 		c.save()
-		#entrem a la carpeta llistat general per a obrir l'arxiu pdf i tornem a la ruta original
+		# Entrem a la carpeta llistat general per a obrir l'arxiu pdf i tornem a la ruta original.
 		ruta=os.getcwd()
 		os.chdir("llistat general")
-		os.startfile(str(datafinal)+".pdf")
+		os.startfile(str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
+	def llistat_altes_baixes(self):
+		'''
+		Crea un .pdf amb un llistat de les altes i les baixes de la falla al comparar
+		els actuals fallers amb el resum de l'any anterior.
+		'''
+		arxiu=Arxiu('exercici')
+		exercici_actual=arxiu.llegir_exercici_actual()
+		any_anterior=exercici_actual-1
+		try:
+			fitxer=open("resum "+str(any_anterior), "rb")
+		except IOError:
+			messagebox.showerror("Informe", "No existeix l'arxiu resum de l'any anterior")
+		else:
+			llistat_fallers_anteriors=pickle.load(fitxer)
+			fitxer.close()
+			del(fitxer)
+			ids_anteriors=[]
+			ids_actuals=[]
+			for faller in llistat_fallers_anteriors:
+				ids_anteriors.append(faller[0])
+			bd=BaseDeDades('falla.db')
+			llistat_fallers_actuals=bd.llegir_fallers_per_alta(1)
+			for faller in llistat_fallers_actuals:
+				ids_actuals.append(faller.id)
+			llistat_ids_baixes=set(ids_anteriors)-set(ids_actuals)
+			llistat_ids_altes=set(ids_actuals)-set(ids_anteriors)
+			# Calculem la data actual per a utilitzar-la a l'informe.
+			utils=Utils()
+			data=utils.calcular_data_actual()
+			data_actual=data[0] + "-" + data[1] + "-" + data[2]
+			pagina=0
+			# Intentem crear la carpeta altes i baixes si no està creada.
+			try:
+				os.mkdir("altes i baixes")
+			except OSError as e:
+				if e.errno!=errno.EEXIST:
+					raise
+			arxiu="altes i baixes"+"/"+str(data_actual)
+			# Creem el full i tot el contingut.
+			w,h=A4
+			c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) # El creem en horitzontal.
+			i=0
+			c.drawString(20, w-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
+			c.drawString(50, w-30, "FALLER")
+			c.drawString(250, w-30, "DNI")
+			c.drawString(325, w-30, "ADREÇA")
+			c.drawString(575, w-30, "TELÈFON")
+			c.drawString(650, w-30, "DATA NAIXEMENT")
+			c.line(0, w-35, h, w-35)
+			bd=BaseDeDades('falla.db')
+			for id in llistat_ids_baixes:
+				faller=bd.llegir_faller(id)
+				c.drawString(20, w-i-60, str(id))
+				c.drawString(50, w-i-60, faller.cognoms + ", " + faller.nom)
+				c.drawString(250, w-i-60, faller.dni)
+				c.drawString(325, w-i-60, faller.adresa)
+				c.drawString(575, w-i-60, faller.telefon)
+				c.drawString(650, w-i-60, faller.naixement)
+				i=i+20
+				if i==500: # Quan arribem a 25 fallers canviem de pàgina.
+					pagina=pagina+1
+					c.drawString(20, 20, "baixes")
+					c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+					c.drawString(h-80, 20, data_actual)
+					c.showPage() # Mostrem la pàgina feta.
+					c.drawString(20, w-30, "ID") # Primera línea de la següent pàgina.
+					c.drawString(50, w-30, "FALLER")
+					c.drawString(250, w-30, "DNI")
+					c.drawString(325, w-30, "ADREÇA")
+					c.drawString(575, w-30, "TELÈFON")
+					c.drawString(650, w-30, "DATA NAIXEMENT")
+					c.line(0, w-35, h, w-35)
+					i=0
+			pagina=pagina+1
+			c.drawString(20, 20, "baixes")
+			c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+			c.drawString(h-80, 20, data_actual)
+			c.showPage() # Última pàgina.
+			i=0
+			c.drawString(20, w-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
+			c.drawString(50, w-30, "FALLER")
+			c.drawString(250, w-30, "DNI")
+			c.drawString(325, w-30, "ADREÇA")
+			c.drawString(575, w-30, "TELÈFON")
+			c.drawString(650, w-30, "DATA NAIXEMENT")
+			c.line(0, w-35, h, w-35)
+			for id in llistat_ids_altes:
+				faller=bd.llegir_faller(id)
+				c.drawString(20, w-i-60, str(id))
+				c.drawString(50, w-i-60, faller.cognoms + ", " + faller.nom)
+				c.drawString(250, w-i-60, faller.dni)
+				c.drawString(325, w-i-60, faller.adresa)
+				c.drawString(575, w-i-60, faller.telefon)
+				c.drawString(650, w-i-60, faller.naixement)
+				i=i+20
+				if i==500: # Quan arribem a 25 fallers canviem de pàgina.
+					pagina=pagina+1
+					c.drawString(20, 20, "altes")
+					c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+					c.drawString(h-80, 20, data_actual)
+					c.showPage() # Mostrem la pàgina feta.
+					c.drawString(20, w-30, "ID") # Primera línea de la següent pàgina.
+					c.drawString(50, w-30, "FALLER")
+					c.drawString(250, w-30, "DNI")
+					c.drawString(325, w-30, "ADREÇA")
+					c.drawString(575, w-30, "TELÈFON")
+					c.drawString(650, w-30, "DATA NAIXEMENT")
+					c.line(0, w-35, h, w-35)
+					i=0
+			pagina=pagina+1
+			c.drawString(20, 20, "altes")
+			c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+			c.drawString(h-80, 20, data_actual)
+			c.showPage() # Última pàgina.
+			c.save()
+			# Entrem a la carpeta "altes i baixes" per a obrir l'arxiu pdf i tornem a la ruta original.
+			ruta=os.getcwd()
+			os.chdir("altes i baixes")
+			os.startfile(str(data_actual)+".pdf")
+			os.chdir(ruta)
+
+
+	def FallersAmbRifa(self):
+
+		# Traguem la data actual per a utilitzar-la a l'informe.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_adults()
+		pagina=0
+		# Intentem crear la carpeta "llistat rifes" si no està creada.
+		try:
+			os.mkdir("llistat rifes")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat rifes"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=A4)
+		c.drawString(20, h-30, "ID")
+		c.drawString(50, h-30, "FALLER")
+		c.drawString(300, h-30, "ID")
+		c.drawString(330, h-30, "FALLER")
+		c.line(0, h-35, w, h-35)
+		fila=0
+		columna=0
+		for faller in llistat_fallers:
+			if fila<35 and columna==0:
+				c.drawString(20, h-(fila*20)-60, str(faller.id))
+				c.drawString(50, h-(fila*20)-60, faller.cognoms + ", " + faller.nom)
+				fila=fila+1
+			elif fila==35 and columna==0:
+				columna=1
+				fila=0
+			elif fila<35 and columna==1:
+				c.drawString(300, h-(fila*20)-60, str(faller.id))
+				c.drawString(330, h-(fila*20)-60, faller.cognoms + ", " + faller.nom)
+				fila=fila+1
+			elif fila==35 and columna==1: # Quan arribem a 70 fallers canviem de pàgina
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat rifes")
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				c.drawString(20, h-30, "ID") # Primera línea de la següent pàgina.
+				c.drawString(50, h-30, "FALLER")
+				c.drawString(300, h-30, "ID")
+				c.drawString(330, h-30, "FALLER")
+				c.line(0, h-35, w, h-35)
+				columna=0
+				fila=0
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat rifes")
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(w-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta llistat rifes per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat rifes")
+		os.startfile(str(data_actual)+".pdf")
 		os.chdir(ruta)
 		
-
+'''
 	def LlistatFallers(self):
 
 		#traguem la data actual per a utilitzar-la a l'informe
@@ -366,179 +619,5 @@ class Informe():
 		os.chdir(ruta)
 
 
-	def LlistatAltesBaixes(self):
-
-		fitxer=open("resum 2022", "rb")
-		res=pickle.load(fitxer)
-		fitxer.close()
-		del(fitxer)
-		anterior=[]
-		actual=[]
-		for val in res:
-			anterior.append(val[0])
-		elFaller=Faller()
-		res2=elFaller.BuscarFallerAlta(1)
-		for val in res2:
-			actual.append(val[0])
-		baixes=set(anterior)-set(actual)
-		altes=set(actual)-set(anterior)
-		#traguem la data actual per a utilitzar-la a l'informe
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		pag=0
-		#intentem crear la carpeta altes i baixes si no està creada
-		try:
-			os.mkdir("altes i baixes")
-		except OSError as e:
-			if e.errno!=errno.EEXIST:
-				raise
-		arxiu="altes i baixes"+"/"+str(datafinal)
-		#creem el full i tot el contingut
-		w,h=A4
-		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) #el creem en horitzontal
-		i=0
-		c.drawString(20, w-30, "ID") #la w és el segon parámetre ja que està en horitzontal
-		c.drawString(50, w-30, "FALLER")
-		c.drawString(250, w-30, "DNI")
-		c.drawString(325, w-30, "ADREÇA")
-		c.drawString(575, w-30, "TELÈFON")
-		c.drawString(650, w-30, "DATA NAIXEMENT")
-		c.line(0, w-35, h, w-35)
-		for val in baixes:
-			elFaller.BuscarFallerPerId(val)
-			c.drawString(20, w-i-60, str(val))
-			c.drawString(50, w-i-60, elFaller.cognoms + ", " + elFaller.nom)
-			c.drawString(250, w-i-60, elFaller.dni)
-			c.drawString(325, w-i-60, elFaller.adresa)
-			c.drawString(575, w-i-60, elFaller.telefon)
-			c.drawString(650, w-i-60, elFaller.naixement)
-			i=i+20
-			if i==500: #quan arribem a 25 fallers canviem de pàgina
-				pag=pag+1
-				c.drawString(20, 20, "baixes")
-				c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(h-80, 20, datafinal)
-				c.showPage() #mostrem la pàgina feta
-				c.drawString(20, w-30, "ID") #primera línea de la següent pàgina
-				c.drawString(50, w-30, "FALLER")
-				c.drawString(250, w-30, "DNI")
-				c.drawString(325, w-30, "ADREÇA")
-				c.drawString(575, w-30, "TELÈFON")
-				c.drawString(650, w-30, "DATA NAIXEMENT")
-				c.line(0, w-35, h, w-35)
-				i=0
-		pag=pag+1
-		c.drawString(20, 20, "baixes")
-		c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(h-80, 20, datafinal)
-		c.showPage() #última pàgina
-		i=0
-		c.drawString(20, w-30, "ID") #la w és el segon parámetre ja que està en horitzontal
-		c.drawString(50, w-30, "FALLER")
-		c.drawString(250, w-30, "DNI")
-		c.drawString(325, w-30, "ADREÇA")
-		c.drawString(575, w-30, "TELÈFON")
-		c.drawString(650, w-30, "DATA NAIXEMENT")
-		c.line(0, w-35, h, w-35)
-		for val in altes:
-			elFaller.BuscarFallerPerId(val)
-			c.drawString(20, w-i-60, str(val))
-			c.drawString(50, w-i-60, elFaller.cognoms + ", " + elFaller.nom)
-			c.drawString(250, w-i-60, elFaller.dni)
-			c.drawString(325, w-i-60, elFaller.adresa)
-			c.drawString(575, w-i-60, elFaller.telefon)
-			c.drawString(650, w-i-60, elFaller.naixement)
-			i=i+20
-			if i==500: #quan arribem a 25 fallers canviem de pàgina
-				pag=pag+1
-				c.drawString(20, 20, "altes")
-				c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(h-80, 20, datafinal)
-				c.showPage() #mostrem la pàgina feta
-				c.drawString(20, w-30, "ID") #primera línea de la següent pàgina
-				c.drawString(50, w-30, "FALLER")
-				c.drawString(250, w-30, "DNI")
-				c.drawString(325, w-30, "ADREÇA")
-				c.drawString(575, w-30, "TELÈFON")
-				c.drawString(650, w-30, "DATA NAIXEMENT")
-				c.line(0, w-35, h, w-35)
-				i=0
-		pag=pag+1
-		c.drawString(20, 20, "altes")
-		c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(h-80, 20, datafinal)
-		c.showPage() #última pàgina
-		c.save()
-		#entrem a la carpeta llistat de fallers per a obrir l'arxiu pdf i tornem a la ruta original
-		ruta=os.getcwd()
-		os.chdir("altes i baixes")
-		os.startfile(str(datafinal)+".pdf")
-		os.chdir(ruta)
-
-
-	def FallersAmbRifa(self):
-
-		#traguem la data actual per a utilitzar-la a l'informe
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		elFaller=Faller()
-		res=elFaller.BuscarFallerAmbRifa()
-		pag=0
-		#intentem crear la carpeta llistat fallers si no està creada
-		try:
-			os.mkdir("llistat rifes")
-		except OSError as e:
-			if e.errno!=errno.EEXIST:
-				raise
-		arxiu="llistat rifes"+"/"+str(datafinal)
-		#creem el full i tot el contingut
-		w,h=A4
-		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) #el creem en horitzontal
-		i=0
-		c.drawString(20, w-30, "ID") #la w és el segon parámetre ja que està en horitzontal
-		c.drawString(50, w-30, "FALLER")
-		c.drawString(250, w-30, "DNI")
-		c.drawString(325, w-30, "ADREÇA")
-		c.drawString(575, w-30, "TELÈFON")
-		c.drawString(650, w-30, "DATA NAIXEMENT")
-		c.line(0, w-35, h, w-35)
-		for val in res:
-			c.drawString(20, w-i-60, str(val[0]))
-			c.drawString(50, w-i-60, val[2] + ", " + val[1])
-			c.drawString(250, w-i-60, val[5])
-			c.drawString(325, w-i-60, val[6])
-			c.drawString(575, w-i-60, val[7])
-			c.drawString(650, w-i-60, val[3])
-			i=i+20
-			if i==500: #quan arribem a 25 fallers canviem de pàgina
-				pag=pag+1
-				c.drawString(20, 20, "llistat rifes")
-				c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(h-80, 20, datafinal)
-				c.showPage() #mostrem la pàgina feta
-				c.drawString(20, w-30, "ID") #primera línea de la següent pàgina
-				c.drawString(50, w-30, "FALLER")
-				c.drawString(250, w-30, "DNI")
-				c.drawString(325, w-30, "ADREÇA")
-				c.drawString(575, w-30, "TELÈFON")
-				c.drawString(650, w-30, "DATA NAIXEMENT")
-				c.line(0, w-35, h, w-35)
-				i=0
-		pag=pag+1
-		c.drawString(20, 20, "llistat rifes")
-		c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(h-80, 20, datafinal)
-		c.showPage() #última pàgina
-		c.save()
-		#entrem a la carpeta llistat de fallers per a obrir l'arxiu pdf i tornem a la ruta original
-		ruta=os.getcwd()
-		os.chdir("llistat rifes")
-		os.startfile(str(datafinal)+".pdf")
-		os.chdir(ruta)
+	
 		'''

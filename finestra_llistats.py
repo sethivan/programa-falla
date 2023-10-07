@@ -215,8 +215,10 @@ class FinestraLlistats(tk.Toplevel):
 
 
     def crear_llistat_general(self):
-        pass
+        informe=Informe()
+        informe.llistat_general()
 
 
     def crear_llistat_altes_baixes(self):
-        pass
+        informe=Informe()
+        informe.llistat_altes_baixes()
