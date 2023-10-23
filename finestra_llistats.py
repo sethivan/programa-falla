@@ -211,7 +211,9 @@ class FinestraLlistats(tk.Toplevel):
 
 
     def crear_llistat_fallers(self):
-        pass
+        informe=Informe()
+        if self.opcio.get()==1:
+            informe.llistat_fallers()
 
 
     def crear_llistat_general(self):

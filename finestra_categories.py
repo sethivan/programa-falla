@@ -77,13 +77,8 @@ class FinestraCategories(tk.Toplevel):
 
         self.button_modificar=ttk.Button(self, width=15, text="Modificar", style="Boto.TButton", command=self.modificar)
         self.button_modificar.grid(row=5, column=0, columnspan=2, pady=5)
-
-
-
-    def iniciar(self):
-        '''
-		Inicia la nova finestra accedint a la taula "categoria" de la base de dades i omplint tots els camps.
-		'''
+        
+		# Inicia la nova finestra accedint a la taula "categoria" de la base de dades i omplint tots els camps.
         bd=BaseDeDades("falla.db")
         categoria=bd.llegir_categoria(1)
         self.quota_adult.set(categoria.quota)

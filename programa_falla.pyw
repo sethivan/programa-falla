@@ -235,8 +235,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraCategories
 		que obri la finestra "Modificar" del menú "Categoria".
 		'''
-		modificar_categories=FinestraCategories(self)
-		modificar_categories.iniciar()
+		FinestraCategories(self)
 	
 	
 	def gestionar_faller(self):
@@ -334,7 +333,7 @@ class Aplicacio(tk.Frame):
 	def LlistatRifes(self): #funció per a traure el llistat en pdf d'aquells fallers a qui els correpon rifa
 
 		informe=Informe()
-		informe.FallersAmbRifa()
+		informe.llistat_fallers_amb_rifa()
 		
 
 	def nou_exercici(self): #funció per a crear un nou exercici faller

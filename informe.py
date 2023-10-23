@@ -491,8 +491,10 @@ class Informe():
 			os.chdir(ruta)
 
 
-	def FallersAmbRifa(self):
-
+	def llistat_fallers_amb_rifa(self):
+		'''
+		Crea un .pdf amb un llistat dels fallers amb obligació de rifa.
+		'''
 		# Traguem la data actual per a utilitzar-la a l'informe.
 		utils=Utils()
 		data=utils.calcular_data_actual()
@@ -554,49 +556,49 @@ class Informe():
 		os.startfile(str(data_actual)+".pdf")
 		os.chdir(ruta)
 		
-'''
-	def LlistatFallers(self):
 
-		#traguem la data actual per a utilitzar-la a l'informe
-		data=datetime.now()
-		anyactual=datetime.strftime(data, '%Y')
-		mesactual=datetime.strftime(data, '%m')
-		diaactual=datetime.strftime(data, '%d')
-		datafinal=diaactual + "-" + mesactual + "-" + anyactual
-		elFaller=Faller()
-		res=elFaller.BuscarFallerAlta(1)
-		pag=0
-		#intentem crear la carpeta llistat fallers si no està creada
+	def llistat_fallers(self):
+		'''
+		Crea un .pdf amb el llistat de dades dels fallers actius.
+		'''
+		# Traguem la data actual per a utilitzar-la a l'informe.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_per_alta(1)
+		pagina=0
+		# Intentem crear la carpeta "llistat fallers" si no està creada.
 		try:
 			os.mkdir("llistat fallers")
 		except OSError as e:
 			if e.errno!=errno.EEXIST:
 				raise
-		arxiu="llistat fallers"+"/"+str(datafinal)
-		#creem el full i tot el contingut
+		arxiu="llistat fallers"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
 		w,h=A4
-		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) #el creem en horitzontal
+		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) # El creem en horitzontal.
 		i=0
-		c.drawString(20, w-30, "ID") #la w és el segon parámetre ja que està en horitzontal
+		c.drawString(20, w-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
 		c.drawString(50, w-30, "FALLER")
 		c.drawString(250, w-30, "DNI")
 		c.drawString(325, w-30, "ADREÇA")
 		c.drawString(575, w-30, "TELÈFON")
 		c.drawString(650, w-30, "DATA NAIXEMENT")
 		c.line(0, w-35, h, w-35)
-		for val in res:
-			c.drawString(20, w-i-60, str(val[0]))
-			c.drawString(50, w-i-60, val[2] + ", " + val[1])
-			c.drawString(250, w-i-60, val[5])
-			c.drawString(325, w-i-60, val[6])
-			c.drawString(575, w-i-60, val[7])
-			c.drawString(650, w-i-60, val[3])
+		for faller in llistat_fallers:
+			c.drawString(20, w-i-60, str(faller.id))
+			c.drawString(50, w-i-60, faller.cognoms + ", " + faller.nom)
+			c.drawString(250, w-i-60, faller.dni)
+			c.drawString(325, w-i-60, faller.adresa)
+			c.drawString(575, w-i-60, faller.telefon)
+			c.drawString(650, w-i-60, faller.naixement)
 			i=i+20
 			if i==500: #quan arribem a 25 fallers canviem de pàgina
-				pag=pag+1
+				pagina=pagina+1
 				c.drawString(20, 20, "llistat de fallers")
-				c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-				c.drawString(h-80, 20, datafinal)
+				c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(h-80, 20, data_actual)
 				c.showPage() #mostrem la pàgina feta
 				c.drawString(20, w-30, "ID") #primera línea de la següent pàgina
 				c.drawString(50, w-30, "FALLER")
@@ -606,18 +608,14 @@ class Informe():
 				c.drawString(650, w-30, "DATA NAIXEMENT")
 				c.line(0, w-35, h, w-35)
 				i=0
-		pag=pag+1
+		pagina=pagina+1
 		c.drawString(20, 20, "llistat de fallers")
-		c.drawString((h/2)-30, 20, "pàgina "+str(pag))
-		c.drawString(h-80, 20, datafinal)
+		c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(h-80, 20, data_actual)
 		c.showPage() #última pàgina
 		c.save()
 		#entrem a la carpeta llistat de fallers per a obrir l'arxiu pdf i tornem a la ruta original
 		ruta=os.getcwd()
 		os.chdir("llistat fallers")
-		os.startfile(str(datafinal)+".pdf")
+		os.startfile(str(data_actual)+".pdf")
 		os.chdir(ruta)
-
-
-	
-		'''
