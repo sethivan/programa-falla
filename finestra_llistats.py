@@ -211,9 +211,43 @@ class FinestraLlistats(tk.Toplevel):
 
 
     def crear_llistat_fallers(self):
+        bd=BaseDeDades('falla.db')
         informe=Informe()
-        if self.opcio.get()==1:
-            informe.llistat_fallers()
+        # Guardem en un llistat les dades marcades a mostrar.
+        llistat_dades=[]
+        if self.nom_complet.get()==1:
+            llistat_dades.append("nom")
+        if self.dni.get()==1:
+            llistat_dades.append("dni")
+        if self.adresa.get()==1:
+            llistat_dades.append("adreça")
+        if self.telefon.get()==1:
+            llistat_dades.append("telefon")
+        if self.data_naixement.get()==1:
+            llistat_dades.append("naixement")
+        if self.correu_electronic.get()==1:
+            llistat_dades.append("correu")
+        if len(llistat_dades)==6:
+            messagebox.showwarning("Error", "Marca 5 opcions de dades com a màxim")
+        else:
+            # Cridem a la funció corresponent segons l'opció marcada.
+            if self.opcio.get()==1:
+                informe.llistat_fallers(llistat_dades)
+            elif self.opcio.get()==2:
+                llistat_categories=[]
+                if self.adult.get()==1:
+                    llistat_categories.append(1)
+                if self.cadet.get()==1:
+                    llistat_categories.append(2)
+                if self.juvenil.get()==1:
+                    llistat_categories.append(3)
+                if self.infantil.get()==1:
+                    llistat_categories.append(4)
+                if self.bebe.get()==1:
+                    llistat_categories.append(5)
+                informe.llistat_fallers_per_categories(llistat_categories, llistat_dades)
+            elif self.opcio.get()==3:
+                informe.llistat_fallers_per_edat(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
 
 
     def crear_llistat_general(self):
