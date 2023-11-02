@@ -14,7 +14,6 @@ from base_de_dades import BaseDeDades
 from utils import Utils
 from arxiu import Arxiu
 from falla import Falla
-from faller import Faller
 
 
 class Informe():
@@ -366,6 +365,107 @@ class Informe():
 		# Entrem a la carpeta llistat general per a obrir l'arxiu pdf i tornem a la ruta original.
 		ruta=os.getcwd()
 		os.chdir("llistat general")
+		os.startfile(str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
+	def llistat_general_per_families(self):
+		'''
+		'''
+		# Traguem la data actual per a utilitzar-la al rebut.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_families=bd.llegir_families()
+		arxiu=Arxiu('exercici')
+		exercici_actual=arxiu.llegir_exercici_actual()
+		falla=Falla()
+		suma_totals_assignacions=0
+		suma_totals_pagaments=0
+		pagina=0
+		# Intentem crear la carpeta "llistat general familiar" si no està creada.
+		try:
+			os.mkdir("llistat general familiar")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat general familiar"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=landscape(A4)) # El creem en horitzontal.
+		c.setFont("Helvetica", 11)
+		i=0
+		families=0 # Per a acumular el total de families.
+		c.drawRightString(70, w-30, "MEMBRES") # La w és el segon parámetre ja que està en horitzontal.
+		c.drawString(120, w-30, "FAMILIAR REFERENT")
+		c.drawRightString(460, w-30, "TOTAL ASSIGNACIONS")
+		c.drawRightString(635, w-30, "TOTAL PAGAMENTS")
+		c.drawRightString(810, w-30, "DIFERÈNCIA")
+		c.line(0, w-35, h, w-35)
+		llistat_caps_familia=[]
+		for familia in llistat_families:
+			llistat_caps_familia.clear()
+			total_familia_assignat=0
+			total_familia_pagat=0
+			llistat_fallers_familia=bd.llegir_fallers_per_familia_i_alta(familia.id, 1)
+			for faller in llistat_fallers_familia:
+				llistat_caps_familia.append(faller)
+				quota_base=bd.llegir_quota_faller(faller.id)
+				descompte=(faller.familia.descompte*quota_base/100)
+				quota=quota_base-descompte
+				llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
+				quota_assignada=llista_assignacions_pagaments[0]
+				quota_pagada=llista_assignacions_pagaments[1]
+				loteria_assignada=llista_assignacions_pagaments[2]
+				loteria_pagada=llista_assignacions_pagaments[3]
+				rifa_assignada=llista_assignacions_pagaments[4]
+				rifa_pagada=llista_assignacions_pagaments[5]
+				quota_final=quota+quota_assignada
+				total_assignat=quota_final+loteria_assignada+rifa_assignada
+				total_pagat=quota_pagada+loteria_pagada+rifa_pagada
+				total_familia_assignat=total_familia_assignat+total_assignat
+				total_familia_pagat=total_familia_pagat+total_pagat
+			if len(llistat_caps_familia)>0:
+				faller=llistat_caps_familia[0]
+				c.drawRightString(60, w-i-60, str(len(llistat_caps_familia)))
+				c.drawString(120, w-i-60, faller.cognoms + ", " + faller.nom)
+				c.drawRightString(450, w-i-60, "{0:.2f}".format(total_familia_assignat) + " €")
+				suma_totals_assignacions=suma_totals_assignacions+total_familia_assignat
+				c.drawRightString(625, w-i-60, "{0:.2f}".format(total_familia_pagat) + " €")
+				suma_totals_pagaments=suma_totals_pagaments+total_familia_pagat
+				c.drawRightString(800, w-i-60, "{0:.2f}".format(total_familia_assignat-total_familia_pagat) + " €")
+				i=i+20
+			families=families+1
+			if i==500: # Quan arribem a 25 families canviem de pàgina.
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat general familiar")
+				c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(h-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				c.setFont("Helvetica", 11)
+				c.drawRightString(70, w-30, "MEMBRES") # Primera línea de la següent pàgina.
+				c.drawString(120, w-30, "FAMILIAR REFERENT")
+				c.drawRightString(460, w-30, "TOTAL ASSIGNACIONS")
+				c.drawRightString(635, w-30, "TOTAL PAGAMENTS")
+				c.drawRightString(810, w-30, "DIFERÈNCIA.")
+				c.line(0, w-35, h, w-35)
+				i=0
+		c.line(0, w-i-60, h, w-i-60)
+		c.drawRightString(50,w-i-80, "TOTALS")
+		c.drawRightString(200,w-i-80, "FAMILIES = " + str(families))
+		c.drawRightString(450,w-i-80, "{0:.2f}".format(suma_totals_assignacions) + " €")
+		c.drawRightString(625,w-i-80, "{0:.2f}".format(suma_totals_pagaments) + " €")
+		c.drawRightString(800,w-i-80, "{0:.2f}".format(suma_totals_assignacions-suma_totals_pagaments) + " €")
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat general familiar")
+		c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(h-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta llistat general per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat general familiar")
 		os.startfile(str(data_actual)+".pdf")
 		os.chdir(ruta)
 

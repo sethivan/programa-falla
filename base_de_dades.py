@@ -460,7 +460,7 @@ class BaseDeDades:
         except (sqlite3.Error, TypeError, ValueError) as e:
             print("Error al llegir la familia de la base de dades:", e)
             return None
-        
+
     
     def llegir_ultima_familia(self):
         '''
@@ -481,6 +481,32 @@ class BaseDeDades:
                 return None
         except (sqlite3.Error, TypeError, ValueError) as e:
             print("Error al llegir la familia de la base de dades:", e)
+            return None
+        
+    
+    def llegir_families(self):
+        '''
+        Llig de la taula "familia" totes les families
+        i les afegeix a una llista d'objectes de la classe Familia.
+
+        Retorna:
+        --------
+        llista_families : llista
+            Llistat d'objectes de la classe Familia.
+        '''
+        try:
+            self.cursor.execute("SELECT * FROM familia")
+            resultat = self.cursor.fetchall()
+            llistat_families=[]
+            for valors in resultat:
+                familia= Familia(valors[0], valors[1], valors[2])
+                llistat_families.append(familia)
+            return llistat_families
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
             return None
         
         

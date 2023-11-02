@@ -311,8 +311,8 @@ class Aplicacio(tk.Frame):
 
 	def LlistatGeneral(self): #funció per a traure el llistat en pdf dels comptes actualitzats dels fallers
 
-		#elInforme=Informe()
-		#elInforme.LlistatGeneral()
+		#informe=Informe()
+		#informe.llistat_general_per_families()
 		pass
 
 

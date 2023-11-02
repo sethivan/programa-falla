@@ -147,8 +147,11 @@ class FinestraLlistats(tk.Toplevel):
         self.button_general=ttk.Button(label_frame_altres_llistats, text="Llistat general", style="Boto.TButton", command=self.crear_llistat_general)
         self.button_general.grid(row=0, column=0, padx=5, pady=3)
 
+        self.button_general_families=ttk.Button(label_frame_altres_llistats, text="Llistat general per families", style="Boto.TButton", command=self.crear_llistat_general_families)
+        self.button_general_families.grid(row=0, column=1, padx=5, pady=3)
+
         self.button_altes_baixes=ttk.Button(label_frame_altres_llistats, text="Llistat altes i baixes", style="Boto.TButton", command=self.crear_llistat_altes_baixes)
-        self.button_altes_baixes.grid(row=0, column=1, padx=5, pady=3)
+        self.button_altes_baixes.grid(row=0, column=2, padx=5, pady=3)
 
 
     def iniciar(self):
@@ -254,6 +257,11 @@ class FinestraLlistats(tk.Toplevel):
         informe=Informe()
         informe.llistat_general()
 
+
+    def crear_llistat_general_families(self):
+        informe=Informe()
+        informe.llistat_general_per_families()
+        
 
     def crear_llistat_altes_baixes(self):
         informe=Informe()
