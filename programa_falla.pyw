@@ -77,10 +77,8 @@ class Aplicacio(tk.Frame):
 
 		# Submenú Faller.
 		self.menu_faller=tk.Menu(self.barra_menu, tearoff=0)
-		self.menu_faller.add_command(label="Introduir", command=self.introduir_faller, accelerator="Ctrl+I")
-		self.master.bind_all("<Control-i>", self.event_introduir)
-		self.menu_faller.add_command(label="Gestionar", command=self.gestionar_faller, accelerator="Ctrl+G")
-		self.master.bind_all("<Control-g>", self.EventGestionar)
+		self.menu_faller.add_command(label="Introduir", command=self.introduir_faller)
+		self.menu_faller.add_command(label="Gestionar", command=self.gestionar_faller)
 		
 		# Submenú Historial.
 		self.menu_historial=tk.Menu(self.barra_menu, tearoff=0)
@@ -92,13 +90,9 @@ class Aplicacio(tk.Frame):
 		self.menu_sortejos.add_command(label="Assignar rifa", command=self.assignar_rifa)
 		self.menu_sortejos.add_command(label="Assignar loteria", command=self.AssignarLoteria)
 
-		# Submenú Llistats.
+		# Submenú Imprimir.
 		self.menu_imprimir=tk.Menu(self.barra_menu, tearoff=0)
-		self.menu_imprimir.add_command(label="Moviments", command=self.MovimentsDia)
-		self.menu_imprimir.add_command(label="General", command=self.LlistatGeneral)
-		self.menu_imprimir.add_command(label="Fallers", command=self.LlistatFallers)
-		self.menu_imprimir.add_command(label="Altes i Baixes", command=self.LlistatAltesBaixes)
-		self.menu_imprimir.add_command(label="Rifes", command=self.LlistatRifes)
+		self.menu_imprimir.add_command(label="Llistats", command=self.mostrar_llistats)
 
 		# Submenú Ajuda.
 		self.menu_ajuda=tk.Menu(self.barra_menu, tearoff=0)
@@ -182,7 +176,7 @@ class Aplicacio(tk.Frame):
 		self.button_borrar_historial.grid(row=1, column=0, padx=5, pady=5)
 
 		#Frame Imprimir.
-		self.button_llistats=ttk.Button(label_frame_imprimir, width=20, text="Llistats", style="Boto.TButton", command=self.MovimentsDia)
+		self.button_llistats=ttk.Button(label_frame_imprimir, width=20, text="Llistats", style="Boto.TButton", command=self.mostrar_llistats)
 		self.button_llistats.grid(row=0, column=0, padx=5, pady=5)
 
 		# Comprovació que s'efectua cada vegada que es fica en marxa el programa.
@@ -247,13 +241,6 @@ class Aplicacio(tk.Frame):
 		gestionar_faller.iniciar()
 
 
-	def EventGestionar(self, event):
-		'''
-		Bindeig del submenú "Gestionar".
-		'''
-		self.gestionar_faller()
-	
-
 	def introduir_faller(self):
 		''' 
 		Crea una nova instància de la classe FinestraIntroduir
@@ -261,13 +248,6 @@ class Aplicacio(tk.Frame):
 		'''
 		introduir_faller = FinestraIntroduir(self)
 		introduir_faller.iniciar()
-
-	
-	def event_introduir(self, event):
-		'''
-		Bindeig del submenú "Introduir".
-		'''
-		self.introduir_faller()
 
 
 	def AssignarLoteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
@@ -301,39 +281,13 @@ class Aplicacio(tk.Frame):
 		falla.borrar_historial()
 
 
-	def MovimentsDia(self): #funció per a traure el llistat en pdf dels moviments del dia
-
-		#elInforme=Informe()
-		#elInforme.MovimentsDia()
+	def mostrar_llistats(self):
+		''' 
+		Crea una nova instància de la classe FinestraLlistats
+		que obri la finestra "Llistats" del menú "Imprimir".
+		'''
 		llistat = FinestraLlistats(self)
 		llistat.iniciar()
-
-
-	def LlistatGeneral(self): #funció per a traure el llistat en pdf dels comptes actualitzats dels fallers
-
-		#informe=Informe()
-		#informe.llistat_general_per_families()
-		pass
-
-
-	def LlistatFallers(self): #funció per a traure el llistat en pdf dels fallers amb les seues dades
-
-		#elInforme=Informe()
-		#elInforme.LlistatFallers()
-		pass
-
-
-	def LlistatAltesBaixes(self): #funció per a traure el llistat en pdf de les altes i baixes de fallers respecte a l'exercici anterior
-
-		#elInforme=Informe()
-		#elInforme.LlistatAltesBaixes()
-		pass
-
-
-	def LlistatRifes(self): #funció per a traure el llistat en pdf d'aquells fallers a qui els correpon rifa
-
-		informe=Informe()
-		informe.llistat_fallers_amb_rifa()
 		
 
 	def nou_exercici(self): #funció per a crear un nou exercici faller

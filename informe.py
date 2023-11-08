@@ -242,7 +242,7 @@ class Informe():
 		Crea un .pdf amb un llistat amb l'estat actual de comptes de tots els fallers actius
 		i, en conseqüència, de la falla al complet.
 		'''
-		# Traguem la data actual per a utilitzar-la al rebut.
+		# Traguem la data actual per a utilitzar-la a l'informe.
 		utils=Utils()
 		data=utils.calcular_data_actual()
 		data_actual=data[0] + "-" + data[1] + "-" + data[2]
@@ -371,6 +371,8 @@ class Informe():
 
 	def llistat_general_per_families(self):
 		'''
+		Crea un .pdf amb un llistat amb l'estat actual de comptes de tots els fallers actius
+		organitzats per famílies.
 		'''
 		# Traguem la data actual per a utilitzar-la al rebut.
 		utils=Utils()
@@ -466,6 +468,77 @@ class Informe():
 		# Entrem a la carpeta llistat general per a obrir l'arxiu pdf i tornem a la ruta original.
 		ruta=os.getcwd()
 		os.chdir("llistat general familiar")
+		os.startfile(str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
+	def llistat_quotes_no_fallers(self):
+		'''
+		Crea un .pdf amb un llistat dels fallers que s'han donat de baixa però han aportat quotes mentre han segut fallers.
+		'''
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_per_alta(0)
+		arxiu=Arxiu('exercici')
+		exercici_actual=arxiu.llegir_exercici_actual()
+		falla=Falla()
+		suma_quotes_pagades=0
+		pagina=0
+		# Intentem crear la carpeta "llistat quotes no fallers" si no està creada.
+		try:
+			os.mkdir("llistat quotes no fallers")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat quotes no fallers"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=A4) # El creem en vertical.
+		c.setFont("Helvetica", 11)
+		i=0
+		fallers=0 # Per a acumular el total de fallers.
+		c.drawString(20, h-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
+		c.drawString(50, h-30, "FALLER")
+		c.drawRightString(295, h-30, "QUOTA PAGADA")
+		c.line(0, h-35, w, h-35)
+		for faller in llistat_fallers:
+			quota_pagada=0
+			llista_assignacions_pagaments=falla.calcular_assignacions_pagaments(faller.id, exercici_actual)
+			quota_pagada=llista_assignacions_pagaments[1]
+			if quota_pagada>0:
+				c.drawString(20, h-i-60, str(faller.id))
+				c.drawString(50, h-i-60, faller.cognoms + ", " + faller.nom)
+				c.drawRightString(295, h-i-60, "{0:.2f}".format(quota_pagada) + " €")
+				suma_quotes_pagades=suma_quotes_pagades+quota_pagada
+				i=i+20
+				fallers=fallers+1
+			if i==700: # Quan arribem a 35 fallers canviem de pàgina.
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat quotes no fallers")
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				c.setFont("Helvetica", 11)
+				c.drawString(20, h-30, "ID") # Primera línea de la següent pàgina.
+				c.drawString(50, h-30, "FALLER")
+				c.drawRightString(295, h-30, "QUOTA PAGADA")
+				c.line(0, h-35, w, h-35)
+				i=0
+		c.line(0, h-i-60, w, h-i-60)
+		c.drawRightString(50,h-i-80, "TOTALS")
+		c.drawRightString(200,h-i-80, "FALLERS = " + str(fallers))
+		c.drawRightString(295,h-i-80, "{0:.2f}".format(suma_quotes_pagades) + " €")
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat quotes no fallers")
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(w-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta "llistat quotes no fallers" per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat quotes no fallers")
 		os.startfile(str(data_actual)+".pdf")
 		os.chdir(ruta)
 
@@ -765,6 +838,113 @@ class Informe():
 		os.chdir(ruta)
 
 
+	def llistat_fallers_vertical(self, llistat_dades):
+		'''
+		Crea un .pdf amb el llistat de dades dels fallers actius.
+		'''
+		# Traguem la data actual per a utilitzar-la a l'informe.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_per_alta(1)
+		pagina=0
+		# Intentem crear la carpeta "llistat fallers" si no està creada.
+		try:
+			os.mkdir("llistat fallers")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat fallers"+"/"+str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=A4) # El creem en vertical.
+		i=0
+		j=20
+		c.drawString(j, h-30, "ID") # La h és el segon parámetre ja que està en vertical.
+		j=j+30
+		if "nom" in llistat_dades:
+			c.drawString(j, h-30, "FALLER")
+			j=j+200
+		if "dni" in llistat_dades:
+			c.drawString(j, h-30, "DNI")
+			j=j+75
+		if "adreça" in llistat_dades:
+			c.drawString(j, h-30, "ADREÇA")
+			j=j+250
+		if "telefon" in llistat_dades:
+			c.drawString(j, h-30, "TELÈFON")
+			j=j+75
+		if "naixement" in llistat_dades:
+			c.drawString(j, h-30, "NAIXEMENT")
+			j=j+75
+		if "correu" in llistat_dades:
+			c.drawString(j, h-30, "E-MAIL")
+		c.line(0, h-35, w, h-35)
+		for faller in llistat_fallers:
+			j=20
+			c.drawString(j, h-i-60, str(faller.id))
+			j=j+30
+			if "nom" in llistat_dades:
+				c.drawString(j, h-i-60, faller.cognoms + ", " + faller.nom)
+				j=j+200
+			if "dni" in llistat_dades:
+				c.drawString(j, h-i-60, faller.dni)
+				j=j+75
+			if "adreça" in llistat_dades:
+				c.drawString(j, h-i-60, faller.adresa)
+				j=j+250
+			if "telefon" in llistat_dades:
+				c.drawString(j, h-i-60, faller.telefon)
+				j=j+75
+			if "naixement" in llistat_dades:
+				c.drawString(j, h-i-60, faller.naixement)
+				j=j+75
+			if "correu" in llistat_dades:
+				c.drawString(j, h-i-60, faller.correu)
+			i=i+20
+			if i==700: # Quan arribem a 35 fallers canviem de pàgina.
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat de fallers")
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				# Primera línea de la següent pàgina.
+				j=20
+				c.drawString(j, h-30, "ID")
+				j=j+30
+				if "nom" in llistat_dades:
+					c.drawString(j, h-30, "FALLER")
+					j=j+200
+				if "dni" in llistat_dades:
+					c.drawString(j, h-30, "DNI")
+					j=j+75
+				if "adreça" in llistat_dades:
+					c.drawString(j, h-30, "ADREÇA")
+					j=j+250
+				if "telefon" in llistat_dades:
+					c.drawString(j, h-30, "TELÈFON")
+					j=j+75
+				if "naixement" in llistat_dades:
+					c.drawString(j, h-30, "NAIXEMENT")
+					j=j+75
+				if "correu" in llistat_dades:
+					c.drawString(j, h-30, "E-MAIL")
+				c.line(0, h-35, w, h-35)
+				i=0
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat de fallers")
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(w-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta "llistat fallers" per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat fallers")
+		os.startfile(str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
 	def llistat_fallers_per_categories(self, llistat_categories, llistat_dades):
 		'''
 		Crea un .pdf amb el llistat de dades dels fallers actius de les categories passades.
@@ -871,6 +1051,121 @@ class Informe():
 		c.drawString(20, 20, "llistat de fallers per categories")
 		c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
 		c.drawString(h-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta "llistat fallers" per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat fallers")
+		os.startfile("categories " + str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
+	def llistat_fallers_per_categories_vertical(self, llistat_categories, llistat_dades):
+		'''
+		Crea un .pdf amb el llistat de dades dels fallers actius de les categories passades.
+
+		Paràmetres:
+		-----------
+		llistat_categories : llista.
+			Llistat de categories per a les quals volem treure el llistat.
+		'''
+		# Traguem la data actual per a utilitzar-la a l'informe.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=[]
+		for categoria in llistat_categories:
+			llistat_fallers.extend(bd.llegir_fallers_per_categoria(categoria))
+		llistat_fallers=sorted(llistat_fallers, key=lambda faller:faller.cognoms)
+		pagina=0
+		# Intentem crear la carpeta "llistat fallers" si no està creada.
+		try:
+			os.mkdir("llistat fallers")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat fallers"+"/"+"categories " + str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=A4) # El creem en vertical.
+		i=0
+		j=20
+		c.drawString(j, h-30, "ID") # La h és el segon parámetre ja que està en vertical.
+		j=j+30
+		if "nom" in llistat_dades:
+			c.drawString(j, h-30, "FALLER")
+			j=j+200
+		if "dni" in llistat_dades:
+			c.drawString(j, h-30, "DNI")
+			j=j+75
+		if "adreça" in llistat_dades:
+			c.drawString(j, h-30, "ADREÇA")
+			j=j+250
+		if "telefon" in llistat_dades:
+			c.drawString(j, h-30, "TELÈFON")
+			j=j+75
+		if "naixement" in llistat_dades:
+			c.drawString(j, h-30, "NAIXEMENT")
+			j=j+75
+		if "correu" in llistat_dades:
+			c.drawString(j, h-30, "E-MAIL")
+		c.line(0, h-35, w, h-35)
+		for faller in llistat_fallers:
+			j=20
+			c.drawString(j, h-i-60, str(faller.id))
+			j=j+30
+			if "nom" in llistat_dades:
+				c.drawString(j, h-i-60, faller.cognoms + ", " + faller.nom)
+				j=j+200
+			if "dni" in llistat_dades:
+				c.drawString(j, h-i-60, faller.dni)
+				j=j+75
+			if "adreça" in llistat_dades:
+				c.drawString(j, h-i-60, faller.adresa)
+				j=j+250
+			if "telefon" in llistat_dades:
+				c.drawString(j, h-i-60, faller.telefon)
+				j=j+75
+			if "naixement" in llistat_dades:
+				c.drawString(j, h-i-60, faller.naixement)
+				j=j+75
+			if "correu" in llistat_dades:
+				c.drawString(j, h-i-60, faller.correu)
+			i=i+20
+			if i==700: # Quan arribem a 35 fallers canviem de pàgina.
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat de fallers per categories")
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				# Primera línea de la següent pàgina.
+				j=20
+				c.drawString(j, h-30, "ID")
+				j=j+30
+				if "nom" in llistat_dades:
+					c.drawString(j, h-30, "FALLER")
+					j=j+200
+				if "dni" in llistat_dades:
+					c.drawString(j, h-30, "DNI")
+					j=j+75
+				if "adreça" in llistat_dades:
+					c.drawString(j, h-30, "ADREÇA")
+					j=j+250
+				if "telefon" in llistat_dades:
+					c.drawString(j, h-30, "TELÈFON")
+					j=j+75
+				if "naixement" in llistat_dades:
+					c.drawString(j, h-30, "NAIXEMENT")
+					j=j+75
+				if "correu" in llistat_dades:
+					c.drawString(j, h-30, "E-MAIL")
+				c.line(0, h-35, w, h-35)
+				i=0
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat de fallers per categories")
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(w-80, 20, data_actual)
 		c.showPage() # Última pàgina.
 		c.save()
 		# Entrem a la carpeta "llistat fallers" per a obrir l'arxiu pdf i tornem a la ruta original.
@@ -993,6 +1288,128 @@ class Informe():
 		c.drawString(20, 20, "llistat de fallers per edat")
 		c.drawString((h/2)-30, 20, "pàgina "+str(pagina))
 		c.drawString(h-80, 20, data_actual)
+		c.showPage() # Última pàgina.
+		c.save()
+		# Entrem a la carpeta "llistat fallers" per a obrir l'arxiu pdf i tornem a la ruta original.
+		ruta=os.getcwd()
+		os.chdir("llistat fallers")
+		os.startfile("edat " + str(data_actual)+".pdf")
+		os.chdir(ruta)
+
+
+	def llistat_fallers_per_edat_vertical(self, edat_inicial, edat_final, llistat_dades):
+		'''
+		Crea un .pdf amb el llistat de dades dels fallers actius amb edats compreses
+		entre els paràmetres d'entrada.
+
+		Paràmetres:
+		-----------
+		edat_inicial : int.
+			Mínima edat dels fallers del llistat.
+		edat_final : int
+			Màxima edat dels fallers del llistat.
+		'''
+		# Traguem la data actual per a utilitzar-la a l'informe.
+		utils=Utils()
+		data=utils.calcular_data_actual()
+		data_actual=data[0] + "-" + data[1] + "-" + data[2]
+		arxiu=Arxiu('exercici')
+		exercici_actual=arxiu.llegir_exercici_actual()
+		bd=BaseDeDades('falla.db')
+		llistat_fallers=bd.llegir_fallers_per_alta(1)
+		llistat_fallers_per_edat=[]
+		for faller in llistat_fallers:
+			edat=faller.calcular_edat(faller.naixement, exercici_actual)
+			if (edat>=edat_inicial) and (edat<=edat_final):
+				llistat_fallers_per_edat.append(faller)
+		pagina=0
+		# Intentem crear la carpeta "llistat fallers" si no està creada.
+		try:
+			os.mkdir("llistat fallers")
+		except OSError as e:
+			if e.errno!=errno.EEXIST:
+				raise
+		arxiu="llistat fallers"+"/"+"edat " + str(data_actual)
+		# Creem el full i tot el contingut.
+		w,h=A4
+		c=canvas.Canvas(arxiu+".pdf", pagesize=A4) # El creem en vertical.
+		i=0
+		j=20
+		c.drawString(j, h-30, "ID") # La h és el segon parámetre ja que està en vertical.
+		j=j+30
+		if "nom" in llistat_dades:
+			c.drawString(j, h-30, "FALLER")
+			j=j+200
+		if "dni" in llistat_dades:
+			c.drawString(j, h-30, "DNI")
+			j=j+75
+		if "adreça" in llistat_dades:
+			c.drawString(j, h-30, "ADREÇA")
+			j=j+250
+		if "telefon" in llistat_dades:
+			c.drawString(j, h-30, "TELÈFON")
+			j=j+75
+		if "naixement" in llistat_dades:
+			c.drawString(j, h-30, "NAIXEMENT")
+			j=j+75
+		if "correu" in llistat_dades:
+			c.drawString(j, h-30, "E-MAIL")
+		c.line(0, h-35, w, h-35)
+		for faller in llistat_fallers_per_edat:
+			j=20
+			c.drawString(j, h-i-60, str(faller.id))
+			j=j+30
+			if "nom" in llistat_dades:
+				c.drawString(j, h-i-60, faller.cognoms + ", " + faller.nom)
+				j=j+200
+			if "dni" in llistat_dades:
+				c.drawString(j, h-i-60, faller.dni)
+				j=j+75
+			if "adreça" in llistat_dades:
+				c.drawString(j, h-i-60, faller.adresa)
+				j=j+250
+			if "telefon" in llistat_dades:
+				c.drawString(j, h-i-60, faller.telefon)
+				j=j+75
+			if "naixement" in llistat_dades:
+				c.drawString(j, h-i-60, faller.naixement)
+				j=j+75
+			if "correu" in llistat_dades:
+				c.drawString(j, h-i-60, faller.correu)
+			i=i+20
+			if i==700: # Quan arribem a 35 fallers canviem de pàgina.
+				pagina=pagina+1
+				c.drawString(20, 20, "llistat de fallers per edat")
+				c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+				c.drawString(w-80, 20, data_actual)
+				c.showPage() # Mostrem la pàgina feta.
+				# Primera línea de la següent pàgina.
+				j=20
+				c.drawString(j, h-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
+				j=j+30
+				if "nom" in llistat_dades:
+					c.drawString(j, h-30, "FALLER")
+					j=j+200
+				if "dni" in llistat_dades:
+					c.drawString(j, h-30, "DNI")
+					j=j+75
+				if "adreça" in llistat_dades:
+					c.drawString(j, h-30, "ADREÇA")
+					j=j+250
+				if "telefon" in llistat_dades:
+					c.drawString(j, h-30, "TELÈFON")
+					j=j+75
+				if "naixement" in llistat_dades:
+					c.drawString(j, h-30, "NAIXEMENT")
+					j=j+75
+				if "correu" in llistat_dades:
+					c.drawString(j, h-30, "E-MAIL")
+				c.line(0, h-35, w, h-35)
+				i=0
+		pagina=pagina+1
+		c.drawString(20, 20, "llistat de fallers per edat")
+		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))
+		c.drawString(w-80, 20, data_actual)
 		c.showPage() # Última pàgina.
 		c.save()
 		# Entrem a la carpeta "llistat fallers" per a obrir l'arxiu pdf i tornem a la ruta original.

@@ -62,13 +62,17 @@ class FinestraLlistats(tk.Toplevel):
         label_frame_moviments_dia=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_moviments_dia)
         label_frame_moviments_dia.grid(row=0, column=0, padx=5, pady=5, ipadx=2, ipady=3)
 
+        label_estil_llistats_comptables=ttk.Label(self, text="Llistats comptables", style="Titol.TLabel")
+        label_frame_llistats_comptables=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_llistats_comptables)
+        label_frame_llistats_comptables.grid(row=1, column=0, padx=5, pady=5, ipadx=2, ipady=3)
+
         label_estil_fallers=ttk.Label(self, text="Llistat fallers", style="Titol.TLabel")
         label_frame_fallers=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_fallers)
-        label_frame_fallers.grid(row=1, column=0, padx=5, pady=5, ipadx=5, ipady=5)
+        label_frame_fallers.grid(row=2, column=0, padx=5, pady=5, ipadx=5, ipady=5)
 
         label_estil_altres_llistats=ttk.Label(self, text="Altres llistats", style="Titol.TLabel")
         label_frame_altres_llistats=ttk.LabelFrame(self, style="Marc.TFrame", labelwidget=label_estil_altres_llistats)
-        label_frame_altres_llistats.grid(row=2, column=0, padx=5, pady=5, ipadx=2, ipady=3)
+        label_frame_altres_llistats.grid(row=3, column=0, padx=5, pady=5, ipadx=2, ipady=3)
 
         # Widgets per a cada frame.
 
@@ -86,6 +90,16 @@ class FinestraLlistats(tk.Toplevel):
 
         self.button_moviments_dia=ttk.Button(label_frame_moviments_dia, text="Llistat moviments", style="Boto.TButton", command=self.crear_llistat_moviments)
         self.button_moviments_dia.grid(row=0, column=4, padx=5, pady=5)
+
+        # Frame "Llistats comptables"
+        self.button_general=ttk.Button(label_frame_llistats_comptables, text="Llistat general", style="Boto.TButton", command=self.crear_llistat_general)
+        self.button_general.grid(row=0, column=0, padx=5, pady=3)
+
+        self.button_general_families=ttk.Button(label_frame_llistats_comptables, text="Llistat general per families", style="Boto.TButton", command=self.crear_llistat_general_families)
+        self.button_general_families.grid(row=0, column=1, padx=5, pady=3)
+
+        self.button_general_families=ttk.Button(label_frame_llistats_comptables, text="Llistat quotes no fallers", style="Boto.TButton", command=self.crear_llistat_quotes_no_fallers)
+        self.button_general_families.grid(row=0, column=2, padx=5, pady=3)
 
         # Frame "Llistat fallers".
         self.check_button_nom_complet=ttk.Checkbutton(label_frame_fallers, text="Nom complet", style="Check.TCheckbutton", variable=self.nom_complet)
@@ -144,14 +158,11 @@ class FinestraLlistats(tk.Toplevel):
         self.button_fallers.grid(row=4, column=3, rowspan=2, sticky="s")
 
         # Frame "Altres llistats"
-        self.button_general=ttk.Button(label_frame_altres_llistats, text="Llistat general", style="Boto.TButton", command=self.crear_llistat_general)
-        self.button_general.grid(row=0, column=0, padx=5, pady=3)
-
-        self.button_general_families=ttk.Button(label_frame_altres_llistats, text="Llistat general per families", style="Boto.TButton", command=self.crear_llistat_general_families)
-        self.button_general_families.grid(row=0, column=1, padx=5, pady=3)
-
         self.button_altes_baixes=ttk.Button(label_frame_altres_llistats, text="Llistat altes i baixes", style="Boto.TButton", command=self.crear_llistat_altes_baixes)
-        self.button_altes_baixes.grid(row=0, column=2, padx=5, pady=3)
+        self.button_altes_baixes.grid(row=0, column=0, padx=5, pady=3)
+
+        self.button_rifes=ttk.Button(label_frame_altres_llistats, text="Llistat fallers amb rifa", style="Boto.TButton", command=self.crear_llistat_rifes)
+        self.button_rifes.grid(row=0, column=1, padx=5, pady=3)
 
 
     def iniciar(self):
@@ -213,6 +224,21 @@ class FinestraLlistats(tk.Toplevel):
             informe.llistat_moviments(self.data_moviments_dia.get(), self.efectiu.get(), self.banc.get())
 
 
+    def crear_llistat_general(self):
+        informe=Informe()
+        informe.llistat_general()
+
+
+    def crear_llistat_general_families(self):
+        informe=Informe()
+        informe.llistat_general_per_families()
+
+
+    def crear_llistat_quotes_no_fallers(self):
+        informe=Informe()
+        informe.llistat_quotes_no_fallers()
+
+
     def crear_llistat_fallers(self):
         bd=BaseDeDades('falla.db')
         informe=Informe()
@@ -235,7 +261,10 @@ class FinestraLlistats(tk.Toplevel):
         else:
             # Cridem a la funció corresponent segons l'opció marcada.
             if self.opcio.get()==1:
-                informe.llistat_fallers(llistat_dades)
+                if len(llistat_dades)<4:
+                    informe.llistat_fallers_vertical(llistat_dades)
+                else:
+                    informe.llistat_fallers(llistat_dades)
             elif self.opcio.get()==2:
                 llistat_categories=[]
                 if self.adult.get()==1:
@@ -248,21 +277,25 @@ class FinestraLlistats(tk.Toplevel):
                     llistat_categories.append(4)
                 if self.bebe.get()==1:
                     llistat_categories.append(5)
-                informe.llistat_fallers_per_categories(llistat_categories, llistat_dades)
+                if len(llistat_dades)<4:
+                    informe.llistat_fallers_per_categories_vertical(llistat_categories, llistat_dades)
+                else:
+                    informe.llistat_fallers_per_categories(llistat_categories, llistat_dades)
             elif self.opcio.get()==3:
-                informe.llistat_fallers_per_edat(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
+                try:
+                    if len(llistat_dades)<4:
+                        informe.llistat_fallers_per_edat_vertical(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
+                    else:
+                        informe.llistat_fallers_per_edat(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
+                except ValueError:
+                    messagebox.showwarning("Error", "Has d'escriure un valor vàlid com a edats inicial i final")
 
-
-    def crear_llistat_general(self):
-        informe=Informe()
-        informe.llistat_general()
-
-
-    def crear_llistat_general_families(self):
-        informe=Informe()
-        informe.llistat_general_per_families()
-        
 
     def crear_llistat_altes_baixes(self):
         informe=Informe()
         informe.llistat_altes_baixes()
+        
+
+    def crear_llistat_rifes(self):
+        informe=Informe()
+        informe.llistat_fallers_amb_rifa()
