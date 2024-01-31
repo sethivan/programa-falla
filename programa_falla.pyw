@@ -21,6 +21,7 @@ from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
 from finestra_categories import FinestraCategories
 from finestra_llistats import FinestraLlistats
+from finestra_loteria import FinestraLoteria
 
 from arxiu import Arxiu
 from utils import Utils
@@ -28,7 +29,6 @@ from base_de_dades import BaseDeDades
 
 from falla import Falla
 from categoria import Categoria
-from informe import Informe
 
 
 class Aplicacio(tk.Frame):
@@ -88,7 +88,7 @@ class Aplicacio(tk.Frame):
 		# Submenú Sortejos.
 		self.menu_sortejos=tk.Menu(self.barra_menu, tearoff=0)
 		self.menu_sortejos.add_command(label="Assignar rifa", command=self.assignar_rifa)
-		self.menu_sortejos.add_command(label="Assignar loteria", command=self.AssignarLoteria)
+		self.menu_sortejos.add_command(label="Assignar loteria", command=self.assignar_loteria)
 
 		# Submenú Imprimir.
 		self.menu_imprimir=tk.Menu(self.barra_menu, tearoff=0)
@@ -165,7 +165,7 @@ class Aplicacio(tk.Frame):
 		self.button_rifa=ttk.Button(label_frame_sortejos, width=20, text="Assignar rifa", style="Boto.TButton", command=self.assignar_rifa)
 		self.button_rifa.grid(row=0, column=0, padx=5, pady=5)
 
-		self.button_loteria=ttk.Button(label_frame_sortejos, width=20, text="Assignar loteria", style="Boto.TButton", command=self.AssignarLoteria)
+		self.button_loteria=ttk.Button(label_frame_sortejos, width=20, text="Assignar loteria", style="Boto.TButton", command=self.assignar_loteria)
 		self.button_loteria.grid(row=1, column=0, padx=5, pady=5)
 
 		# Frame Historial.
@@ -250,10 +250,9 @@ class Aplicacio(tk.Frame):
 		introduir_faller.iniciar()
 
 
-	def AssignarLoteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
+	def assignar_loteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
 
-		#FinestraAssignar(self.root)
-		pass
+		FinestraLoteria(self)
 
 
 	def assignar_rifa(self):

@@ -6,6 +6,7 @@ from faller import Faller
 from familia import Familia
 from moviment import Moviment
 from categoria import Categoria
+from loteria import Loteria
 
 class BaseDeDades:
     
@@ -633,12 +634,12 @@ class BaseDeDades:
         
     def crear_categoria(self, categoria):
         '''
-        Escriu a la base de dades la categoria que se li passa com a paràmetre a la taula "moviment".
+        Escriu a la base de dades la categoria que se li passa com a paràmetre a la taula "categoria".
 
         Paràmetres:
         -----------
         categoria : Categoria
-            Objecte de la classe Moviment.
+            Objecte de la classe Categoria.
         '''
         dades=categoria.quota, categoria.nom, categoria.descripcio
         self.cursor.execute("INSERT INTO categoria VALUES (null, ?, ?, ?)",(dades))
@@ -690,3 +691,105 @@ class BaseDeDades:
             messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
         else:
             self.conexio.commit()
+
+
+    # Mètodes per a operacions CRUD en la taula loteria.
+
+    def crear_loteria(self, loteria):
+        '''
+        Escriu a la base de dades la loteria que se li passa com a paràmetre a la taula "loteria".
+
+        Paràmetres:
+        -----------
+        loteria : Loteria
+            Objecte de la classe Loteria.
+        '''
+        dades=loteria.sorteig, loteria.data, loteria.paperetes_masculina, loteria.paperetes_femenina, loteria.paperetes_infantil, loteria.decims_masculina, loteria.decims_femenina, loteria.decims_infantil, loteria.assignada, loteria.faller.id
+        self.cursor.execute("INSERT INTO categoria VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",(dades))
+        self.conexio.commit()
+
+    def llegir_loteries_per_sorteig(self, sorteig):
+        query_params=(sorteig,)
+        try:
+            self.cursor.execute("SELECT * FROM loteria INNER JOIN faller ON loteria.idfaller = faller.id WHERE loteria.sorteig=?", query_params)
+            resultat = self.cursor.fetchall()
+            llistat_loteries=[]
+            for valors in resultat:
+                faller=Faller(valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18], valors[19])
+                loteria= Loteria(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[9], faller)
+                llistat_loteries.append(loteria)
+            return llistat_loteries
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+        
+
+    def llegir_sortejos(self):
+        try:
+            self.cursor.execute("SELECT DISTINCT sorteig FROM loteria")
+            llistat_sortejos = self.cursor.fetchall()
+            return llistat_sortejos
+        except sqlite3.Error as e:
+            messagebox.showerror("Error", f"Error en la consulta a la base de dades: {str(e)}")
+            return None
+        except ConnectionError as e:
+            messagebox.showerror("Error", f"No s'ha pogut conectar a la base de dades: {str(e)}")
+            return None
+
+
+    def llegir_ultim_id_loteria(self):
+        try:
+            self.cursor.execute("SELECT * FROM loteria ORDER BY id DESC LIMIT 1")
+            resultat = self.cursor.fetchone()
+            if resultat is not None:
+                return resultat
+            else:
+                return None
+        except (sqlite3.Error, TypeError, ValueError) as e:
+            print("Error al llegir la loteria de la base de dades:", e)
+            return None
+
+
+    def actualitzar_loteria(self, loteria):
+        '''
+        Actualitza la taula "loteria" amb l'objecte de la classe Loteria que se li passa per paràmetre.
+
+        Paràmetres:
+        -----------
+        loteria : Loteria
+            Objecte de la classe Loteria.
+        '''
+        dades=loteria.paperetes_masculina, loteria.paperetes_femenina, loteria.paperetes_infantil, loteria.decims_masculina, loteria.decims_femenina, loteria.decims_infantil, loteria.id
+        try:
+            self.cursor.execute("UPDATE loteria SET paperetes_masculina=?, paperetes_femenina=?, paperetes_infantil=?, decims_masculina=?, decims_femenina=?, decims_infantil=? WHERE id=?", (dades))
+        except sqlite3.Error:
+            messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
+        else:
+            self.conexio.commit()
+
+
+    def actualitzar_assignada_loteria(self, id):
+        assignada=1
+        dades=assignada, id
+        try:
+            self.cursor.execute("UPDATE loteria SET assignada=? WHERE id=?", (dades))
+        except sqlite3.Error:
+            messagebox.showerror("Error", "Hi ha un problema amb la base de dades")
+        else:
+            self.conexio.commit()
+
+
+    def eliminar_loteria(self, id):
+        '''
+        Elimina de la base de dades la loteria el id de la qual se li passa per paràmetre
+
+        Paràmetres:
+        -----------
+        id : integer
+            Identificador de la loteria a eliminar.
+        '''
+        self.cursor.execute("DELETE FROM loteria WHERE id=?", (id,))
+        self.conexio.commit()

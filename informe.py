@@ -400,9 +400,10 @@ class Informe():
 		i=0
 		families=0 # Per a acumular el total de families.
 		c.drawRightString(70, w-30, "MEMBRES") # La w és el segon parámetre ja que està en horitzontal.
-		c.drawString(120, w-30, "FAMILIAR REFERENT")
-		c.drawRightString(460, w-30, "TOTAL ASSIGNACIONS")
-		c.drawRightString(635, w-30, "TOTAL PAGAMENTS")
+		c.drawString(100, w-30, "FAMILIAR REFERENT")
+		c.drawString(300, w-30, "ADREÇA")
+		c.drawRightString(590, w-30, "TOTAL ASSIGNACIONS")
+		c.drawRightString(715, w-30, "TOTAL PAGAMENTS")
 		c.drawRightString(810, w-30, "DIFERÈNCIA")
 		c.line(0, w-35, h, w-35)
 		llistat_caps_familia=[]
@@ -430,11 +431,12 @@ class Informe():
 				total_familia_pagat=total_familia_pagat+total_pagat
 			if len(llistat_caps_familia)>0:
 				faller=llistat_caps_familia[0]
-				c.drawRightString(60, w-i-60, str(len(llistat_caps_familia)))
-				c.drawString(120, w-i-60, faller.cognoms + ", " + faller.nom)
-				c.drawRightString(450, w-i-60, "{0:.2f}".format(total_familia_assignat) + " €")
+				c.drawRightString(50, w-i-60, str(len(llistat_caps_familia)))
+				c.drawString(100, w-i-60, faller.cognoms + ", " + faller.nom)
+				c.drawString(275, w-i-60, faller.adresa)
+				c.drawRightString(550, w-i-60, "{0:.2f}".format(total_familia_assignat) + " €")
 				suma_totals_assignacions=suma_totals_assignacions+total_familia_assignat
-				c.drawRightString(625, w-i-60, "{0:.2f}".format(total_familia_pagat) + " €")
+				c.drawRightString(675, w-i-60, "{0:.2f}".format(total_familia_pagat) + " €")
 				suma_totals_pagaments=suma_totals_pagaments+total_familia_pagat
 				c.drawRightString(800, w-i-60, "{0:.2f}".format(total_familia_assignat-total_familia_pagat) + " €")
 				i=i+20
@@ -447,9 +449,10 @@ class Informe():
 				c.showPage() # Mostrem la pàgina feta.
 				c.setFont("Helvetica", 11)
 				c.drawRightString(70, w-30, "MEMBRES") # Primera línea de la següent pàgina.
-				c.drawString(120, w-30, "FAMILIAR REFERENT")
-				c.drawRightString(460, w-30, "TOTAL ASSIGNACIONS")
-				c.drawRightString(635, w-30, "TOTAL PAGAMENTS")
+				c.drawString(100, w-30, "FAMILIAR REFERENT")
+				c.drawString(300, w-30, "ADREÇA")
+				c.drawRightString(590, w-30, "TOTAL ASSIGNACIONS")
+				c.drawRightString(715, w-30, "TOTAL PAGAMENTS")
 				c.drawRightString(810, w-30, "DIFERÈNCIA.")
 				c.line(0, w-35, h, w-35)
 				i=0
@@ -501,7 +504,7 @@ class Informe():
 		fallers=0 # Per a acumular el total de fallers.
 		c.drawString(20, h-30, "ID") # La w és el segon parámetre ja que està en horitzontal.
 		c.drawString(50, h-30, "FALLER")
-		c.drawRightString(295, h-30, "QUOTA PAGADA")
+		c.drawString(295, h-30, "QUOTA PAGADA")
 		c.line(0, h-35, w, h-35)
 		for faller in llistat_fallers:
 			quota_pagada=0
@@ -510,7 +513,7 @@ class Informe():
 			if quota_pagada>0:
 				c.drawString(20, h-i-60, str(faller.id))
 				c.drawString(50, h-i-60, faller.cognoms + ", " + faller.nom)
-				c.drawRightString(295, h-i-60, "{0:.2f}".format(quota_pagada) + " €")
+				c.drawString(295, h-i-60, "{0:.2f}".format(quota_pagada) + " €")
 				suma_quotes_pagades=suma_quotes_pagades+quota_pagada
 				i=i+20
 				fallers=fallers+1
@@ -523,13 +526,13 @@ class Informe():
 				c.setFont("Helvetica", 11)
 				c.drawString(20, h-30, "ID") # Primera línea de la següent pàgina.
 				c.drawString(50, h-30, "FALLER")
-				c.drawRightString(295, h-30, "QUOTA PAGADA")
+				c.drawString(295, h-30, "QUOTA PAGADA")
 				c.line(0, h-35, w, h-35)
 				i=0
 		c.line(0, h-i-60, w, h-i-60)
 		c.drawRightString(50,h-i-80, "TOTALS")
 		c.drawRightString(200,h-i-80, "FALLERS = " + str(fallers))
-		c.drawRightString(295,h-i-80, "{0:.2f}".format(suma_quotes_pagades) + " €")
+		c.drawString(295,h-i-80, "{0:.2f}".format(suma_quotes_pagades) + " €")
 		pagina=pagina+1
 		c.drawString(20, 20, "llistat quotes no fallers")
 		c.drawString((w/2)-30, 20, "pàgina "+str(pagina))

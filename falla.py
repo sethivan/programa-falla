@@ -63,6 +63,13 @@ class Falla():
     def llistat_moviments(self, value):
 		
         self._llistat_moviments=value
+
+
+    def llegir_fallers_per_cognom(self, cadena):
+        bd=BaseDeDades('falla.db')
+        self.llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
+        bd.tancar_conexio()
+        return self.llistat_fallers
    
     
     def assignar_rifa_auto(self):
