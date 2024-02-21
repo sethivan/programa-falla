@@ -46,4 +46,10 @@ class Utils():
         data_final.append(mes_actual)
         data_final.append(any_actual)
         return data_final
+    
+
+    def convert_date(self, spanish_date):
+        date = datetime.strptime(spanish_date, '%d-%m-%Y')
+        mariadb_date = date.strftime('%Y-%m-%d')
+        return mariadb_date
 

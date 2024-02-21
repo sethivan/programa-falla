@@ -14,6 +14,34 @@ class BaseDeDades:
         self.conexio = sqlite3.connect(nom_db)
         self.cursor = self.conexio.cursor()
 
+    
+    def import_categoria_from_sqlite(self):
+
+        self.cursor.execute("SELECT * FROM CATEGORIA")
+        result = self.cursor.fetchall()
+        return result
+    
+
+    def import_familia_from_sqlite(self):
+
+        self.cursor.execute("SELECT * FROM FAMILIA")
+        result = self.cursor.fetchall()
+        return result
+    
+
+    def import_faller_from_sqlite(self):
+
+        self.cursor.execute("SELECT * FROM FALLER")
+        result = self.cursor.fetchall()
+        return result
+    
+
+    def import_moviment_from_sqlite(self):
+
+        self.cursor.execute("SELECT * FROM MOVIMENT")
+        result = self.cursor.fetchall()
+        return result
+
 
     def crear_taules(self):
         '''
