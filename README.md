@@ -144,15 +144,17 @@ Per a poder utilitzar el programa podeu descarregar el seu codi des del github d
 
 Una vegada descarregat el codi, necessiteu fer ús del llenguatje de programació amb el que l'he creat per a obrir el programa. Aquest llenguatje és Python i podeu descarregar_se'l des de la [**web oficial**](https://www.python.org/).
 
-En aquest moment, i com podeu vore en les següents importacions, el programa utilitza dos llibreries externes que haurem d'instal·lar per al seu correcte funcionament: [**Pillow**](https://pypi.org/project/Pillow/) i [**reportlab**](https://pypi.org/project/reportlab/).
+En aquest moment, i com podeu vore en les següents importacions, el programa utilitza varies llibreries externes que haurem d'instal·lar per al seu correcte funcionament:
+[**Pillow**](https://pypi.org/project/Pillow/), [**reportlab**](https://pypi.org/project/reportlab/) i [**mysql-connector-python**](https://dev.mysql.com/doc/connector-python/en/).
 
 ```python
 from PIL import Image, ImageTk
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
+import mysql.connector
 ```
 
-La llibreria Pillow és l'encarregada de gestionar les imatges en el sistema de finestres utilitzat (tkinter) i la llibreria reportlab és amb la qual creem els informes en .pdf.
+La llibreria Pillow és l'encarregada de gestionar les imatges en el sistema de finestres utilitzat (tkinter) i la llibreria reportlab és amb la qual creem els informes en .pdf. Per altra banda, la llibreria mysql-connector-python s'encarrega de conectar el codi de python amb la BBDD de MariaDb.
 
 Per a utilitzar-les només heu d'acudir a la terminal i instal·lar-les a través de pip.
 
@@ -163,6 +165,8 @@ Una vegada teniu el pip instal·lat, només heu d'executar les següents instruc
 >pip install Pillow
 
 >pip install reportlab
+
+>pip install mysql-connector-python
 
 Ara únicament heu d'accedir a la terminal i, des d'allí, accedir a la carpeta on heu copiat el codi. Amb la següent instrucció fiqueu en marxa el programa:
 
