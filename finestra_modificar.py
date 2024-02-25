@@ -8,7 +8,6 @@ from arxiu import Arxiu
 from utils import Utils
 
 from familia import Familia
-from categoria import Categoria
 
 
 class FinestraModificar(tk.Toplevel):
@@ -254,7 +253,6 @@ class FinestraModificar(tk.Toplevel):
 		'''
 		arxiu=Arxiu("exercici")
 		bd=BaseDeDades("falla.db")
-		categoria=Categoria(0,0,"","")
 		exercici_actual=arxiu.llegir_exercici_actual()
 		faller=bd.llegir_faller(self.id)
 		try:
@@ -264,8 +262,8 @@ class FinestraModificar(tk.Toplevel):
 		else:
 			valor=messagebox.askquestion("Modificar dades","Vols modificar les dades del faller?")
 			if valor=="yes":
-				categoria.calcular_categoria(edat)
-				categoria=bd.llegir_categoria(categoria.id)
+				category_id=faller.calculate_category(edat)
+				faller.category=bd.llegir_categoria(category_id)
 				faller.nom=self.nom.get()
 				faller.cognoms=self.cognoms.get()
 				faller.sexe=self.sexe.get()
@@ -273,7 +271,6 @@ class FinestraModificar(tk.Toplevel):
 				faller.adresa=self.adresa.get()
 				faller.telefon=self.telefon.get()
 				faller.correu=self.correu.get()
-				faller.categoria=categoria
 				if faller.naixement!=self.naixement.get():
 					valor=messagebox.askquestion("Modificar dades","Has modificat la data de naixement del faller i s'haurà de crear un nou historial, estas segur?")
 					if valor=="yes":
