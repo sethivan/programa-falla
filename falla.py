@@ -8,7 +8,7 @@ from utils import Utils
 from arxiu import Arxiu
 
 from moviment import Moviment
-from categoria import Categoria
+from category import Category
 
 
 class Falla():
@@ -219,15 +219,15 @@ class Falla():
         messagebox.showinfo("Exercici nou", "Nou any assignat correctament")
         
         # Assignem la nova categoria a cada faller que haja canviat.
-        categoria=Categoria(0,0,"","")
         exercici_actual=arxiu.llegir_exercici_actual()
         for faller in llistat_fallers:
-            if faller.categoria.id>1:
+            if faller.category.id>1:
+                old_category_id=faller.category.id
                 edat=faller.calcular_edat(faller.naixement, exercici_actual)
-                categoria.calcular_categoria(edat)
-                if categoria.id!=faller.categoria.id:
-                    categoria=bd.llegir_categoria(categoria.id)
-                    faller.categoria=categoria
+                category_id=faller.calculate_category(edat)
+                if category_id!=old_category_id:
+                    category=bd.llegir_categoria(category.id)   #provar en la refactoritzacio a juntar les 2 linies
+                    faller.category=category                    #provar en la refactoritzacio a juntar les 2 linies
                     bd.actualitzar_faller(faller)
         messagebox.showinfo("Exercici nou", "Categories de fallers actualitzades")
 

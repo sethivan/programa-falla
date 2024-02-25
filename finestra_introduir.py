@@ -12,7 +12,6 @@ from base_de_dades import BaseDeDades
 from arxiu import Arxiu
 from utils import Utils
 
-from categoria import Categoria
 from faller import Faller
 from familia import Familia
 
@@ -247,19 +246,18 @@ class FinestraIntroduir(tk.Toplevel):
 		Crea un historial per al faller nou.
 		'''
 		arxiu=Arxiu("exercici")
-		categoria=Categoria(0,0,"","")
-		faller=Faller(0,"","","",0,"","","",0,"")
+		faller=Faller(0,"","","",0,"","","",0,"")					#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
 		exercici_actual=arxiu.llegir_exercici_actual()
 		try:
-			edat=faller.calcular_edat(self.naixement.get(), exercici_actual)
+			edat=faller.calcular_edat(self.naixement.get(), exercici_actual)	#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
 		except:
 			messagebox.showerror("Error", "El format per a la data ha de ser dd-mm-aaaa")
 		else:
 			valor=messagebox.askquestion("Alta nova", "Donar d'alta el nou faller?")
 			if valor=="yes":
 				bd=BaseDeDades("falla.db")
-				categoria.calcular_categoria(edat)
-				categoria=bd.llegir_categoria(categoria.id)
+				category_id=faller.calculate_category(edat)		#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
+				faller.category=bd.llegir_categoria(category_id)
 				if self.familia.get()=="1":
 					familia=bd.llegir_familia(self.identificador_familia)
 					faller=Faller(
@@ -273,8 +271,7 @@ class FinestraIntroduir(tk.Toplevel):
 						self.telefon.get(), 
 						1, 
 						self.correu.get(), 
-						familia, 
-						categoria
+						familia
 					)
 					bd.crear_faller(faller)
 					llistat_fallers=bd.llegir_fallers_per_familia(
@@ -297,8 +294,7 @@ class FinestraIntroduir(tk.Toplevel):
 						self.telefon.get(), 
 						1, 
 						self.correu.get(), 
-						familia, 
-						categoria
+						familia
 					)
 					bd.crear_faller(faller)
 				

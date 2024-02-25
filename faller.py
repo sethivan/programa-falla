@@ -2,7 +2,7 @@ from datetime import datetime
 
 class Faller():
 
-	def __init__(self, id, nom, cognoms, naixement, sexe, dni, adresa, telefon, alta, correu, familia=None, categoria=None):
+	def __init__(self, id, nom, cognoms, naixement, sexe, dni, adresa, telefon, alta, correu, familia=None, category=None):
 
 		self.id=id
 		self.nom=nom
@@ -15,7 +15,7 @@ class Faller():
 		self.alta=alta
 		self.correu=correu
 		self.familia=familia
-		self.categoria=categoria
+		self.category=category
 
 
 	@property
@@ -151,15 +151,15 @@ class Faller():
 
 
 	@property
-	def categoria(self):
+	def category(self):
 
-		return self._categoria
+		return self._category
 	
 
-	@categoria.setter
-	def categoria(self, value):
+	@category.setter
+	def category(self, value):
 		
-		self._categoria=value
+		self._category=value
 
 
 	def calcular_edat(self, naixement, exercici):
@@ -189,6 +189,28 @@ class Faller():
 		else:
 			edat=int(any_exercici)-int(any_naixement)
 		return edat
+	
+
+	def calculate_category(self, age):
+		'''
+		A partir de l'edat del faller assigna l'id de la categoria a la que pertany.
+
+		Paràmetres:
+		-----------
+		edat : int
+			L'edat del faller a data 19 de març del present exercici.
+		'''
+		if age<5:
+			category_id=5
+		elif 5<=age<=9:
+			category_id=4
+		elif 10<=age<=13:
+			category_id=3
+		elif 14<=age<=17:
+			category_id=2
+		else:
+			category_id=1
+		return category_id
 	
 
 	def calcular_primer_exercici(self, naixement):

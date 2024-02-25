@@ -5,7 +5,7 @@ import traceback
 from faller import Faller
 from familia import Familia
 from moviment import Moviment
-from categoria import Categoria
+from category import Category
 from loteria import Loteria
 
 class BaseDeDades:
@@ -109,7 +109,7 @@ class BaseDeDades:
         faller : Faller
             Objecte de la classe Faller.
         '''
-        dades=faller.nom, faller.cognoms, faller.naixement, faller.sexe, faller.dni, faller.adresa, faller.telefon, faller.alta, faller.familia.id, faller.categoria.id, faller.correu
+        dades=faller.nom, faller.cognoms, faller.naixement, faller.sexe, faller.dni, faller.adresa, faller.telefon, faller.alta, faller.familia.id, faller.category.id, faller.correu
         try:
             self.cursor.execute("INSERT INTO faller VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (dades))
         except sqlite3.Error:
@@ -130,7 +130,7 @@ class BaseDeDades:
         Retorna:
         --------
         faller : Faller
-            Objecte de la classe Faller complet amb els atributs "familia" i "categoria".
+            Objecte de la classe Faller complet amb els atributs "familia" i "category".
         '''
         query_params=(id,)
         try:
@@ -139,8 +139,8 @@ class BaseDeDades:
             if resultat is not None:
                 # Crear objecte Faller a partir de la fila obtinguda a la base de dades
                 familia= Familia(resultat[12], resultat[13], resultat[14])
-                categoria= Categoria(resultat[15], resultat[16], resultat[17], resultat[18])
-                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
+                category= Category(resultat[15], resultat[16], resultat[17], resultat[18])
+                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, category)
                 return faller
             else:
                 return None
@@ -164,7 +164,7 @@ class BaseDeDades:
             if resultat is not None:
                 # Crear objecte Faller a partir de la fila obtinguda a la base de dades
                 familia= Familia(resultat[12], resultat[13], resultat[14])
-                categoria= Categoria(resultat[15], resultat[16], resultat[17], resultat[18])
+                categoria= Category(resultat[15], resultat[16], resultat[17], resultat[18])
                 faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
                 return faller
             else:
@@ -190,7 +190,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -218,7 +218,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -253,7 +253,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -287,7 +287,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -323,7 +323,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -357,7 +357,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -391,7 +391,7 @@ class BaseDeDades:
             llistat_fallers=[]
             for valors in resultat:
                 familia= Familia(valors[12], valors[13], valors[14])
-                categoria= Categoria(valors[15], valors[16], valors[17], valors[18])
+                categoria= Category(valors[15], valors[16], valors[17], valors[18])
                 faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
@@ -433,7 +433,7 @@ class BaseDeDades:
         faller : Faller
             Objecte de la classe Faller.
         '''
-        dades=faller.nom, faller.cognoms, faller.naixement, faller.sexe, faller.dni, faller.adresa, faller.telefon, faller.alta, faller.familia.id, faller.categoria.id, faller.correu, faller.id
+        dades=faller.nom, faller.cognoms, faller.naixement, faller.sexe, faller.dni, faller.adresa, faller.telefon, faller.alta, faller.familia.id, faller.category.id, faller.correu, faller.id
         try:
             self.cursor.execute("UPDATE faller SET nom=?, cognoms=?, naixement=?, sexe=?, dni=?, adreça=?, telefon=?, alta=?, idfamilia=?, idcategoria=?, correu=? WHERE id=?", (dades))
         except sqlite3.Error as error:
@@ -669,7 +669,7 @@ class BaseDeDades:
         categoria : Categoria
             Objecte de la classe Categoria.
         '''
-        dades=categoria.quota, categoria.nom, categoria.descripcio
+        dades=categoria.fee, categoria.name, categoria.description
         self.cursor.execute("INSERT INTO categoria VALUES (null, ?, ?, ?)",(dades))
         self.conexio.commit()
     
@@ -694,7 +694,7 @@ class BaseDeDades:
             self.cursor.execute("SELECT * FROM categoria WHERE id=?", query_params)
             resultat = self.cursor.fetchone()
             if resultat is not None:
-                categoria = Categoria(resultat[0], resultat[1], resultat[2], resultat[3])
+                categoria = Category(resultat[0], resultat[1], resultat[2], resultat[3])
                 return categoria
             else:
                 return None
@@ -712,7 +712,7 @@ class BaseDeDades:
         categoria : Categoria
             Objecte de la classe Categoria.
         '''
-        dades=categoria.quota, categoria.nom, categoria.descripcio, categoria.id
+        dades=categoria.fee, categoria.name, categoria.description, categoria.id
         try:
             self.cursor.execute("UPDATE categoria SET quota=?, nom=?, descripcio=? WHERE id=?", (dades))
         except sqlite3.Error:

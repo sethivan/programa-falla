@@ -493,8 +493,8 @@ class FinestraGestionar(tk.Toplevel):
 			if valor=="yes":
 				edat=faller.calcular_edat(faller.naixement, exercici_actual)
 				# Asignem categoria per si ha canviat de tram mentre estava de baixa
-				faller.categoria.calcular_categoria(edat)
-				faller.categoria=bd.llegir_categoria(faller.categoria.id)
+				faller.calculate_category(edat)
+				faller.category=bd.llegir_categoria(faller.category.id)
 				faller.alta=1
 				bd.actualitzar_faller(faller)
 				historial[exercici_actual]=["vocal", "Sants Patrons"]				

@@ -57,7 +57,7 @@ class Familia():
 		for faller in llistat_fallers:
 			if faller.alta==1:
 				membres=membres+1
-				if faller.categoria.id==1:
+				if faller.category.id==1:
 					maxima=True
 		if maxima==True and membres==3:
 			self.descompte=5

@@ -29,7 +29,7 @@ from base_de_dades import BaseDeDades
 from database import Database
 
 from falla import Falla
-from categoria import Categoria
+from category import Category
 
 
 class Aplicacio(tk.Frame):
@@ -213,15 +213,15 @@ class Aplicacio(tk.Frame):
 		if not os.path.exists("falla.db"):
 			bd=BaseDeDades("falla.db")
 			bd.crear_taules()
-			categoria=Categoria(0, 475, "adult", "major de 18 anys")
+			categoria=Category(0, 475, "adult", "major de 18 anys")
 			bd.crear_categoria(categoria)
-			categoria=Categoria(0, 300, "cadet", "entre 14 i 17 anys")
+			categoria=Category(0, 300, "cadet", "entre 14 i 17 anys")
 			bd.crear_categoria(categoria)
-			categoria=Categoria(0, 200, "juvenil", "entre 10 i 13 anys")
+			categoria=Category(0, 200, "juvenil", "entre 10 i 13 anys")
 			bd.crear_categoria(categoria)
-			categoria=Categoria(0, 125, "infantil", "entre 5 i 9 anys")
+			categoria=Category(0, 125, "infantil", "entre 5 i 9 anys")
 			bd.crear_categoria(categoria)
-			categoria=Categoria(0, 50, "bebè", "menor de 5 anys")
+			categoria=Category(0, 50, "bebè", "menor de 5 anys")
 			bd.crear_categoria(categoria)
 			bd.tancar_conexio()
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")
