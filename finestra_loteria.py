@@ -9,7 +9,7 @@ from arxiu import Arxiu
 
 from falla import Falla
 from loteria import Loteria
-from moviment import Moviment
+from movement import Moviment
 
 
 class FinestraLoteria(tk.Toplevel):

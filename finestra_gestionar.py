@@ -9,7 +9,7 @@ from base_de_dades import BaseDeDades
 from utils import Utils
 
 from falla import Falla
-from moviment import Moviment
+from movement import Moviment
 from informe import Informe
 from finestra_modificar import FinestraModificar
 

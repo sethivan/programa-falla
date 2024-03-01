@@ -18,12 +18,14 @@ class Category():
 	'''
 
 	
-	def __init__(self, id, fee, name, description):		#llevar quan arreglem la bbdd
+	def __init__(self, id: int, fee: float, name: str, description: str):
 		'''
 		Inicialitza una nova instància de la classe Category.
 
 		Paràmetres:
 		-----------
+		id : int
+			El identificador a la taula "category" de la base de dades.
 		fee : float
 			Quantitat a pagar corresponent a dita categoria.
 		name : string
@@ -31,17 +33,7 @@ class Category():
 		description : string
 			Informació curta sobre les edats a les quals correspon la categoria.
 		'''
-		self.id=id								#llevar quan arreglem la bbdd
-		self.fee=fee
-		self.name=name
-		self.description=description
-
-
-	def get_Category(self):
-		pass
-
-
-	def set_Category(self, fee, name, description):
+		self.id=id
 		self.fee=fee
 		self.name=name
 		self.description=description
