@@ -7,69 +7,85 @@ from base_de_dades import BaseDeDades
 from utils import Utils
 from arxiu import Arxiu
 
-from moviment import Moviment
+from movement import Movement
+from database import Database
+from familia import Familia
+from faller import Faller
 from category import Category
 
 
 class Falla():
     '''
-	Aquesta classe pot controlar llistats de les classes "faller" i "moviment" i operar amb elles.
+	Aquesta classe pot controlar llistats de les classes "Member" i "Movement" i operar amb elles.
 
 	Atributs:
 	---------
-	llistat_fallers : llista
-        Llistat d'objectes de la classe "Faller".
-    llistat_moviments : llista
-        Llistat d'objectes de la classe "Moviment".
+	members_list : list
+        Llistat d'objectes de la classe "Member".
+    movements_list : list
+        Llistat d'objectes de la classe "Movement".
 	'''
 
     
-    def __init__(self, llistat_fallers=None, llistat_moviments=None):
+    def __init__(self, members_list: list = None, movements_list: list = None):
         '''
 		Inicialitza una nova instància de la classe Falla.
-        Disposa de dos paràmetres que mostren les relacions que manté amb la classe "Faller" i la clase "Moviment".
+        Disposa de dos paràmetres que mostren les relacions que manté amb la classe "Member" i la classe "Movement".
 
 		Paràmetres:
 		-----------
-		llistat_fallers : llista
-            Llistat d'objectes de la classe "Faller".
-        llistat_moviments : llista
-            Llistat d'objectes de la classe "Moviment".
+		members_list : list
+        Llistat d'objectes de la classe "Member".
+        movements_list : list
+        Llistat d'objectes de la classe "Movement".
 		'''
-        self.llistat_fallers=llistat_fallers
-        self.llistat_moviments=llistat_moviments
-
-    
-    # Getters i setters
-    @property
-    def llistat_fallers(self):
-        
-        return self._llistat_fallers
-	
-    
-    @llistat_fallers.setter
-    def llistat_fallers(self, value):
-        
-        self._llistat_fallers=value
+        self.members_list = members_list
+        self.movements_list = movements_list
 
 
-    @property
-    def llistat_moviments(self):
+    def enroll_member(member):
+        pass
 
-        return self._llistat_moviments
-	
+    def deactivate_member(member):
+        pass
 
-    @llistat_moviments.setter
-    def llistat_moviments(self, value):
-		
-        self._llistat_moviments=value
+    def activate_member(member):
+        pass
 
 
     def llegir_fallers_per_cognom(self, cadena):
         bd=BaseDeDades('falla.db')
-        self.llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
+        self.members_list=bd.llegir_fallers_per_cognom(cadena)
         bd.tancar_conexio()
-        return self.llistat_fallers
+        return self.members_list
+    
+    
+    def get_members_by_surname(self, surname):
+        db = Database('sp')
+        result = db.select_members_by_surname(surname)
+        db.close_connection()
+        for values in result:
+            family = Familia(values[12], values[13], values[14])
+            category = Category(values[15], values[16], values[17], values[18])
+            member = Faller(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11], family, category)
+            self.members_list.append(member)
+
+
+    def assign_fee(self, amount, id_member):
+        Movement.insert_movement(amount, 1, 1, "quota", 0, id_member)
+
+
+    def assign_lottery(self, amount, id_member):
+        Movement.insert_movement(amount, 1, 2, "loteria", 0, id_member)
+
+    
+    def assign_raffle(self, amount, id_member):
+        Movement.insert_movement(amount, 1, 3, "rifa", 0, id_member)
+
+
+    def assign_massive_raffle(self, amount, members_list):
+        for member in members_list:
+            self.assign_raffle(amount, member.id)
    
     
     def assignar_rifa_auto(self):
@@ -85,11 +101,11 @@ class Falla():
             bd=BaseDeDades("falla.db")
             data=utils.calcular_data_actual()
             data_actual=data[0] + "-" + data[1] + "-" + data[2]
-            self.llistat_fallers=bd.llegir_fallers_adults()
+            self.members_list=bd.llegir_fallers_adults()
             exercici_actual=arxiu.llegir_exercici_actual()
             try:
-                for faller in self.llistat_fallers:
-                    moviment=Moviment(0, data_actual, 15, 1, 3, exercici_actual, "rifa", 0, faller)
+                for faller in self.members_list:
+                    moviment=Movement(0, data_actual, 15, 1, 3, exercici_actual, "rifa", 0, faller)
                     bd.crear_moviment(moviment)
             except TypeError:
                 bd.tancar_conexio()
@@ -97,6 +113,66 @@ class Falla():
             else:
                 bd.tancar_conexio()
                 messagebox.showinfo("Assignar rifa", "La rifa s'ha assignat correctament")
+
+
+    def calculate_fee_assignments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_fee_assignment_movements_by_member(id_member)
+        db.close_connection()
+        fee = 0
+        for movement in self.movements_list:
+            fee = fee + movement.amount
+        return fee
+
+
+    def calculate_fee_payments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_fee_payment_movements_by_member(id_member)
+        db.close_connection()
+        fee = 0
+        for movement in self.movements_list:
+            fee = fee + movement.amount
+        return fee
+
+
+    def calculate_lottery_assignments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_lottery_assignment_movements_by_member(id_member)
+        db.close_connection()
+        lottery = 0
+        for movement in self.movements_list:
+            lottery = lottery + movement.amount
+        return lottery
+
+
+    def calculate_lottery_payments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_lottery_payment_movements_by_member(id_member)
+        db.close_connection()
+        lottery = 0
+        for movement in self.movements_list:
+            lottery = lottery + movement.amount
+        return lottery
+
+
+    def calculate_raffle_assignments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_raffle_assignment_movements_by_member(id_member)
+        db.close_connection()
+        raffle = 0
+        for movement in self.movements_list:
+            raffle = raffle + movement.amount
+        return raffle
+
+
+    def calculate_raffle_payments(self, id_member):
+        db = Database('sp')
+        self.movements_list = db.select_raffle_payment_movements_by_member(id_member)
+        db.close_connection()
+        raffle = 0
+        for movement in self.movements_list:
+            raffle = raffle + movement.amount
+        return raffle
 
 
     def calcular_assignacions_pagaments(self, id, exercici):
@@ -123,8 +199,8 @@ class Falla():
         loteria_pagada=0
         rifa_assignada=0
         rifa_pagada=0
-        self.llistat_moviments=bd.llegir_moviments(id, exercici)
-        for moviment in self.llistat_moviments:
+        self.movements_list=bd.llegir_moviments(id, exercici)
+        for moviment in self.movements_list:
             if moviment.tipo==1 and moviment.concepte==1:
                 quota_assignada=quota_assignada+moviment.quantitat
             elif moviment.tipo==2 and moviment.concepte==1:
@@ -158,10 +234,10 @@ class Falla():
 		# Creem una cópia en fitxer binari del resultat de l'exercici.
         bd=BaseDeDades("falla.db")
         arxiu=Arxiu("exercici")
-        llistat_fallers=bd.llegir_fallers_per_alta(1)
+        members_list=bd.llegir_fallers_per_alta(1)
         exercici_actual=arxiu.llegir_exercici_actual()
         llista=[]
-        for faller in llistat_fallers:
+        for faller in members_list:
             valors=[]
             quota_assignada=0
             quota_pagada=0
@@ -220,7 +296,7 @@ class Falla():
         
         # Assignem la nova categoria a cada faller que haja canviat.
         exercici_actual=arxiu.llegir_exercici_actual()
-        for faller in llistat_fallers:
+        for faller in members_list:
             if faller.category.id>1:
                 old_category_id=faller.category.id
                 edat=faller.calcular_edat(faller.naixement, exercici_actual)
@@ -239,14 +315,14 @@ class Falla():
         for valor in llista:
              if valor[9]!="0.00":
                 faller=bd.llegir_faller(valor[0])
-                moviment=Moviment(0, data, valor[9], 1, 1, exercici_actual, "any anterior", 0, faller)
+                moviment=Movement(0, data, valor[9], 1, 1, exercici_actual, "any anterior", 0, faller)
                 bd.crear_moviment(moviment)
         bd.tancar_conexio()
         messagebox.showinfo("Exercici nou", "Deutes i sobrants de l'exercici anterior actualitzats")
 
         # Afegim a cada faller l'historial de l'exercici nou.
-        llistat_fallers=bd.llegir_fallers()
-        for faller in llistat_fallers:
+        members_list=bd.llegir_fallers()
+        for faller in members_list:
             nom_arxiu="historials"+"/"+str(faller.id)
             arxiu=Arxiu(nom_arxiu)
             historial=arxiu.llegir_historial()
@@ -270,8 +346,8 @@ class Falla():
             bd=BaseDeDades("falla.db")
             arxiu=Arxiu("exercici")
             exercici_actual=arxiu.llegir_exercici_actual()
-            llistat_fallers=bd.llegir_fallers()
-            for faller in llistat_fallers:
+            members_list=bd.llegir_fallers()
+            for faller in members_list:
                 exercici=faller.calcular_primer_exercici(faller.naixement)
                 historial={}
                 while exercici < exercici_actual:

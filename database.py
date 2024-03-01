@@ -9,7 +9,7 @@ class Database:
         '''
         Conexió MariaDb
         '''
-        self.verify_existence_bd(db_name)
+        self.verify_existence_db(db_name)
         self.mysqlConnection = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -21,8 +21,12 @@ class Database:
         else:
             messagebox.showerror("Error", "No s'ha pogut establir la conexió amb la base de dades.")
 
+    def close_connection(self):
+        self.mysqlCursor.close()
+        self.mysqlConnection.close()
 
-    def verify_existence_bd(self, db_name):
+
+    def verify_existence_db(self, db_name):
         try:
             self.mysqlConnection = mysql.connector.connect(
                 host="localhost",
@@ -36,8 +40,7 @@ class Database:
             query = f"SHOW DATABASES LIKE '{db_name}'"
             self.mysqlCursor.execute(query)
             result = self.mysqlCursor.fetchone()
-            self.mysqlCursor.close()
-            self.mysqlConnection.close()
+            self.close_connection()
             if result:
                 pass
             else:
@@ -62,14 +65,11 @@ class Database:
             self.mysqlCursor=self.mysqlConnection.cursor()
         else:
             messagebox.showerror("Error", "No s'ha pogut establir la conexió amb la base de dades.")
-        query = f"CREATE DATABASE IF NOT EXISTS {db_name}"
+        query=f"CREATE DATABASE IF NOT EXISTS {db_name}"
         try:
             self.mysqlCursor.execute(query)
         except mysql.connector.Error as error:
             messagebox.showerror("Error", "No s'ha pogut crear la base de dades")
-        finally:
-            self.mysqlCursor.close()
-            self.mysqlConnection.close()
        
 
     def create_tables(self, db_name):
@@ -184,15 +184,14 @@ class Database:
         except mysql.connector.Error as error:
             messagebox.showerror("Error", "Ha fallat la creació de la FK de la taula moviment.")
         finally:
-            self.mysqlCursor.close()
-            self.mysqlConnection.close()
+            self.close_connection()
 
 
     def export_category_to_mysql(self, result):
         '''
         Exportació taula categoria a sp.category
         '''
-        query = "INSERT INTO category (id, fee, name, description) VALUES (%s, %s, %s, %s)"
+        query="INSERT INTO category (id, fee, name, description) VALUES (%s, %s, %s, %s)"
         try:
             for row in result:
                 self.mysqlCursor.execute(query, row)
@@ -200,13 +199,15 @@ class Database:
         except mysql.connector.Error as error:
             self.mysqlConnection.rollback()
             messagebox.showerror("Error", "No s'han pogut insertar les dades a la taula category")
+        finally:
+            self.close_connection()
 
 
     def export_family_to_mysql(self, result):
         '''
         Exportació taula familia a sp.family
         '''
-        query = "INSERT INTO family (id, discount, isDirectDebited) VALUES (%s, %s, %s)"
+        query="INSERT INTO family (id, discount, isDirectDebited) VALUES (%s, %s, %s)"
         try:
             for row in result:
                 self.mysqlCursor.execute(query, row)
@@ -214,6 +215,8 @@ class Database:
         except mysql.connector.Error as error:
             self.mysqlConnection.rollback()
             messagebox.showerror("Error", "No s'han pogut insertar les dades a la taula family")
+        finally:
+            self.close_connection()
 
 
     def export_member_to_mysql(self, result):
@@ -221,7 +224,7 @@ class Database:
         Exportació taula faller a sp.member
         '''
         utils=Utils()
-        query = "INSERT INTO member (id, name, surname, birthdate, gender, dni, address, phoneNumber, isRegistered, idFamily, idCategory, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query="INSERT INTO member (id, name, surname, birthdate, gender, dni, address, phoneNumber, isRegistered, idFamily, idCategory, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             for row in result:
                 as_list = list(row)
@@ -232,14 +235,16 @@ class Database:
         except mysql.connector.Error as error:
             self.mysqlConnection.rollback()
             messagebox.showerror("Error", "No s'han pogut insertar les dades a la taula member")
+        finally:
+            self.close_connection()
 
 
     def export_movements_to_mysql(self, result):
         '''
-        Exportació taula moviment a sp.movements
+        Exportació taula moviment a sp.movement
         '''
         utils=Utils()
-        query = "INSERT INTO movements (id, transactionDate, amount, idType, idConcept, fallaYear, idMember, description, receiptNumber) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query="INSERT INTO movement (id, transactionDate, amount, idType, idConcept, fallaYear, idMember, description, receiptNumber) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         try:
             for row in result:
                 as_list = list(row)
@@ -249,5 +254,86 @@ class Database:
             self.mysqlConnection.commit()
         except mysql.connector.Error as error:
             self.mysqlConnection.rollback()
-            messagebox.showerror("Error", "No s'han pogut insertar les dades a la taula member")
+            messagebox.showerror("Error", "No s'han pogut insertar les dades a la taula movement")
+        finally:
+            self.close_connection()
 
+
+    def select_members_by_surname(self, surname):
+        query = "SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.cognoms LIKE %s"
+        try:
+            self.mysqlCursor.execute(query, (f"%{surname}%",))
+            members_list = self.mysqlCursor.fetchall()
+            return members_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_fee_assignment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 1 and idConcept = 1"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_lottery_assignment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 1 and idConcept = 2"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_raffle_assignment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 1 and idConcept = 3"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_fee_payment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 2 and idConcept = 1"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_lottery_payment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 2 and idConcept = 2"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_raffle_payment_movements_by_member(self, member_id):
+        query = "SELECT * FROM movement WHERE idMember = %s and idType = 2 and idConcept = 3"
+        try:
+            self.mysqlCursor.execute(query, (member_id,))
+            movements_list = self.mysqlCursor.fetchall()
+            return movements_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+
+    def insert_movement(self, amount, id_type, id_concept, description, receipt_number, member_id):
+        query = "INSERT INTO movements (amount, idType, idConcept, idMember, description, receiptNumber) VALUES (%s, %s, %s, %s, %s, %s)"
+        data = amount, id_type, id_concept, member_id, description, receipt_number
+        try:
+            self.mysqlCursor.execute(query, data)
+        except mysql.connector.Error as error:
+             messagebox.showerror("Error", "Error al conectar a la base de dades")
