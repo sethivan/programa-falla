@@ -18,7 +18,7 @@ class Category():
 	'''
 
 	
-	def __init__(self, id: int, fee: float, name: str, description: str):
+	def __init__(self, id: int, fee: float, name: str, description: str, members_list: list = None):
 		'''
 		Inicialitza una nova instància de la classe Category.
 
@@ -33,7 +33,8 @@ class Category():
 		description : string
 			Informació curta sobre les edats a les quals correspon la categoria.
 		'''
-		self.id=id
-		self.fee=fee
-		self.name=name
-		self.description=description
+		self.id = id
+		self.fee = fee
+		self.name = name
+		self.description = description
+		self.members_list = members_list
