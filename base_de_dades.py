@@ -2,9 +2,9 @@ import sqlite3
 from tkinter import messagebox
 import traceback
 
-from faller import Faller
-from familia import Familia
-from movement import Moviment
+from member import Member
+from family import Family
+from movement import Movement
 from category import Category
 from loteria import Loteria
 
@@ -138,9 +138,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchone()
             if resultat is not None:
                 # Crear objecte Faller a partir de la fila obtinguda a la base de dades
-                familia= Familia(resultat[12], resultat[13], resultat[14])
+                familia= Family(resultat[12], resultat[13], resultat[14])
                 category= Category(resultat[15], resultat[16], resultat[17], resultat[18])
-                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, category)
+                faller = Member(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, category)
                 return faller
             else:
                 return None
@@ -163,9 +163,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchone()
             if resultat is not None:
                 # Crear objecte Faller a partir de la fila obtinguda a la base de dades
-                familia= Familia(resultat[12], resultat[13], resultat[14])
+                familia= Family(resultat[12], resultat[13], resultat[14])
                 categoria= Category(resultat[15], resultat[16], resultat[17], resultat[18])
-                faller = Faller(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
+                faller = Member(resultat[0], resultat[1], resultat[2], resultat[3], resultat[4], resultat[5], resultat[6], resultat[7], resultat[8], resultat[11], familia, categoria)
                 return faller
             else:
                 return None
@@ -189,9 +189,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -217,9 +217,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -252,9 +252,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -286,9 +286,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -322,9 +322,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -356,9 +356,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -390,9 +390,9 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_fallers=[]
             for valors in resultat:
-                familia= Familia(valors[12], valors[13], valors[14])
+                familia= Family(valors[12], valors[13], valors[14])
                 categoria= Category(valors[15], valors[16], valors[17], valors[18])
-                faller = Faller(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
+                faller = Member(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[11], familia, categoria)
                 llistat_fallers.append(faller)
             return llistat_fallers
         except sqlite3.Error as e:
@@ -482,7 +482,7 @@ class BaseDeDades:
             self.cursor.execute("SELECT * FROM familia WHERE id=?", query_params)
             resultat = self.cursor.fetchone()
             if resultat is not None:
-                familia = Familia(resultat[0], resultat[1], resultat[2])
+                familia = Family(resultat[0], resultat[1], resultat[2])
                 return familia
             else:
                 return None
@@ -497,14 +497,14 @@ class BaseDeDades:
 
         Retorna:
         --------
-        familia : Familia
+        familia : Family
             Objecte de la classe Familia.
         '''
         try:
             self.cursor.execute("SELECT * FROM familia ORDER BY id DESC LIMIT 1")
             resultat = self.cursor.fetchone()
             if resultat is not None:
-                familia = Familia(resultat[0], resultat[1], resultat[2])
+                familia = Family(resultat[0], resultat[1], resultat[2])
                 return familia
             else:
                 return None
@@ -528,7 +528,7 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_families=[]
             for valors in resultat:
-                familia= Familia(valors[0], valors[1], valors[2])
+                familia= Family(valors[0], valors[1], valors[2])
                 llistat_families.append(familia)
             return llistat_families
         except sqlite3.Error as e:
@@ -609,7 +609,7 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_moviments=[]
             for valors in resultat:
-                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8])
+                moviment=Movement(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8])
                 llistat_moviments.append(moviment)
             return llistat_moviments
         except sqlite3.Error as e:
@@ -627,8 +627,8 @@ class BaseDeDades:
             resultat=self.cursor.fetchall()
             llistat_moviments=[]
             for valors in resultat:
-                faller=Faller(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
-                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
+                faller=Member(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
+                moviment=Movement(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
                 llistat_moviments.append(moviment)
             return llistat_moviments
         except sqlite3.Error as e:
@@ -646,8 +646,8 @@ class BaseDeDades:
             resultat=self.cursor.fetchall()
             llistat_moviments=[]
             for valors in resultat:
-                faller=Faller(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
-                moviment=Moviment(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
+                faller=Member(valors[9], valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18])
+                moviment=Movement(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[7], valors[8], faller)
                 llistat_moviments.append(moviment)
             return llistat_moviments
         except sqlite3.Error as e:
@@ -743,7 +743,7 @@ class BaseDeDades:
             resultat = self.cursor.fetchall()
             llistat_loteries=[]
             for valors in resultat:
-                faller=Faller(valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18], valors[19])
+                faller=Member(valors[10], valors[11], valors[12], valors[13], valors[14], valors[15], valors[16], valors[17], valors[18], valors[19])
                 loteria= Loteria(valors[0], valors[1], valors[2], valors[3], valors[4], valors[5], valors[6], valors[7], valors[8], valors[9], faller)
                 llistat_loteries.append(loteria)
             return llistat_loteries

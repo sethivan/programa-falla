@@ -7,7 +7,7 @@ from base_de_dades import BaseDeDades
 from arxiu import Arxiu
 from utils import Utils
 
-from familia import Familia
+from family import Family
 
 
 class FinestraModificar(tk.Toplevel):
@@ -303,7 +303,7 @@ class FinestraModificar(tk.Toplevel):
 						# Actualitzem familia vella
 						llistat_fallers=[]
 						llistat_fallers=bd.llegir_fallers_per_familia(self.id_familia)
-						familia=Familia(self.id_familia,0,0)
+						familia=Family(self.id_familia,0,0)
 						familia.calcular_descompte(llistat_fallers)
 						bd.actualitzar_familia(familia)
 						# Actualitzem familia nova
@@ -313,7 +313,7 @@ class FinestraModificar(tk.Toplevel):
 						bd.actualitzar_familia(faller.familia)
 				# Si estava en familia i passa a estar sol	
 				elif len(llistat_fallers)>1 and self.identificador_familia==0:					
-					familia=Familia(0, 0, 0)
+					familia=Family(0, 0, 0)
 					bd.crear_familia(familia)
 					faller.familia=bd.llegir_ultima_familia()
 					print(faller.familia.descompte)
@@ -321,7 +321,7 @@ class FinestraModificar(tk.Toplevel):
 					# Actualitzem familia vella
 					llistat_fallers=[]
 					llistat_fallers=bd.llegir_fallers_per_familia(self.id_familia)
-					familia=Familia(self.id_familia,0,0)
+					familia=Family(self.id_familia,0,0)
 					familia.calcular_descompte(llistat_fallers)
 					bd.actualitzar_familia(familia)
 				bd.tancar_conexio()

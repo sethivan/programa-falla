@@ -9,8 +9,8 @@ from arxiu import Arxiu
 
 from movement import Movement
 from database import Database
-from familia import Familia
-from faller import Faller
+from family import Family
+from member import Member
 from category import Category
 
 
@@ -65,9 +65,9 @@ class Falla():
         result = db.select_members_by_surname(surname)
         db.close_connection()
         for values in result:
-            family = Familia(values[12], values[13], values[14])
+            family = Family(values[12], values[13], values[14])
             category = Category(values[15], values[16], values[17], values[18])
-            member = Faller(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11], family, category)
+            member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11], family, category)
             self.members_list.append(member)
 
 

@@ -1,10 +1,12 @@
 from database import Database
-from faller import Faller
+from datetime import date
+
+from member import Member
 
 class Movement():
 
-	def __init__(self, id: int, transaction_date: str, amount: float, id_type: int, id_concept: int, falla_year: int,
-			  	description: str, receipt_number: int, member: Faller = None):
+	def __init__(self, id: int, transaction_date: date, amount: float, id_type: int, id_concept: int, falla_year: int,
+			  	description: str, receipt_number: int, member: Member = None):
 
 		self.id = id
 		self.transaction_date = transaction_date
