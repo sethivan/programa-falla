@@ -1,4 +1,4 @@
-class Familia():
+class Family():
 
 	def __init__(self, id: int, discount: float, is_direct_debited: bool, members_list: list = None):
 

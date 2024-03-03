@@ -12,8 +12,8 @@ from base_de_dades import BaseDeDades
 from arxiu import Arxiu
 from utils import Utils
 
-from faller import Faller
-from familia import Familia
+from member import Member
+from family import Family
 
 
 class FinestraIntroduir(tk.Toplevel):
@@ -246,21 +246,21 @@ class FinestraIntroduir(tk.Toplevel):
 		Crea un historial per al faller nou.
 		'''
 		arxiu=Arxiu("exercici")
-		faller=Faller(0,"","","",0,"","","",0,"")					#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
+		faller=Member(0,"","","",0,"","","",0,"")					#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
 		exercici_actual=arxiu.llegir_exercici_actual()
 		try:
-			edat=faller.calcular_edat(self.naixement.get(), exercici_actual)	#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
+			edat=Member.calcular_edat(self.naixement.get(), exercici_actual)	#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
 		except:
 			messagebox.showerror("Error", "El format per a la data ha de ser dd-mm-aaaa")
 		else:
 			valor=messagebox.askquestion("Alta nova", "Donar d'alta el nou faller?")
 			if valor=="yes":
 				bd=BaseDeDades("falla.db")
-				category_id=faller.calculate_category(edat)		#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
-				faller.category=bd.llegir_categoria(category_id)
+				category_id=member.calculate_category(edat)		#mirar el tema de metodes de classe en chatgpt (ja esta explicat)
+				member.category=bd.llegir_categoria(category_id)
 				if self.familia.get()=="1":
 					familia=bd.llegir_familia(self.identificador_familia)
-					faller=Faller(
+					member=Member(
 						0, 
 						self.nom.get(), 
 						self.cognoms.get(), 
@@ -273,17 +273,17 @@ class FinestraIntroduir(tk.Toplevel):
 						self.correu.get(), 
 						familia
 					)
-					bd.crear_faller(faller)
+					bd.crear_faller(member)
 					llistat_fallers=bd.llegir_fallers_per_familia(
 						self.identificador_familia
 					)
 					familia.calcular_descompte(llistat_fallers)
 					bd.actualitzar_familia(familia)
 				else:
-					familia=Familia(0, 0, 0)
+					familia=Family(0, 0, 0)
 					bd.crear_familia(familia)
 					familia=bd.llegir_ultima_familia()
-					faller=Faller(
+					member=Member(
 						0, 
 						self.nom.get(), 
 						self.cognoms.get(), 
@@ -296,17 +296,17 @@ class FinestraIntroduir(tk.Toplevel):
 						self.correu.get(), 
 						familia
 					)
-					bd.crear_faller(faller)
+					bd.crear_faller(member)
 				
 				# Creem un historial nou i l'omplim
-				faller=bd.llegir_ultim_faller()
-				exercici=faller.calcular_primer_exercici(faller.naixement)
+				member=bd.llegir_ultim_faller()
+				exercici=member.calcular_primer_exercici(member.naixement)
 				historial={}
 				while exercici < exercici_actual:
 					historial[exercici]=["baixa", ""]
 					exercici=exercici+1
 				historial[exercici_actual]=["vocal", "Sants Patrons"]
-				nom_arxiu="historials"+"/"+str(faller.id)
+				nom_arxiu="historials"+"/"+str(member.id)
 				arxiu=Arxiu(nom_arxiu)
 				arxiu.crear_historial(historial)
 				bd.tancar_conexio()
