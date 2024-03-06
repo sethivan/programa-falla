@@ -9,7 +9,7 @@ from arxiu import Arxiu
 
 from falla import Falla
 from loteria import Loteria
-from movement import Moviment
+from movement import Movement
 
 
 class FinestraLoteria(tk.Toplevel):
@@ -557,9 +557,9 @@ class FinestraLoteria(tk.Toplevel):
 			for fila in llistat_files:
 				id=self.tree_loteria.item(fila, option="text")
 				llistat_dades=self.tree_loteria.item(fila, option="values")
-				moviment=Moviment(0, data, llistat_dades[8], 1, 2, exercici_actual, self.combo_box_sorteig.get())
+				moviment=Movement(0, data, llistat_dades[8], 1, 2, exercici_actual, self.combo_box_sorteig.get())
 				bd.crear_moviment(moviment)
-				moviment=Moviment(0, data, llistat_dades[9], 2, 1, exercici_actual, self.combo_box_sorteig.get())
+				moviment=Movement(0, data, llistat_dades[9], 2, 1, exercici_actual, self.combo_box_sorteig.get())
 				bd.crear_moviment(moviment)
 				# Actualització de tots els registres a estat assignat.
 				bd.actualitzar_assignada_loteria(id)

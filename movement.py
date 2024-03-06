@@ -1,12 +1,10 @@
 from database import Database
 from datetime import date
 
-from member import Member
-
 class Movement():
 
 	def __init__(self, id: int, transaction_date: date, amount: float, id_type: int, id_concept: int, falla_year: int,
-			  	description: str, receipt_number: int, member: Member = None):
+			  	description: str, receipt_number: int):
 
 		self.id = id
 		self.transaction_date = transaction_date
@@ -16,7 +14,6 @@ class Movement():
 		self.falla_year = falla_year
 		self.description = description
 		self.receipt_number = receipt_number
-		self.member = member
 
 
 	@classmethod

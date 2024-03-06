@@ -26,21 +26,13 @@ class Falla():
         Llistat d'objectes de la classe "Movement".
 	'''
 
-    
-    def __init__(self, members_list: list = None, movements_list: list = None):
+    def __init__(self):
         '''
 		Inicialitza una nova instància de la classe Falla.
         Disposa de dos paràmetres que mostren les relacions que manté amb la classe "Member" i la classe "Movement".
-
-		Paràmetres:
-		-----------
-		members_list : list
-        Llistat d'objectes de la classe "Member".
-        movements_list : list
-        Llistat d'objectes de la classe "Movement".
 		'''
-        self.members_list = members_list
-        self.movements_list = movements_list
+        self.members_list = []
+        self.movements_list = []
 
 
     def enroll_member(member):
@@ -80,38 +72,31 @@ class Falla():
 
     
     def assign_raffle(self, amount, id_member):
+        '''
+        Crida a la classe Movement per a crear una assignació de rifa.
+        '''
         Movement.insert_movement(amount, 1, 3, "rifa", 0, id_member)
 
 
-    def assign_massive_raffle(self, amount, members_list):
-        for member in members_list:
-            self.assign_raffle(amount, member.id)
-   
-    
-    def assignar_rifa_auto(self):
+    def assign_massive_raffle(self):
         '''
         Crea un moviment per cadascún dels fallers amb obligació de pagar rifa i
         el guarda a la base de dades.
         '''
-        valor=messagebox.askquestion("Assignar rifa",
-                                     "Estàs segur que vols assignar 15€ de rifa als fallers corresponents?")
-        if valor=="yes":
-            arxiu=Arxiu("exercici")
-            utils=Utils()
-            bd=BaseDeDades("falla.db")
-            data=utils.calcular_data_actual()
-            data_actual=data[0] + "-" + data[1] + "-" + data[2]
-            self.members_list=bd.llegir_fallers_adults()
-            exercici_actual=arxiu.llegir_exercici_actual()
+        answer=messagebox.askquestion("Assignar rifa",
+                                     "Estàs segur que vols assignar la rifa als fallers corresponents?")
+        if answer == "yes":
+            db = Database('sp')
+            result = db.select_adult_members()
+            for values in result:
+                member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
+                self.members_list.append(member)
             try:
-                for faller in self.members_list:
-                    moviment=Movement(0, data_actual, 15, 1, 3, exercici_actual, "rifa", 0, faller)
-                    bd.crear_moviment(moviment)
+                for member in self.members_list:
+                    self.assign_raffle(15, member.id)
             except TypeError:
-                bd.tancar_conexio()
                 messagebox.showerror("Assignar rifa", "La rifa no s'ha pogut assignar correctament")
             else:
-                bd.tancar_conexio()
                 messagebox.showinfo("Assignar rifa", "La rifa s'ha assignat correctament")
 
 

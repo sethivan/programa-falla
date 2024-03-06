@@ -9,7 +9,7 @@ from base_de_dades import BaseDeDades
 from utils import Utils
 
 from falla import Falla
-from movement import Moviment
+from movement import Movement
 from informe import Informe
 from finestra_modificar import FinestraModificar
 
@@ -934,13 +934,13 @@ class FinestraGestionar(tk.Toplevel):
 				faller=bd.llegir_faller(self.id.get())
 				# Inserta a la base de dades cada moviment realitzat.
 				if float(self.pagar_quota.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, numero_rebut, faller)
+					moviment=Movement(0, data_actual, float(self.pagar_quota.get()), 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
 				if float(self.pagar_loteria.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, numero_rebut, faller)
+					moviment=Movement(0, data_actual, float(self.pagar_loteria.get()), 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
 				if float(self.pagar_rifa.get())!=0:
-					moviment=Moviment(0, data_actual, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, numero_rebut, faller)
+					moviment=Movement(0, data_actual, float(self.pagar_rifa.get()), 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 					bd.crear_moviment(moviment)
 				# Netegem les dades i refresquem per a vore el quadre de pagaments actualitzat.
 				self.entry_id.focus()
@@ -1055,46 +1055,46 @@ class FinestraGestionar(tk.Toplevel):
 					quota_final=quota+quota_assignada
 					diferencia_quota=quota_final-quota_pagada
 					if pagament_quota!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 						pagament_quota=0
 					if pagament_quota!=0 and pagament_quota<=diferencia_quota and membres!=1:
-						moviment=Moviment(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 						pagament_quota=0
 					if pagament_quota!=0 and pagament_quota>diferencia_quota and membres!=1:
 						if diferencia_quota!=0: #per a que no cree moviments a 0
-							moviment=Moviment(0, data_actual, diferencia_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
+							moviment=Movement(0, data_actual, diferencia_quota, 2, 1, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
 						pagament_quota=pagament_quota-diferencia_quota
 
 					# Pagament de loteries.
 					diferencia_loteria=loteria_assignada-loteria_pagada
 					if pagament_loteria!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 					if pagament_loteria!=0 and pagament_loteria<=diferencia_loteria and membres!=1:
-						moviment=Moviment(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 						pagament_loteria=0
 					if pagament_loteria!=0 and pagament_loteria>diferencia_loteria and membres!=1:
 						if diferencia_loteria!=0:
-							moviment=Moviment(0, data_actual, diferencia_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
+							moviment=Movement(0, data_actual, diferencia_loteria, 2, 2, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
 						pagament_loteria=pagament_loteria-diferencia_loteria
 					
 					# Pagament de rifes.
 					diferencia_rifa=rifa_assignada-rifa_pagada
 					if pagament_rifa!=0 and membres==1:
-						moviment=Moviment(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 					if pagament_rifa!=0 and pagament_rifa<=diferencia_rifa and membres!=1:
-						moviment=Moviment(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
+						moviment=Movement(0, data_actual, pagament_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 						bd.crear_moviment(moviment)
 						pagament_rifa=0
 					if pagament_rifa!=0 and pagament_rifa>diferencia_rifa and membres!=1:
 						if diferencia_rifa!=0:
-							moviment=Moviment(0, data_actual, diferencia_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
+							moviment=Movement(0, data_actual, diferencia_rifa, 2, 3, exercici_actual, descripcio, numero_rebut, faller)
 							bd.crear_moviment(moviment)
 						pagament_rifa=pagament_rifa-diferencia_rifa
 
@@ -1126,7 +1126,7 @@ class FinestraGestionar(tk.Toplevel):
 					messagebox.showwarning("Error", "No es pot fer una assignació de 0 euros")
 				else:
 					faller=bd.llegir_faller(self.id.get())
-					moviment=Moviment(0, data_actual, float(self.total_assignacio.get()), 1, int(self.concepte_assignacio.get()), exercici_actual, self.descripcio_assignacio.get(), 0, faller)
+					moviment=Movement(0, data_actual, float(self.total_assignacio.get()), 1, int(self.concepte_assignacio.get()), exercici_actual, self.descripcio_assignacio.get(), 0, faller)
 					bd.crear_moviment(moviment)
 					self.entry_id.focus()
 					self.buscar_per_id('<Return>')
