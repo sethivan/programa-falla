@@ -260,9 +260,19 @@ class Database:
 
 
     def select_members_by_surname(self, surname):
-        query = "SELECT * FROM faller INNER JOIN familia ON faller.idfamilia = familia.id INNER JOIN categoria ON faller.idcategoria = categoria.id WHERE faller.cognoms LIKE %s"
+        query = "SELECT * FROM member INNER JOIN family ON member.idFamily = family.id INNER JOIN category ON member.idCategory = category.id WHERE member.surname LIKE %s"
         try:
             self.mysqlCursor.execute(query, (f"%{surname}%",))
+            members_list = self.mysqlCursor.fetchall()
+            return members_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_adult_members(self):
+        query = "SELECT * FROM member INNER JOIN family ON member.idFamily = family.id INNER JOIN category ON member.idCategory = category.id WHERE member.isRegistered and (member.idCategory=1 or member.idCategory=2) ORDER BY member.surname"
+        try:
+            self.mysqlCursor.execute(query)
             members_list = self.mysqlCursor.fetchall()
             return members_list
         except mysql.connector.Error as error:
@@ -331,9 +341,12 @@ class Database:
 
 
     def insert_movement(self, amount, id_type, id_concept, description, receipt_number, member_id):
-        query = "INSERT INTO movements (amount, idType, idConcept, idMember, description, receiptNumber) VALUES (%s, %s, %s, %s, %s, %s)"
-        data = amount, id_type, id_concept, member_id, description, receipt_number
+        transactionDate = None
+        fallaYear = None
+        query = "INSERT INTO movement (transactionDate, amount, idType, idConcept, fallaYear, idMember, description, receiptNumber) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        data = transactionDate, amount, id_type, id_concept, fallaYear, member_id, description, receipt_number
         try:
             self.mysqlCursor.execute(query, data)
+            self.mysqlConnection.commit()
         except mysql.connector.Error as error:
              messagebox.showerror("Error", "Error al conectar a la base de dades")

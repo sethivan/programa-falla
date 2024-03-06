@@ -263,7 +263,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe Falla per que assigne la rifa corresponent als fallers.
 		'''
 		falla=Falla()
-		falla.assignar_rifa_auto()
+		falla.assign_massive_raffle()
 
 
 	def modificar_historial(self):
