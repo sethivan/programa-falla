@@ -8,7 +8,7 @@ class Utils():
         pass
 
 
-    def definir_estil_global(self):
+    def define_global_style(self):
         '''
 		Definició dels estils per als widgets ttk de la finestra.
 		'''

@@ -16,7 +16,7 @@ import os
 import platform
 from PIL import Image, ImageTk
 
-from finestra_introduir import FinestraIntroduir
+from insert_member_window import InsertMemberWindow
 from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
 from finestra_categories import FinestraCategories
@@ -63,7 +63,7 @@ class Aplicacio(tk.Frame):
 			self.master.attributes('-zoomed', True)
 		self.master.title("Falla Sants Patrons")
 		utils=Utils()
-		utils.definir_estil_global()
+		utils.define_global_style()
 		self.master.configure(bg="#ffffff", pady=5, padx=5)
 		
 		# Barra de menú.
@@ -249,7 +249,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraIntroduir
 		que obri la finestra "Introduir" del menú "Faller".
 		'''
-		introduir_faller = FinestraIntroduir(self)
+		introduir_faller = InsertMemberWindow(self)
 		introduir_faller.iniciar()
 
 

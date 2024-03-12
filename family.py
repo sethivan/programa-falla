@@ -1,3 +1,5 @@
+from database import Database
+
 class Family():
 
 	def __init__(self, id: int, discount: float, is_direct_debited: bool, members_list: list = None):
@@ -8,11 +10,43 @@ class Family():
 		self.members_list = members_list
 
 
+	@classmethod
+	def get_family(cls, id):
+		db = Database('sp')
+		if id == 0:
+			family = db.select_last_family()
+		else:
+			family = db.select_family(id)
+		db.close_connection()
+		return family
+	
+
+	@classmethod
+	def set_family(cls, discount, is_direct_debited):
+		db = Database('sp')
+		db.insert_family(discount, is_direct_debited)
+		db.close_connection()
+
+
+	def modify_family(self, id, discount, is_direct_debited):
+		db = Database('sp')
+		db.update_family(id, discount, is_direct_debited)
+		db.close_connection()
+
+
 	def calculate_discount(self, members_list):
+		'''
+		A partir del llistat de fallers d'una mateixa familia calculem el descompte segons els membres actius.
+
+		Paràmetres:
+		-----------
+		llistat_fallers : llista
+			Llistat de fallers que pertanyen a la mateixa familia.
+		'''
 		family_members = 0
 		is_maximum_fee = False
 		for member in members_list:
-			if member.isRegistered:
+			if member.is_registered:
 				family_members = family_members + 1
 				if member.category.id == 1:
 					is_maximum_fee = True
@@ -22,30 +56,6 @@ class Family():
 			self.discount = 10
 		else:
 			self.discount = 0
-
-	
-	def calcular_descompte(self, llistat_fallers):
-		'''
-		A partir del llistat de fallers d'una mateixa familia calculem el descompte segons els membres actius.
-
-		Paràmetres:
-		-----------
-		llistat_fallers : llista
-			Llistat de fallers que pertanyen a la mateixa familia.
-		'''
-		membres=0
-		maxima=False
-		for faller in llistat_fallers:
-			if faller.alta==1:
-				membres=membres+1
-				if faller.category.id==1:
-					maxima=True
-		if maxima==True and membres==3:
-			self.descompte=5
-		elif maxima==True and membres>=4:
-			self.descompte=10
-		else:
-			self.descompte=0
 
 
 	def calculate_family_members(self, members_list):
