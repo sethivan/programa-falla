@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+from database import Database
+
 from family import Family
 from category import Category
 from movement import Movement
@@ -23,8 +25,31 @@ class Member():
 		self.category = category
 
 
-	def calculate_age(self, birthdate, falla_year):
+	@classmethod
+	def set_member(cls, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
+		db = Database('sp')
+		db.insert_member(name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category)
+		db.close_connection()	
 
+
+	@classmethod
+	def calculate_age(cls, birthdate, falla_year):
+		'''
+		A partir de la data de naixement i l'exercici actual calculem l'edat del faller a data 19 de març del present exercici.
+
+		Paràmetres:
+		-----------
+		birthdate : string
+			La data de naixement del faller.
+		falla_year : int
+			L'exercici actual.
+		
+		Retorna:
+        --------
+        age : int
+            L'edat del faller a data 19 de març del present exercici.
+		'''
+		birthdate=datetime.strptime(birthdate, '%d-%m-%Y')
 		year = date.strftime(birthdate, '%Y')
 		month = date.strftime(birthdate, '%m')
 		day = date.strftime(birthdate, '%d')
@@ -35,44 +60,16 @@ class Member():
 		else:
 			age = int(falla_year) - int(year)
 		return age
-
-
-	def calcular_edat(self, naixement, exercici):
-		'''
-		A partir de la data de naixement i l'exercici actual calculem l'edat del faller a data 19 de març del present exercici.
-
-		Paràmetres:
-		-----------
-		naixement : string
-			La data de naixement del faller.
-		exercici : int
-			L'exercici actual.
-		
-		Retorna:
-        --------
-        edat : int
-            L'edat del faller a data 19 de març del present exercici.
-		'''
-		naixement_faller=date.strptime(naixement, '%d-%m-%Y')
-		any_naixement=date.strftime(naixement_faller, '%Y')
-		mes_naixement=date.strftime(naixement_faller, '%m')
-		dia_naixement=date.strftime(naixement_faller, '%d')
-		data_exercici=date.strptime(str(exercici), '%Y')
-		any_exercici=date.strftime(data_exercici, '%Y')
-		if int(mes_naixement)>3 or (int(mes_naixement)==3 and int(dia_naixement)>19):
-			edat=int(any_exercici)-int(any_naixement)-1
-		else:
-			edat=int(any_exercici)-int(any_naixement)
-		return edat
 	
 
-	def calculate_category(self, age):
+	@classmethod
+	def calculate_category(cls, age):
 		'''
 		A partir de l'edat del faller assigna l'id de la categoria a la que pertany.
 
 		Paràmetres:
 		-----------
-		edat : int
+		age : int
 			L'edat del faller a data 19 de març del present exercici.
 		'''
 		if age<5:

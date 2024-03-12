@@ -26,13 +26,24 @@ class Falla():
         Llistat d'objectes de la classe "Movement".
 	'''
 
-    def __init__(self):
+    def __init__(self, members_list = None, movements_list = None):
         '''
 		Inicialitza una nova instància de la classe Falla.
         Disposa de dos paràmetres que mostren les relacions que manté amb la classe "Member" i la classe "Movement".
+
+        Atributs:
+	    ---------
+	    members_list : list
+            Llistat d'objectes de la classe "Member".
+        movements_list : list
+            Llistat d'objectes de la classe "Movement".
 		'''
-        self.members_list = []
-        self.movements_list = []
+        if members_list is None:
+            members_list = []
+        self.members_list = members_list
+        if movements_list is None:
+            movements_list = []
+        self.movements_list = movements_list
 
 
     def enroll_member(member):
@@ -43,18 +54,16 @@ class Falla():
 
     def activate_member(member):
         pass
-
-
-    def llegir_fallers_per_cognom(self, cadena):
-        bd=BaseDeDades('falla.db')
-        self.members_list=bd.llegir_fallers_per_cognom(cadena)
-        bd.tancar_conexio()
-        return self.members_list
     
     
-    def get_members_by_surname(self, surname):
+    def get_members(self, filter, value):
         db = Database('sp')
-        result = db.select_members_by_surname(surname)
+        if filter == "surname":
+            result = db.select_members_by_surname(value)
+        elif filter == "adult":
+            result = db.select_adult_members()
+        elif filter == "family":
+            result = db.select_members_by_family(value)
         db.close_connection()
         for values in result:
             family = Family(values[12], values[13], values[14])
@@ -64,18 +73,18 @@ class Falla():
 
 
     def assign_fee(self, amount, id_member):
-        Movement.insert_movement(amount, 1, 1, "quota", 0, id_member)
+        Movement.set_movement(amount, 1, 1, "quota", 0, id_member)
 
 
     def assign_lottery(self, amount, id_member):
-        Movement.insert_movement(amount, 1, 2, "loteria", 0, id_member)
+        Movement.set_movement(amount, 1, 2, "loteria", 0, id_member)
 
     
-    def assign_raffle(self, amount, id_member):
+    def assign_raffle(self, transaction_date, amount, falla_year, id_member):
         '''
         Crida a la classe Movement per a crear una assignació de rifa.
         '''
-        Movement.insert_movement(amount, 1, 3, "rifa", 0, id_member)
+        Movement.set_movement(transaction_date, amount, 1, 3, falla_year, "rifa", 0, id_member)
 
 
     def assign_massive_raffle(self):
@@ -86,14 +95,13 @@ class Falla():
         answer=messagebox.askquestion("Assignar rifa",
                                      "Estàs segur que vols assignar la rifa als fallers corresponents?")
         if answer == "yes":
-            db = Database('sp')
-            result = db.select_adult_members()
+            result = self.get_members("adult", "")
             for values in result:
                 member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
                 self.members_list.append(member)
             try:
                 for member in self.members_list:
-                    self.assign_raffle(15, member.id)
+                    self.assign_raffle(None, 15, None, member.id)
             except TypeError:
                 messagebox.showerror("Assignar rifa", "La rifa no s'ha pogut assignar correctament")
             else:

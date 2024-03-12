@@ -17,7 +17,7 @@ class Movement():
 
 
 	@classmethod
-	def insert_movement(cls, amount, id_type, id_concept, description, receipt_number, id_member):
+	def set_movement(cls, transaction_date, amount, id_type, id_concept, falla_year, description, receipt_number, id_member):
 		db = Database('sp')
-		db.insert_movement(amount, id_type, id_concept, description, receipt_number, id_member)
+		db.insert_movement(transaction_date, amount, id_type, id_concept, falla_year, description, receipt_number, id_member)
 		db.close_connection()

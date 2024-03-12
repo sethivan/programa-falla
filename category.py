@@ -1,3 +1,5 @@
+from database import Database
+
 '''
 Proporciona la classe "Category".
 '''
@@ -38,3 +40,11 @@ class Category():
 		self.name = name
 		self.description = description
 		self.members_list = members_list
+
+
+	@classmethod
+	def get_category(cls, id):
+		db = Database('sp')
+		result = db.select_category(id)
+		db.close_connection()
+		return result
