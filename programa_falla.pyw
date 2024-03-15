@@ -19,7 +19,7 @@ from PIL import Image, ImageTk
 from insert_member_window import InsertMemberWindow
 from finestra_gestionar import FinestraGestionar
 from finestra_historial import FinestraHistorial
-from finestra_categories import FinestraCategories
+from modify_categories_window import ModifyCategoriesWindow
 from finestra_llistats import FinestraLlistats
 from finestra_loteria import FinestraLoteria
 
@@ -232,7 +232,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraCategories
 		que obri la finestra "Modificar" del menú "Categoria".
 		'''
-		FinestraCategories(self)
+		ModifyCategoriesWindow(self)
 	
 	
 	def gestionar_faller(self):

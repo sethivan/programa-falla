@@ -48,3 +48,9 @@ class Category():
 		result = db.select_category(id)
 		db.close_connection()
 		return result
+	
+
+	def modify_category(self, id, fee, name, description):
+		db = Database('sp')
+		db.update_category(id, fee, name, description)
+		db.close_connection()

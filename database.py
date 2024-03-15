@@ -418,3 +418,23 @@ class Database:
             return category
         except mysql.connector.Error as error:
             messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def select_categories(self):
+        query = "SELECT * FROM category"
+        try:
+            self.mysqlCursor.execute(query)
+            categories_list = self.mysqlCursor.fetchall()
+            return categories_list
+        except mysql.connector.Error as error:
+            messagebox.showerror("Error", "Error al conectar a la base de dades")
+
+
+    def update_category(self, id, fee, name, description):
+        query = "UPDATE category SET fee = %s, name = %s, description = %s WHERE id = %s"
+        data = fee, name, description, id
+        try:
+            self.mysqlCursor.execute(query, data)
+            self.mysqlConnection.commit()
+        except mysql.connector.Error as error:
+             messagebox.showerror("Error", "Error al conectar a la base de dades")
