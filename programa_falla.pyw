@@ -249,8 +249,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraIntroduir
 		que obri la finestra "Introduir" del menú "Faller".
 		'''
-		introduir_faller = InsertMemberWindow(self)
-		introduir_faller.iniciar()
+		InsertMemberWindow(self)
 
 
 	def assignar_loteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"

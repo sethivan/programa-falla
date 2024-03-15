@@ -2,8 +2,7 @@ DROP PROCEDURE IF EXISTS sp.getCurrentFallaYear;
 
 DELIMITER $$
 $$
-
-CREATE PROCEDURE sp.getCurrentFallaYear(INOUT vFallaYear INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`getCurrentFallaYear`(INOUT vFallaYear INT)
 /*
 Si l'exercici d'entrada es NULL, fica com a exercici l'actual.
 @params vFallaYear: int
