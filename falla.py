@@ -26,7 +26,7 @@ class Falla():
         Llistat d'objectes de la classe "Movement".
 	'''
 
-    def __init__(self, members_list = None, movements_list = None):
+    def __init__(self, members_list: list = None, movements_list: list = None, categories_list: list = None):
         '''
 		Inicialitza una nova instància de la classe Falla.
         Disposa de dos paràmetres que mostren les relacions que manté amb la classe "Member" i la classe "Movement".
@@ -37,6 +37,8 @@ class Falla():
             Llistat d'objectes de la classe "Member".
         movements_list : list
             Llistat d'objectes de la classe "Movement".
+        categories_list: list
+            Llistat d'objectes de la classe "Category".
 		'''
         if members_list is None:
             members_list = []
@@ -44,6 +46,9 @@ class Falla():
         if movements_list is None:
             movements_list = []
         self.movements_list = movements_list
+        if categories_list is None:
+            categories_list = []
+        self.categories_list = categories_list
 
 
     def enroll_member(member):
@@ -70,6 +75,15 @@ class Falla():
             category = Category(values[15], values[16], values[17], values[18])
             member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11], family, category)
             self.members_list.append(member)
+
+
+    def get_categories(self):
+        db = Database('sp')
+        result = db.select_categories()
+        db.close_connection()
+        for values in result:
+            category = Category(values[0], values[1], values[2], values[3])
+            self.categories_list.append(category)
 
 
     def assign_fee(self, amount, id_member):
