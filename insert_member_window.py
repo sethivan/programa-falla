@@ -1,5 +1,5 @@
 '''
-Módul que conté la classe FinestraIntroduir.
+Módul que conté la classe InsertMemberWindow.
 És la finestra en la qual s'indiquen les dades del nou faller per a guardar-lo
 a la base de dades.
 '''
@@ -8,14 +8,11 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
 
-from base_de_dades import BaseDeDades
-from arxiu import Arxiu
 from utils import Utils
 
 from member import Member
 from family import Family
 from falla import Falla
-from category import Category
 
 
 class InsertMemberWindow(tk.Toplevel):
@@ -174,15 +171,11 @@ class InsertMemberWindow(tk.Toplevel):
 		self.combo_box_member_family.bind("<<ComboboxSelected>>", self.select_family)
 		self.combo_box_member_family.configure(state = "disabled")
 
-		#Botó "Introduir".
+		# Botó "Introduir".
 		self.button_insert = ttk.Button(self, text = "Introduir", style = "Boto.TButton", command = self.insert_member)
 		self.button_insert.grid(row = 3, column = 0, padx = 5, pady = 5)
 
-
-	def iniciar(self):# vore si mos pulim aso
-		'''
-		Inicia la nova finestra.
-		'''
+		# Paràmetres d'inici de la finestra.
 		self.gender.set(1)
 		self.family.set(2)
 		self.grab_set() # Manté el foco en la finestra.
@@ -246,51 +239,47 @@ class InsertMemberWindow(tk.Toplevel):
 		Si ja pertany a una familia l'inclou en ella i recalcula el descompte familiar.
 		Crea un historial per al faller nou.
 		'''
-		exercici_actual = 2024
-		edat = Member.calculate_age(self.birthdate.get(), exercici_actual)
-		messagebox.showerror("Error", "El format per a la data ha de ser dd-mm-aaaa")
 		valor = messagebox.askquestion("Alta nova", "Donar d'alta el nou faller?")
 		if valor == "yes":
-			category_id=Member.calculate_category(edat)
-			result = Category.get_category(category_id)
-			category = Category(result[0], result[1], result[2], result[3])
-			if self.family.get()=="1":
-				result = Family.get_family(self.final_family_id)
-				family = Family(result[0], result[1], result[2])
-				utils = Utils()
+			utils = Utils()
+			try:
 				birthdate = utils.convert_date(self.birthdate.get())
-				Member.set_member(self.name.get(),
-						self.surname.get(),
-						birthdate,
-						self.gender.get(),
-						self.dni.get(),
-						self.address.get(),
-						self.phone_number.get(),
-						1,
-						self.email.get(),
-						family.id,
-						category.id)
-				falla = Falla()
-				falla.get_members("family", self.final_family_id)
-				family.calculate_discount(falla.members_list)
-				family.modify_family(family.id, family.discount, family.is_direct_debited)
+			except:
+				messagebox.showerror("Error", "El format per a la data ha de ser dd-mm-aaaa i ser una data vàlida")
 			else:
-				Family.set_family(0, 0)
-				result = Family.get_family(0)
-				family = Family(result[0], result[1], result[2])
-				utils = Utils()
-				birthdate = utils.convert_date(self.birthdate.get())
-				Member.set_member(self.name.get(),
-						self.surname.get(),
-						birthdate,
-						self.gender.get(),
-						self.dni.get(),
-						self.address.get(),
-						self.phone_number.get(),
-						1,
-						self.email.get(),
-						family.id,
-						category.id)
+				if self.family.get()=="1":
+					result = Family.get_family(self.final_family_id)
+					family = Family(result[0], result[1], result[2])
+					Member.set_member(self.name.get(),
+							self.surname.get(),
+							birthdate,
+							self.gender.get(),
+							self.dni.get(),
+							self.address.get(),
+							self.phone_number.get(),
+							1,
+							self.email.get(),
+							family.id,
+							None)
+					falla = Falla()
+					falla.get_members("family", self.final_family_id)
+					family.calculate_discount(falla.members_list)
+					family.modify_family(family.id, family.discount, family.is_direct_debited)
+				else:
+					Family.set_family(0, 0)
+					result = Family.get_family(0)
+					family = Family(result[0], result[1], result[2])
+					Member.set_member(self.name.get(),
+							self.surname.get(),
+							birthdate,
+							self.gender.get(),
+							self.dni.get(),
+							self.address.get(),
+							self.phone_number.get(),
+							1,
+							self.email.get(),
+							family.id,
+							None)
 			'''
 			# Creem un historial nou i l'omplim
 			member=bd.llegir_ultim_faller()
