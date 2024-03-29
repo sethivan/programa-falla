@@ -49,6 +49,7 @@ class Falla():
         if categories_list is None:
             categories_list = []
         self.categories_list = categories_list
+        self.falla_year = 0
 
 
     def enroll_member(member):
@@ -77,6 +78,15 @@ class Falla():
             self.members_list.append(member)
 
 
+    def get_movements(self, id_member, falla_year):
+        db = Database('sp')
+        result = db.select_movements_by_member(id_member, falla_year)
+        db.close_connection()
+        for values in result:
+            movement = Movement(values[0], values[1], values[2], values[3], values[4], values[5], values[7], values[8])
+            self.movements_list.append(movement)
+
+
     def get_categories(self):
         db = Database('sp')
         result = db.select_categories()
@@ -86,19 +96,25 @@ class Falla():
             self.categories_list.append(category)
 
 
-    def assign_fee(self, amount, id_member):
-        Movement.set_movement(amount, 1, 1, "quota", 0, id_member)
+    def get_current_falla_year(self):
+        db = Database('sp')
+        self.falla_year = db.select_current_falla_year()
+        db.close_connection()
 
 
-    def assign_lottery(self, amount, id_member):
-        Movement.set_movement(amount, 1, 2, "loteria", 0, id_member)
+    def assign_fee(self, transaction_date, amount, falla_year, id_member, description):
+        Movement.set_movement(transaction_date, amount, 1, 1, falla_year, id_member, description, 0)
+
+
+    def assign_lottery(self, transaction_date, amount, falla_year, id_member, description):
+        Movement.set_movement(transaction_date, amount, 1, 2, falla_year, id_member, description, 0)
 
     
-    def assign_raffle(self, transaction_date, amount, falla_year, id_member):
+    def assign_raffle(self, transaction_date, amount, falla_year, id_member, description):
         '''
         Crida a la classe Movement per a crear una assignació de rifa.
         '''
-        Movement.set_movement(transaction_date, amount, 1, 3, falla_year, "rifa", 0, id_member)
+        Movement.set_movement(transaction_date, amount, 1, 3, falla_year, id_member, description, 0)
 
 
     def assign_massive_raffle(self):
@@ -115,115 +131,75 @@ class Falla():
                 self.members_list.append(member)
             try:
                 for member in self.members_list:
-                    self.assign_raffle(None, 15, None, member.id)
+                    self.assign_raffle(None, 15, None, "rifa", member.id)
             except TypeError:
                 messagebox.showerror("Assignar rifa", "La rifa no s'ha pogut assignar correctament")
             else:
                 messagebox.showinfo("Assignar rifa", "La rifa s'ha assignat correctament")
 
 
-    def calculate_fee_assignments(self, id_member):
+    def calculate_assigned_fee(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_fee_assignment_movements_by_member(id_member)
+        result = db.select_fee_by_member(id_member)
+        fee = result[0]
+        result = db.select_discount_by_member(id_member)
+        discount = result[0]*fee/100
+        fee = fee - discount
+        result = db.select_fee_assignment_movements_by_member(id_member, falla_year)
         db.close_connection()
-        fee = 0
-        for movement in self.movements_list:
-            fee = fee + movement.amount
+        for value in result:
+            fee = fee + value[0]
         return fee
 
 
-    def calculate_fee_payments(self, id_member):
+    def calculate_payed_fee(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_fee_payment_movements_by_member(id_member)
+        result = db.select_fee_payment_movements_by_member(id_member, falla_year)
         db.close_connection()
         fee = 0
-        for movement in self.movements_list:
-            fee = fee + movement.amount
+        for value in result:
+            fee = fee + value[0]
         return fee
 
 
-    def calculate_lottery_assignments(self, id_member):
+    def calculate_assigned_lottery(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_lottery_assignment_movements_by_member(id_member)
+        result = db.select_lottery_assignment_movements_by_member(id_member, falla_year)
         db.close_connection()
         lottery = 0
-        for movement in self.movements_list:
-            lottery = lottery + movement.amount
+        for value in result:
+            lottery = lottery + value[0]
         return lottery
 
 
-    def calculate_lottery_payments(self, id_member):
+    def calculate_payed_lottery(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_lottery_payment_movements_by_member(id_member)
+        result = db.select_lottery_payment_movements_by_member(id_member, falla_year)
         db.close_connection()
         lottery = 0
-        for movement in self.movements_list:
-            lottery = lottery + movement.amount
+        for value in result:
+            lottery = lottery + value[0]
         return lottery
 
 
-    def calculate_raffle_assignments(self, id_member):
+    def calculate_assigned_raffle(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_raffle_assignment_movements_by_member(id_member)
+        result = db.select_raffle_assignment_movements_by_member(id_member, falla_year)
         db.close_connection()
         raffle = 0
-        for movement in self.movements_list:
-            raffle = raffle + movement.amount
+        for value in result:
+            raffle = raffle + value[0]
         return raffle
 
 
-    def calculate_raffle_payments(self, id_member):
+    def calculate_payed_raffle(self, id_member, falla_year):
         db = Database('sp')
-        self.movements_list = db.select_raffle_payment_movements_by_member(id_member)
+        result = db.select_raffle_payment_movements_by_member(id_member, falla_year)
         db.close_connection()
         raffle = 0
-        for movement in self.movements_list:
-            raffle = raffle + movement.amount
+        for value in result:
+            raffle = raffle + value[0]
         return raffle
-
-
-    def calcular_assignacions_pagaments(self, id, exercici):
-        '''
-        Llig els moviments del faller i suma les quotes, loteries i rifes assignades i pagades
-        i torna un llistat amb aquests sumatoris.
-
-        Paràmetres:
-        -----------
-        id : int
-            Identificador del faller.
-        exercici : int
-            Exercici del qual volem extraure els moviments.
-
-        Retorna:
-        --------
-        llista_assignacions_pagaments : llista
-            Llistat amb els sumatoris d'assignacions i pagaments totals.
-        '''
-        bd=BaseDeDades("falla.db")
-        quota_assignada=0
-        quota_pagada=0
-        loteria_assignada=0
-        loteria_pagada=0
-        rifa_assignada=0
-        rifa_pagada=0
-        self.movements_list=bd.llegir_moviments(id, exercici)
-        for moviment in self.movements_list:
-            if moviment.tipo==1 and moviment.concepte==1:
-                quota_assignada=quota_assignada+moviment.quantitat
-            elif moviment.tipo==2 and moviment.concepte==1:
-                quota_pagada=quota_pagada+moviment.quantitat
-            elif moviment.tipo==1 and moviment.concepte==2:
-                loteria_assignada=loteria_assignada+moviment.quantitat
-            elif moviment.tipo==2 and moviment.concepte==2:
-                loteria_pagada=loteria_pagada+moviment.quantitat
-            elif moviment.tipo==1 and moviment.concepte==3:
-                rifa_assignada=rifa_assignada+moviment.quantitat
-            elif moviment.tipo==2 and moviment.concepte==3:
-                rifa_pagada=rifa_pagada+moviment.quantitat
-        bd.tancar_conexio()
-        llista_assignacions_pagaments=[]
-        llista_assignacions_pagaments.extend([quota_assignada, quota_pagada, loteria_assignada, loteria_pagada, rifa_assignada, rifa_pagada])
-        return llista_assignacions_pagaments
     
 
     def nou_exercici(self):

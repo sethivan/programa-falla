@@ -23,13 +23,39 @@ class Member():
 		self.email = email
 		self.family = family
 		self.category = category
+		self.membership_history = {}
+
+
+	@classmethod
+	def get_member(cls, id):
+		db = Database('sp')
+		if id == 0:
+			member = db.select_last_member()
+		else:
+			member = db.select_member(id)
+		db.close_connection()
+		return member
 
 
 	@classmethod
 	def set_member(cls, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
 		db = Database('sp')
 		db.insert_member(name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category)
-		db.close_connection()	
+		db.close_connection()
+
+
+	def modify_member(self, id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
+		db = Database('sp')
+		db.update_member(id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category)
+		db.close_connection()
+
+
+	def get_membership_history(self, id):
+		db = Database('sp')
+		result = db.select_membership_history(id)
+		db.close_connection()
+		for value in result:
+			self.membership_history[value[1]] = [value[2], value[3]]
 
 
 	@classmethod
@@ -121,13 +147,13 @@ class Member():
 		return first_falla_year
 	
 
-	def pay_fee(self, amount, receipt_number):
-		Movement.insert_movement(amount, 2, 1, "quota", receipt_number, self.id)
+	def pay_fee(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
+		Movement.set_movement(transaction_date, amount, 2, 1, falla_year, description, receipt_number, id_member)
 
 
-	def pay_lottery(self, amount, receipt_number):
-		Movement.insert_movement(amount, 2, 2, "loteria", receipt_number, self.id)
+	def pay_lottery(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
+		Movement.set_movement(transaction_date, amount, 2, 2, falla_year, description, receipt_number, id_member)
 
 
-	def pay_raffle(self, amount, receipt_number):
-		Movement.insert_movement(amount, 2, 3, "rifa", receipt_number, self.id)
+	def pay_raffle(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
+		Movement.set_movement(transaction_date, amount, 2, 3, falla_year, description, receipt_number, id_member)
