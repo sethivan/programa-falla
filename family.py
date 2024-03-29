@@ -61,7 +61,7 @@ class Family():
 	def calculate_family_members(self, members_list):
 		family_members = 0
 		for member in members_list:
-			if member.isRegistered:
+			if member.is_registered:
 				family_members = family_members + 1
 		return family_members
 	

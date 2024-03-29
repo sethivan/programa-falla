@@ -17,7 +17,7 @@ import platform
 from PIL import Image, ImageTk
 
 from insert_member_window import InsertMemberWindow
-from finestra_gestionar import FinestraGestionar
+from manage_member_window import ManageMemberWindow
 from finestra_historial import FinestraHistorial
 from modify_categories_window import ModifyCategoriesWindow
 from finestra_llistats import FinestraLlistats
@@ -240,7 +240,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraGestionar
 		que obri la finestra "Gestionar" del menú "Faller".
 		'''
-		gestionar_faller=FinestraGestionar(self)
+		gestionar_faller=ManageMemberWindow(self)
 		gestionar_faller.iniciar()
 
 
