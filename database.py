@@ -1,5 +1,5 @@
 import mysql.connector
-from decimal import Decimal
+#from decimal import Decimal
 from tkinter import messagebox
 
 from utils import Utils

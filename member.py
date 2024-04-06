@@ -111,32 +111,20 @@ class Member():
 		return category_id
 	
 
-	def calcular_primer_exercici(self, naixement):
+	def calculate_first_falla_year(self, birthdate):
 		'''
 		A partir de la data de naixement calculem quin podria haver segut el seu primer exercici.
 
 		Paràmetres:
 		-----------
-		naixement : string
+		birthdate : string
 			La data de naixement del faller.
 		
 		Retorna:
         --------
-        exercici : int
+        first_falla_year : int
             Primer possible exercici del faller.
 		'''
-		naixement_faller=date.strptime(naixement, '%d-%m-%Y')
-		any_naixement=date.strftime(naixement_faller,'%Y')
-		mes_naixement=date.strftime(naixement_faller, '%m')
-		dia_naixement=date.strftime(naixement_faller, '%d')
-		if int(mes_naixement)>3 or (int(mes_naixement)==3 and int(dia_naixement)>19):
-			exercici=int(any_naixement)+1
-		else:
-			exercici=int(any_naixement)
-		return exercici
-	
-
-	def calculate_first_falla_year(self, birthdate):
 		year = date.strftime(birthdate, '%Y')
 		month = date.strftime(birthdate, '%m')
 		day = date.strftime(birthdate, '%d')
