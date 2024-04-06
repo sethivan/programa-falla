@@ -261,9 +261,11 @@ class InsertMemberWindow(tk.Toplevel):
 							self.email.get(),
 							family.id,
 							None)
-					falla = Falla()
-					falla.get_members("family", self.final_family_id)
-					family.calculate_discount(falla.members_list)
+					result = family.get_members(family.id)
+					for values in result:
+						family_member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
+						family.members_list.append(family_member)
+					family.calculate_discount(family.members_list)
 					family.modify_family(family.id, family.discount, family.is_direct_debited)
 				else:
 					Family.set_family(0, 0)

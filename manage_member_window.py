@@ -405,7 +405,7 @@ class ManageMemberWindow(tk.Toplevel):
 		self.radio_button_lottery.grid(row = 1, column = 2, padx = 5, sticky = "w")
 		self.radio_button_raffle.grid(row = 1, column = 3, padx = 5, sticky = "w")
 
-		self.button_assign = ttk.Button(label_frame_assign, state = "disabled", text = "Assignar", style = "Boto.TButton", command = self.assignar)
+		self.button_assign = ttk.Button(label_frame_assign, state = "disabled", text = "Assignar", style = "Boto.TButton", command = self.assign)
 		self.button_assign.grid(row = 3, column = 2, columnspan = 2, padx = 5)
 
 		# Frame "Taula".
@@ -495,8 +495,12 @@ class ManageMemberWindow(tk.Toplevel):
 			if value == "yes":
 				member.is_registered = 1
 				member.modify_member(member.id, member.name, member.surname, member.birthdate, member.gender, member.dni, member.address, member.phone_number, member.is_registered, member.email, family.id, category.id)
-		falla.get_members("family", family.id)				
-		family.calculate_discount(falla.members_list)
+		result = family.get_members(family.id)
+		for values in result:
+			category = Category(values[15], values[16], values[17], values[18])
+			family_member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11], family, category)
+			family.members_list.append(family_member)
+		family.calculate_discount(family.members_list)
 		family.modify_family(family.id, family.discount, family.is_direct_debited)
 		self.entry_id.focus() # Fica el foco en el camp id.
 		self.search_by_id('<Return>') # Refresca les dades fent la cerca de nou amb el id del faller.
@@ -560,12 +564,13 @@ class ManageMemberWindow(tk.Toplevel):
 		'''
 		result = Member.get_member(self.id.get())
 		family = Family(result[12], result[13], result[14])
-		member = Member(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], result[11], family)
-		falla = Falla()
-		falla.get_members("family", member.family.id)
+		result = family.get_members(family.id)
+		for values in result:
+			family_member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
+			family.members_list.append(family_member)
 		members_list = []
 		self.member_ids = []
-		for member in falla.members_list:
+		for member in family.members_list:
 			self.member_ids = self.member_ids + [member.id]
 			members_list = members_list + [(member.surname + ", " + member.name)]
 		self.combo_box_family["values"] = members_list
@@ -659,27 +664,30 @@ class ManageMemberWindow(tk.Toplevel):
 		self.total_debt.set("{0:.2f}".format((assigned_fee+assigned_lottery+assigned_raffle)-(payed_fee+payed_lottery+payed_raffle)) + " €")
 
 		# Omplim els camps d'assignacions i pagaments de la familia completa del faller.
-		falla.get_members("family", family.id)
-		family_members = family.calculate_family_members(falla.members_list)
-		self.family_members.set(family_members)
-		if member.is_registered==1 and family_members>1: # Activarem els camps si hi ha membres actius a la familia.
+		result = family.get_members(family.id)
+		for values in result:
+			family_member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
+			family.members_list.append(family_member)
+		number_family_members = family.calculate_family_members(family.members_list)
+		self.family_members.set(number_family_members)
+		if member.is_registered == 1 and number_family_members > 1: # Activarem els camps si hi ha membres actius a la familia.
 			self.family_pay_fee.set(0)
-			self.entry_family_pay_fee.config(state="normal")
+			self.entry_family_pay_fee.config(state = "normal")
 			self.family_pay_lottery.set(0)
-			self.entry_family_pay_lottery.config(state="normal")
+			self.entry_family_pay_lottery.config(state = "normal")
 			self.family_pay_raffle.set(0)
-			self.entry_family_pay_raffle.config(state="normal")
+			self.entry_family_pay_raffle.config(state = "normal")
 			self.family_pay_total.set(0)
-			self.button_family_pay.config(state="normal")			
+			self.button_family_pay.config(state = "normal")
 		else:
 			self.family_pay_fee.set("")
-			self.entry_family_pay_fee.config(state="disabled")
+			self.entry_family_pay_fee.config(state = "disabled")
 			self.family_pay_lottery.set("")
-			self.entry_family_pay_lottery.config(state="disabled")
+			self.entry_family_pay_lottery.config(state = "disabled")
 			self.family_pay_raffle.set("")
-			self.entry_family_pay_raffle.config(state="disabled")
+			self.entry_family_pay_raffle.config(state = "disabled")
 			self.family_pay_total.set("")
-			self.button_family_pay.config(state="disabled")				
+			self.button_family_pay.config(state = "disabled")			
 		# Iniciem les variables per a poder iterar.
 		family_assigned_fee = 0
 		family_payed_fee = 0
@@ -687,7 +695,7 @@ class ManageMemberWindow(tk.Toplevel):
 		family_payed_lottery = 0
 		family_assigned_raffle = 0
 		family_payed_raffle = 0
-		for family_member in falla.members_list:
+		for family_member in family.members_list:
 			if family_member.is_registered == 1:
 				family_assigned_fee = family_assigned_fee + falla.calculate_assigned_fee(family_member.id, falla.falla_year)
 				family_payed_fee = family_payed_fee + falla.calculate_payed_fee(family_member.id, falla.falla_year)
@@ -697,16 +705,16 @@ class ManageMemberWindow(tk.Toplevel):
 				family_payed_raffle = family_payed_raffle + falla.calculate_payed_raffle(family_member.id, falla.falla_year)
 		self.family_assigned_fee.set("{0:.2f}".format(family_assigned_fee) + " €")
 		self.family_payed_fee.set("{0:.2f}".format(family_payed_fee) + " €")
-		self.family_debt_fee.set("{0:.2f}".format(family_assigned_fee-family_payed_fee) + " €")
+		self.family_debt_fee.set("{0:.2f}".format(family_assigned_fee - family_payed_fee) + " €")
 		self.family_assigned_lottery.set("{0:.2f}".format(family_assigned_lottery) + " €")
 		self.family_payed_lottery.set("{0:.2f}".format(family_payed_lottery) + " €")
-		self.family_debt_lottery.set("{0:.2f}".format(family_assigned_lottery-family_payed_lottery) + " €")
+		self.family_debt_lottery.set("{0:.2f}".format(family_assigned_lottery - family_payed_lottery) + " €")
 		self.family_assigned_raffle.set("{0:.2f}".format(family_assigned_raffle) + " €")
 		self.family_payed_raffle.set("{0:.2f}".format(family_payed_raffle) + " €")
-		self.family_debt_raffle.set("{0:.2f}".format(family_assigned_raffle-family_payed_raffle) + " €")
-		self.family_total_assigned.set("{0:.2f}".format(family_assigned_fee+family_assigned_lottery+family_assigned_raffle) + " €")
-		self.family_total_payed.set("{0:.2f}".format(family_payed_fee+family_payed_lottery+family_payed_raffle) + " €")
-		self.family_total_debt.set("{0:.2f}".format((family_assigned_fee-family_payed_fee)+(family_assigned_lottery-family_payed_lottery)+(family_assigned_raffle-family_payed_raffle)) + " €")
+		self.family_debt_raffle.set("{0:.2f}".format(family_assigned_raffle - family_payed_raffle) + " €")
+		self.family_total_assigned.set("{0:.2f}".format(family_assigned_fee + family_assigned_lottery + family_assigned_raffle) + " €")
+		self.family_total_payed.set("{0:.2f}".format(family_payed_fee + family_payed_lottery+family_payed_raffle) + " €")
+		self.family_total_debt.set("{0:.2f}".format((family_assigned_fee - family_payed_fee) + (family_assigned_lottery - family_payed_lottery) + (family_assigned_raffle - family_payed_raffle)) + " €")
 
 		# Reiniciem el valor de descripció de les assignacions.
 		self.assignment_description.set("")	
@@ -984,12 +992,15 @@ class ManageMemberWindow(tk.Toplevel):
 				family = Family(result[12], result[13], result[14])
 				member = Member(result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[8], result[11], family)
 				falla = Falla()
-				falla.get_members("family", family.id)
+				result = family.get_members(family.id)
+				for values in result:
+					family_member = Member(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[11])
+					family.members_list.append(family_member)
 				registered_members_list = []
-				for member in falla.members_list:
+				for member in family.members_list:
 					if member.is_registered == 1:
 						registered_members_list.append(member)
-				total_registered_members=len(registered_members_list)
+				total_registered_members = len(registered_members_list)
 				assigned_fee = 0
 				payed_fee = 0
 				assigned_lottery = 0
@@ -1063,7 +1074,7 @@ class ManageMemberWindow(tk.Toplevel):
 					receipt.crear_rebut(0,self.combo_box_member.get(), family_fee_payment, family_lottery_payment, family_raffle_payment, self.family_assigned_fee.get()[:-2], self.family_payed_fee.get()[:-2], self.family_assigned_lottery.get()[:-2], self.family_payed_lottery.get()[:-2], self.family_assigned_raffle.get()[:-2], self.family_payed_raffle.get()[:-2])
 	
 	
-	def assignar(self):
+	def assign(self):
 		'''
 		Crea un moviment d'assignació de quota, loteria o rifa amb la descripció que li fiquem.
 		'''
