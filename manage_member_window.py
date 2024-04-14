@@ -12,7 +12,7 @@ from member import Member
 from family import Family
 from category import Category
 from informe import Informe
-from finestra_modificar import FinestraModificar
+from modify_member_window import ModifyMemberWindow
 
 
 class ManageMemberWindow(tk.Toplevel):
@@ -41,7 +41,7 @@ class ManageMemberWindow(tk.Toplevel):
 		operating_system = platform.system()
 		if operating_system == 'Windows':
 			self.iconbitmap("escut.ico")
-		self.resizable(0,0)
+		self.resizable(0, 0)
 		self.title("Gestionar Faller")
 		utils = Utils()
 		utils.define_global_style()
@@ -212,7 +212,7 @@ class ManageMemberWindow(tk.Toplevel):
 		self.entry_phone_number = ttk.Entry(label_frame_data, style = "Entrada.TEntry", state = "disabled", textvariable = self.phone_number)
 		self.entry_phone_number.grid(row = 1, column = 2, padx = 5)
 
-		self.button_modify = ttk.Button(label_frame_data, state = "disabled", text = "Modificar dades", style = "Boto.TButton", command = self.modificar)
+		self.button_modify = ttk.Button(label_frame_data, state = "disabled", text = "Modificar dades", style = "Boto.TButton", command = self.open_modify_member_window)
 		self.button_modify.grid(row = 2, column = 2, padx = 5, rowspan = 2, sticky = "s" + "e")
 
 		#Frame "Moviments".
@@ -433,15 +433,10 @@ class ManageMemberWindow(tk.Toplevel):
 		# Bindegem la finestra per a que refresque quan pille el foco al tancar la finestra "modificar".
 		self.bind("<FocusIn>", self.handle_focus)
 
-
-	def iniciar(self):
-		'''
-		Inicia la nova finestra omplint automàticament el camp "exercici"
-		i ficant el foco en el id per a buscar faller.
-		'''
-		arxiu=Arxiu("exercici")
-		exercici_actual=arxiu.llegir_exercici_actual()
-		self.falla_year.set(str(exercici_actual-1) + "-" + str(exercici_actual))
+		# Inici de la finestra.
+		falla = Falla()
+		falla.get_current_falla_year()
+		self.falla_year.set(str(falla.falla_year-1) + "-" + str(falla.falla_year))
 		self.entry_id.focus()
 		self.way_to_pay.set(1)
 		self.family_way_to_pay.set(1)
@@ -462,14 +457,14 @@ class ManageMemberWindow(tk.Toplevel):
 			self.modify_member_window_opened = 0
 
 
-	def modificar(self):
+	def open_modify_member_window(self):
 		''' 
-		Crea una nova instància de la classe FinestraModificar
+		Crea una nova instància de la classe ModifyMemberWindow
 		que obri la finestra "Modificar" des del botó.
 		'''
-		modificar=FinestraModificar(self)
-		self.modify_member_window_opened=1
-		modificar.iniciar(int(self.id.get()))
+		modify = ModifyMemberWindow(self)
+		self.modify_member_window_opened = 1
+		modify.fill_in_fields(int(self.id.get()))
 		
 
 	def change_membership_status(self):
@@ -602,7 +597,9 @@ class ManageMemberWindow(tk.Toplevel):
 		
 		# Omplim els camps de dades personals.
 		self.combo_box_member.set(member.surname + ", " + member.name)
-		self.birthdate.set(member.birthdate)
+		utils = Utils()
+		birthdate = utils.english_to_spanish_date(member.birthdate)
+		self.birthdate.set(birthdate)
 		self.dni.set(member.dni)
 		self.address.set(member.address)
 		self.phone_number.set(member.phone_number)

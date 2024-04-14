@@ -52,4 +52,9 @@ class Utils():
         date = datetime.strptime(spanish_date, '%d-%m-%Y')
         mariadb_date = date.strftime('%Y-%m-%d')
         return mariadb_date
+    
+
+    def english_to_spanish_date(self, english_date):
+        spanish_date = english_date.strftime('%d-%m-%Y')
+        return spanish_date
 

@@ -62,12 +62,12 @@ class InsertMemberWindow(tk.Toplevel):
 		self.final_family_id = 0 # Atribut on guardem el valor final de l'id_familia.
 		
 		# Frames en els que dividim la finestra.
-		label_data_style = ttk.Label(self, text = "Introduir dades", style = "Titol.TLabel")
-		label_frame_data = ttk.LabelFrame(self, style = "Marc.TFrame", labelwidget = label_data_style)
+		label_style_data = ttk.Label(self, text = "Introduir dades", style = "Titol.TLabel")
+		label_frame_data = ttk.LabelFrame(self, style = "Marc.TFrame", labelwidget = label_style_data)
 		label_frame_data.grid(row = 0, column = 0, padx = 5, pady = 5, ipadx = 4, ipady = 5)
 
-		label_family_style = ttk.Label(self, text = "Buscar familiar del faller", style = "Titol.TLabel")
-		label_frame_family = ttk.LabelFrame(self, style = "Marc.TFrame", labelwidget = label_family_style)
+		label_style_family = ttk.Label(self, text = "Buscar familiar del faller", style = "Titol.TLabel")
+		label_frame_family = ttk.LabelFrame(self, style = "Marc.TFrame", labelwidget = label_style_family)
 		label_frame_family.grid(row = 1, column = 0, padx = 5, pady = 5, ipady = 5)
 
 		# Widgets per a cada frame.
@@ -89,22 +89,22 @@ class InsertMemberWindow(tk.Toplevel):
 		self.label_gender = ttk.Label(label_frame_data, text = "Sexe", style = "Etiqueta.TLabel")
 		self.label_gender.grid(row = 2, column = 0, padx = 7, pady = 5, sticky = "w")
 
-		self.radio_button_masculi = ttk.Radiobutton(
+		self.radio_button_male = ttk.Radiobutton(
 			label_frame_data,
 			text = "M",
 			style = "Radio.TRadiobutton",
 			variable = self.gender,
 			value = 1
 		)
-		self.radio_button_femeni = ttk.Radiobutton(
+		self.radio_button_female = ttk.Radiobutton(
 			label_frame_data,
 			text = "F",
 			style = "Radio.TRadiobutton",
 			variable = self.gender,
 			value = 2
 		)
-		self.radio_button_masculi.grid(row = 3, column = 0, padx = 7, sticky = "w")
-		self.radio_button_femeni.grid(row = 3, column = 0)
+		self.radio_button_male.grid(row = 3, column = 0, padx = 7, sticky = "w")
+		self.radio_button_female.grid(row = 3, column = 0)
 
 		self.label_birthdate = ttk.Label(label_frame_data, text = "Data de naixement", style = "Etiqueta.TLabel")
 		self.label_birthdate.grid(row = 2, column = 1, pady = 5, sticky = "w")

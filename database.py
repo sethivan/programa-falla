@@ -390,6 +390,16 @@ class Database:
              messagebox.showerror("Error", "Error al conectar a la base de dades" + str(error))
 
 
+    def delete_family(self, id):
+        query = "DELETE family WHERE id = %s"
+        data = id
+        try:
+            self.mysqlCursor.execute(query, data)
+            self.mysqlConnection.commit()
+        except mysql.connector.Error as error:
+             messagebox.showerror("Error", "Error al conectar a la base de dades" + str(error))
+
+
     def select_fee_assignment_movements_by_member(self, id_member, falla_year):
         query = "SELECT amount FROM movement WHERE idMember = %s and idType = 1 and idConcept = 1 and fallaYear = %s"
         try:

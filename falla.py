@@ -61,15 +61,12 @@ class Falla():
     def activate_member(member):
         pass
     
-    
-    def get_members(self, filter, value):
+    def get_members(self, *args):
         db = Database('sp')
-        if filter == "surname":
-            result = db.select_members_by_surname(value)
-        elif filter == "adult":
+        if args[0] == "surname":
+            result = db.select_members_by_surname(args[1])
+        elif args[0] == "adult":
             result = db.select_adult_members()
-        elif filter == "family":
-            result = db.select_members_by_family(value)
         db.close_connection()
         for values in result:
             family = Family(values[12], values[13], values[14])
