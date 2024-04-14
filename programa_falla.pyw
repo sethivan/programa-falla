@@ -240,8 +240,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraGestionar
 		que obri la finestra "Gestionar" del menú "Faller".
 		'''
-		gestionar_faller=ManageMemberWindow(self)
-		gestionar_faller.iniciar()
+		ManageMemberWindow(self)
 
 
 	def introduir_faller(self):

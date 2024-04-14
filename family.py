@@ -34,6 +34,12 @@ class Family():
 		db.close_connection()
 
 
+	def delete_family(self, id):
+		db = Database('sp')
+		db.delete_family(id)
+		db.close_connection()
+
+
 	def get_members(self, id):
 		db = Database('sp')
 		result = db.select_members_by_family(id)
@@ -57,7 +63,6 @@ class Family():
 				family_members = family_members + 1
 				if member.category.id == 1:
 					is_maximum_fee = True
-		print(family_members)
 		if is_maximum_fee and family_members == 3:
 			self.discount = 5
 		elif is_maximum_fee and family_members >= 4:
