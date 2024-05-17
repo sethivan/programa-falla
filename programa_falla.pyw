@@ -34,37 +34,37 @@ from category import Category
 
 class Aplicacio(tk.Frame):
 	"""
-    Aquesta classe representa l'aplicació principal de la interfície gràfica d'usuari.
+	Aquesta classe representa l'aplicació principal de la interfície gràfica d'usuari.
 
-    Atributs:
-    ---------
-    master : tk.Tk
-        La instància principal de l'aplicació.
-    """
+	Atributs:
+	---------
+	master : tk.Tk
+		La instància principal de l'aplicació.
+	"""
 		
 		
 	def __init__(self, master=None):
 		"""
-        Inicialitza una nova instància de la classe Aplicacio.
+		Inicialitza una nova instància de la classe Aplicacio.
 
-        Paràmetres:
-        -----------
-        master : tk.Tk, opcional
-            La instància principal de l'aplicació. Si no es proporciona,
+		Paràmetres:
+		-----------
+		master : tk.Tk, opcional
+			La instància principal de l'aplicació. Si no es proporciona,
 			es crearà una nova instància de tk.Tk().
-        """
+		"""
 		super().__init__(master) # Heretem de la classe Frame.
-		self.master=master
-		self.sistema_operatiu=platform.system()
-		if self.sistema_operatiu=='Windows':
+		self.master = master
+		self.sistema_operatiu = platform.system()
+		if self.sistema_operatiu == 'Windows':
 			self.master.state('zoomed') # La finestra s'obri maximitzada.
 			self.master.iconbitmap("escut.ico")
-		elif self.sistema_operatiu=='Linux':
+		elif self.sistema_operatiu == 'Linux':
 			self.master.attributes('-zoomed', True)
 		self.master.title("Falla Sants Patrons")
-		utils=Utils()
+		utils = Utils()
 		utils.define_global_style()
-		self.master.configure(bg="#ffffff", pady=5, padx=5)
+		self.master.configure(bg = "#ffffff", pady = 5, padx = 5)
 		
 		# Barra de menú.
 		self.barra_menu=tk.Menu() # Guardem el menú en una variable.

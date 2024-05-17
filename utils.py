@@ -1,60 +1,117 @@
+'''
+Proporciona la classe "Utils".
+'''
 from datetime import datetime
 import tkinter.ttk as ttk
 
+
 class Utils():
+	'''
+	Aquesta classe controla els estils de l'aplicació i les operacions amb dates.
+	'''
 
-    def __init__(self):
-
-        pass
-
-
-    def define_global_style(self):
-        '''
+	
+	def define_global_style(self):
+		'''
 		Definició dels estils per als widgets ttk de la finestra.
 		'''
-        self.estil=ttk.Style()
-        self.estil.theme_use('clam')
-        self.estil.configure(".", font=("Ubuntu", 10))
-        self.estil.configure("Marc.TFrame", background="#ffffff", relief="groove")
-        self.estil.configure("Titol.TLabel", background="#ffffff", foreground="#e95420", font=("Ubuntu", 11))
-        self.estil.configure("Portada.TLabel", background="#ffffff", foreground="#e95420", font=("Ubuntu", 40))
-        self.estil.configure("Etiqueta.TLabel", background="#ffffff")
-        self.estil.map("Entrada.TEntry", foreground=[('disabled','black')])
-        self.estil.configure("Check.TCheckbutton", background="#ffffff")
-        self.estil.map("Check.TCheckbutton", background=[('disabled', '#eae9e7')])
-        self.estil.configure("Radio.TRadiobutton", background="#ffffff")
-        self.estil.map("Radio.TRadiobutton", background=[('active', '#e95420')], foreground=[('active', '#ffffff')])
-        self.estil.configure("Boto.TButton", background="#ffffff", foreground="#000000", font=("Ubuntu", 11))
-        self.estil.map("Boto.TButton", background=[('active', '#e95420')], foreground=[('active', '#ffffff'), ('disabled', '#aea79f')])
-                
+		self.estil=ttk.Style()
+		self.estil.theme_use('clam')
+		self.estil.configure(".", font=("Ubuntu", 10))
+		self.estil.configure(
+			"Marc.TFrame", background="#ffffff", relief="groove"
+		)
+		self.estil.configure(
+			"Titol.TLabel",
+			background="#ffffff",
+			foreground="#e95420",
+			font=("Ubuntu", 11)
+		)
+		self.estil.configure(
+			"Portada.TLabel",
+			background="#ffffff",
+			foreground="#e95420",
+			font=("Ubuntu", 40)
+		)
+		self.estil.configure("Etiqueta.TLabel", background="#ffffff")
+		self.estil.map("Entrada.TEntry", foreground=[('disabled','black')])
+		self.estil.configure("Check.TCheckbutton", background="#ffffff")
+		self.estil.map(
+			"Check.TCheckbutton", background=[('disabled', '#eae9e7')]
+		)
+		self.estil.configure("Radio.TRadiobutton", background="#ffffff")
+		self.estil.map(
+			"Radio.TRadiobutton",
+			background=[('active', '#e95420')],
+			foreground=[('active', '#ffffff')]
+		)
+		self.estil.configure(
+			"Boto.TButton",
+			background="#ffffff",
+			foreground="#000000",
+			font=("Ubuntu", 11)
+		)
+		self.estil.map(
+			"Boto.TButton",
+			background=[('active', '#e95420')],
+			foreground=[('active', '#ffffff'), ('disabled', '#aea79f')]
+		)
 
-    def calcular_data_actual(self):
-        '''
+
+	def convert_to_mariadb_date(self, spanish_date):
+		'''
+		Converteix la data en format espanyol a format mariaDb.
+
+		Paràmetres:
+		-----------
+		spanish_date : string
+			Data en format espanyol.
+
+		Retorna:
+		--------
+		mariadb_date : date
+			Data en format anglés.
+		'''
+		date = datetime.strptime(spanish_date, '%d-%m-%Y')
+		mariadb_date = date.strftime('%Y-%m-%d')
+		return mariadb_date
+
+
+	def convert_to_spanish_date(self, english_date):
+		'''
+		Converteix la data en format mariaDb a format espanyol.
+
+		Paràmetres:
+		-----------
+		mariadb_date : date
+			Data en format anglés.
+
+		Retorna:
+		--------
+		spanish_date : string
+			Data en format espanyol.
+		'''
+		spanish_date = english_date.strftime('%d-%m-%Y')
+		return spanish_date
+	
+
+	def calcular_data_actual(self):
+		# a borrar amb el temps
+		'''
 		Llegim la data actual del sistema i la tornem en format llista.
 
 		Retorna:
-        --------
-        data_final : llista
-            Llistat amb el dia, mes i any actuals.
+		--------
+		data_final : list
+			Llistat amb el dia, mes i any actuals.
 		'''
-        data=datetime.now()
-        any_actual=datetime.strftime(data,'%Y')
-        mes_actual=datetime.strftime(data,'%m')
-        dia_actual=datetime.strftime(data,'%d')
-        data_final=[]
-        data_final.append(dia_actual)
-        data_final.append(mes_actual)
-        data_final.append(any_actual)
-        return data_final
-    
-
-    def convert_date(self, spanish_date):
-        date = datetime.strptime(spanish_date, '%d-%m-%Y')
-        mariadb_date = date.strftime('%Y-%m-%d')
-        return mariadb_date
-    
-
-    def english_to_spanish_date(self, english_date):
-        spanish_date = english_date.strftime('%d-%m-%Y')
-        return spanish_date
+		data=datetime.now()
+		any_actual=datetime.strftime(data,'%Y')
+		mes_actual=datetime.strftime(data,'%m')
+		dia_actual=datetime.strftime(data,'%d')
+		data_final=[]
+		data_final.append(dia_actual)
+		data_final.append(mes_actual)
+		data_final.append(any_actual)
+		return data_final
 

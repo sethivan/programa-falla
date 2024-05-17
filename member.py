@@ -1,3 +1,6 @@
+'''
+Proporciona la classe "Member".
+'''
 from datetime import date, datetime
 
 from database import Database
@@ -7,10 +10,102 @@ from category import Category
 from movement import Movement
 
 class Member():
+	'''
+	Aquesta classe controla els atributs
+	de la taula "member" de la base de dades.
 
-	def __init__(self, id: int, name: str, surname: str, birthdate: date, gender: int, dni: str, address: str, phone_number: str,
-			  	is_registered: bool, email: str, family: Family = None, category: Category = None):
+	Atributs:
+	---------
+	id : int
+		El identificador a la taula "member" de la base de dades.
+	name : string
+		Nom del faller.
+	surname : string
+		Cognoms del faller.
+	birthdate : date
+		Data de naixement.
+	gender : int
+		Sexe.
+	dni : string
+		Dni.
+	address : string
+		Adreça.
+	phone_number : string
+		Telèfon.
+	is_registered : bool
+		Marca si està donat d'alta o no.
+	email : string
+		Correu electrònic.
+	family : Family
+		Familia a la que pertany.
+	category : Category
+		Categoria de la falla a la que pertany.
 
+	Mètodes:
+	--------
+	@classmethod get_member(id): list
+	@classmethod set_member(name, surname, birthdate, gender, dni, address,
+		phone_number, is_registered, email, id_family, id_category)
+	modify_member(id, name, surname, birthdate, gender, dni, address,
+		phone_number, is_registered, email, id_family, id_category)
+	get_membership_history(id)
+	calculate_age(birthdate, falla_year): int
+	calculate_category(age): int
+	calculate_first_falla_year(birthdate): int
+	pay_fee(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
+	pay_lottery(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
+	pay_raffle(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
+	'''
+
+
+	def __init__(
+		self,
+		id: int,
+		name: str,
+		surname: str,
+		birthdate: date,
+		gender: int,
+		dni: str,
+		address: str,
+		phone_number: str,
+		is_registered: bool,
+		email: str,
+		family: Family = None,
+		category: Category = None
+	):
+		'''
+		Inicialitza una nova instància de la classe Member.
+
+		Paràmetres:
+		-----------
+		id : int
+			El identificador a la taula "member" de la base de dades.
+		name : string
+			Nom del faller.
+		surname : string
+			Cognoms del faller.
+		birthdate : date
+			Data de naixement.
+		gender : int
+			Sexe.
+		dni : string
+			Dni.
+		address : string
+			Adreça.
+		phone_number : string
+			Telèfon.
+		is_registered : bool
+			Marca si està donat d'alta o no.
+		email : string
+			Correu electrònic.
+		family : Family
+			Familia a la que pertany.
+		category : Category
+			Categoria de la falla a la que pertany.
+		'''
 		self.id = id
 		self.name = name
 		self.surname = surname
@@ -28,6 +123,20 @@ class Member():
 
 	@classmethod
 	def get_member(cls, id):
+		'''
+		Recupera les dades del faller i les retorna en forma de llista.
+		Si es passa id = 0 retorna l'últim membre de la taula.
+
+		Paràmetres:
+		-----------
+		id : int
+			El identificador del faller.
+
+		Retorna:
+		--------
+		member : list
+			Llista amb totes les dades del faller.
+		'''
 		db = Database('sp')
 		if id == 0:
 			member = db.select_last_member()
@@ -38,19 +147,137 @@ class Member():
 
 
 	@classmethod
-	def set_member(cls, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
+	def set_member(
+		cls,
+		name,
+		surname,
+		birthdate,
+		gender,
+		dni,
+		address,
+		phone_number,
+		is_registered,
+		email,
+		id_family,
+		id_category
+	):
+		'''
+		Inserta a la taula member un nou faller amb els paràmetres passats.
+
+		Paràmetres:
+		-----------
+		name : string
+			Nom del faller.
+		surname : string
+			Cognoms del faller.
+		birthdate : date
+			Data de naixement.
+		gender : int
+			Sexe.
+		dni : string
+			Dni.
+		address : string
+			Adreça.
+		phone_number : string
+			Telèfon.
+		is_registered : bool
+			Marca si està donat d'alta o no.
+		email : string
+			Correu electrònic.
+		id_family : int
+			Identificador de la familia a la que pertany.
+		id_category : int
+			Identificador de la categoria de la falla a la que pertany.
+		'''
 		db = Database('sp')
-		db.insert_member(name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category)
+		db.insert_member(
+			name,
+			surname,
+			birthdate,
+			gender,
+			dni,
+			address,
+			phone_number,
+			is_registered,
+			email,
+			id_family,
+			id_category
+		)
 		db.close_connection()
 
 
-	def modify_member(self, id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
+	def modify_member(
+		self,
+		id,
+		name,
+		surname,
+		birthdate,
+		gender,
+		dni,
+		address,
+		phone_number,
+		is_registered,
+		email,
+		id_family,
+		id_category
+	):
+		'''
+		Modifica les dades del faller.
+
+		Paràmetres:
+		-----------
+		id : int
+			El identificador a la taula "member" de la base de dades.
+		name : string
+			Nom del faller.
+		surname : string
+			Cognoms del faller.
+		birthdate : date
+			Data de naixement.
+		gender : int
+			Sexe.
+		dni : string
+			Dni.
+		address : string
+			Adreça.
+		phone_number : string
+			Telèfon.
+		is_registered : bool
+			Marca si està donat d'alta o no.
+		email : string
+			Correu electrònic.
+		id_family : int
+			Identificador de la familia a la que pertany.
+		id_category : int
+			Identificador de la categoria de la falla a la que pertany.
+		'''
 		db = Database('sp')
-		db.update_member(id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category)
+		db.update_member(
+			id,
+			name,
+			surname,
+			birthdate,
+			gender,
+			dni,
+			address,
+			phone_number,
+			is_registered,
+			email,
+			id_family,
+			id_category
+		)
 		db.close_connection()
 
 
 	def get_membership_history(self, id):
+		'''
+		Recupera l'historial del faller.
+
+		Paràmetres:
+		-----------
+		id : int
+			Identificador del faller.
+		'''
 		db = Database('sp')
 		result = db.select_membership_history(id)
 		db.close_connection()
@@ -61,7 +288,8 @@ class Member():
 	@classmethod
 	def calculate_age(cls, birthdate, falla_year):
 		'''
-		A partir de la data de naixement i l'exercici actual calculem l'edat del faller a data 19 de març del present exercici.
+		A partir de la data de naixement i l'exercici actual
+		calculem l'edat del faller a data 19 de març del present exercici.
 
 		Paràmetres:
 		-----------
@@ -91,7 +319,8 @@ class Member():
 	@classmethod
 	def calculate_category(cls, age):
 		'''
-		A partir de l'edat del faller assigna l'id de la categoria a la que pertany.
+		A partir de l'edat del faller assigna l'id
+		de la categoria a la que pertany.
 
 		Paràmetres:
 		-----------
@@ -113,7 +342,8 @@ class Member():
 
 	def calculate_first_falla_year(self, birthdate):
 		'''
-		A partir de la data de naixement calculem quin podria haver segut el seu primer exercici.
+		A partir de la data de naixement calculem
+		quin podria haver segut el seu primer exercici.
 
 		Paràmetres:
 		-----------
@@ -121,9 +351,9 @@ class Member():
 			La data de naixement del faller.
 		
 		Retorna:
-        --------
-        first_falla_year : int
-            Primer possible exercici del faller.
+		--------
+		first_falla_year : int
+			Primer possible exercici del faller.
 		'''
 		year = date.strftime(birthdate, '%Y')
 		month = date.strftime(birthdate, '%m')
@@ -135,13 +365,118 @@ class Member():
 		return first_falla_year
 	
 
-	def pay_fee(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
-		Movement.set_movement(transaction_date, amount, 2, 1, falla_year, description, receipt_number, id_member)
+	def pay_fee(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar quota.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			1,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
 
 
-	def pay_lottery(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
-		Movement.set_movement(transaction_date, amount, 2, 2, falla_year, description, receipt_number, id_member)
+	def pay_lottery(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar loteria.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			2,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
 
 
-	def pay_raffle(self, transaction_date, amount, falla_year, description, receipt_number, id_member):
-		Movement.set_movement(transaction_date, amount, 2, 3, falla_year, description, receipt_number, id_member)
+	def pay_raffle(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar rifa.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			3,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
