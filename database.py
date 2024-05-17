@@ -229,7 +229,7 @@ class Database:
         try:
             for row in result:
                 as_list = list(row)
-                date=utils.convert_date(as_list[3])
+                date=utils.convert_to_mariadb_date(as_list[3])
                 as_list[3]=date
                 self.mysqlCursor.execute(query, as_list)
             self.mysqlConnection.commit()
@@ -249,7 +249,7 @@ class Database:
         try:
             for row in result:
                 as_list = list(row)
-                date=utils.convert_date(as_list[1])
+                date=utils.convert_to_mariadb_date(as_list[1])
                 as_list[1]=date
                 self.mysqlCursor.execute(query, as_list)
             self.mysqlConnection.commit()
@@ -391,13 +391,12 @@ class Database:
 
 
     def delete_family(self, id):
-        query = "DELETE family WHERE id = %s"
-        data = id
+        query = "DELETE FROM family WHERE id = %s"
         try:
-            self.mysqlCursor.execute(query, data)
+            self.mysqlCursor.execute(query, (id,))
             self.mysqlConnection.commit()
         except mysql.connector.Error as error:
-             messagebox.showerror("Error", "Error al conectar a la base de dades" + str(error))
+             messagebox.showerror("Error", "Error al conectar a la base de dadesesteeeeeeeeeeeeee" + str(error))
 
 
     def select_fee_assignment_movements_by_member(self, id_member, falla_year):
