@@ -25,7 +25,6 @@ from finestra_loteria import FinestraLoteria
 
 from arxiu import Arxiu
 from utils import Utils
-from base_de_dades import BaseDeDades
 from database import Database
 
 from falla import Falla
@@ -188,7 +187,7 @@ class Aplicacio(tk.Frame):
 		'''
 		Comprova si existeixen els arxius necessaris per a que funcione el programa i en cas de que falten, els crea.
 		Si es crea algún arxiu, avisa a l'usuari de que ho ha fet per a que prenga les mesures necessàries.
-		'''
+		
 		db=Database("sp")
 		bd=BaseDeDades("falla.db")
 		if not os.path.exists("exercici"):
@@ -224,7 +223,7 @@ class Aplicacio(tk.Frame):
 			categoria=Category(0, 50, "bebè", "menor de 5 anys")
 			bd.crear_categoria(categoria)
 			bd.tancar_conexio()
-			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")
+			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
 	
 	
 	def modificar_categories(self):

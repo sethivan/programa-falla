@@ -103,12 +103,12 @@ class Movement():
 			Concepte. Pot ser quota, loteria o rifa.
 		falla_year : int
 			Exercici faller.
+		id_member : int
+			Identificador del faller sobre el que es fa el moviment.
 		description : string
 			Descripció del moviment.
 		receipt_number : int
 			Número de rebut.
-		id_member : int
-			Identificador del faller sobre el que es fa el moviment.
 		'''
 		db = Database('sp')
 		db.insert_movement(
