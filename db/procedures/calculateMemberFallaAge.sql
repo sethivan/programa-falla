@@ -4,9 +4,10 @@ DELIMITER $$
 $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`calculateMemberFallaAge`(IN vBirthdate DATETIME, OUT vFallaAge INT)
 /*
-A partir de la data de naixement del faller calcula l'edat a dia 19 de març de l'exercici actual.
-@params vBirthdate: date
-@params vFallaAge; int
+* A partir de la data de naixement del faller calcula l'edat a dia 19 de març de l'exercici actual.
+*
+* @params vBirthdate: date
+* @params vFallaAge; int
 */
 BEGIN
 	DECLARE vFallaYear INT;

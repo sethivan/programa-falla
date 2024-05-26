@@ -4,7 +4,7 @@ from tkinter import messagebox
 import platform
 
 from utils import Utils
-from base_de_dades import BaseDeDades
+from export_sqlite_to_mariadb import BaseDeDades
 from arxiu import Arxiu
 
 from falla import Falla

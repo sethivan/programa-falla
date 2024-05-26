@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
 
-from base_de_dades import BaseDeDades
+from export_sqlite_to_mariadb import BaseDeDades
 from arxiu import Arxiu
 from utils import Utils
 
