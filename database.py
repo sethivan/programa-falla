@@ -498,7 +498,7 @@ class Database:
 			ON member.familyFk = family.id INNER JOIN category \
 				ON member.categoryFk = category.id \
 					WHERE member.isRegistered and \
-						(member.categoryFk=1 or member.categoryFk=2) \
+						(member.categoryFk = 1 or member.categoryFk = 2) \
 							ORDER BY member.surname"
 		try:
 			self.mysqlCursor.execute(query)
@@ -508,6 +508,32 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir els membres adults de la base de dades"
+			)
+
+
+	def select_registered_members(self, is_registered):
+		'''
+		Llig de la taula "member" tots aquells fallers actius
+		i els afegeix a una llista de fallers.
+
+		Retorna:
+		--------
+		members_list : list
+			Llistat de fallers.
+		'''
+		query = "SELECT * FROM member INNER JOIN family \
+			ON member.familyFk = family.id INNER JOIN category \
+				ON member.categoryFk = category.id \
+					WHERE member.isRegistered = %s \
+						ORDER BY member.surname"
+		try:
+			self.mysqlCursor.execute(query, (is_registered,))
+			members_list = self.mysqlCursor.fetchall()
+			return members_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir els membres actius de la base de dades"
 			)
 
 
@@ -537,6 +563,35 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir els membres per familia de la base de dades"
+			)
+
+
+	def select_members_by_category(self, id_category):
+		'''
+		Llig de la taula "member" tots aquells fallers
+		amb l'identificador de categoria passat per paràmetre.
+
+		Paràmetres:
+		-----------
+		id_category : int
+			Identificador de la categoria del faller.
+
+		Retorna:
+		--------
+		members_list : list
+			Llistat de fallers.
+		'''
+		query = "SELECT * FROM member INNER JOIN family \
+			ON member.familyFk = family.id INNER JOIN category \
+				ON member.categoryFk = category.id WHERE member.categoryFk = %s"
+		try:
+			self.mysqlCursor.execute(query, (id_category,))
+			members_list = self.mysqlCursor.fetchall()
+			return members_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir els membres per categoria de la base de dades"
 			)
 
 
@@ -686,6 +741,27 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir l'última familia de la base de dades"
+			)
+
+
+	def select_families(self):
+		'''
+		Llig tot el contingut de la taula "family" i els afegeix a una llista de families.
+
+		Retorna:
+		--------
+		families_list : list
+			Llistat de families.
+		'''
+		query = "SELECT * FROM family"
+		try:
+			self.mysqlCursor.execute(query)
+			families_list = self.mysqlCursor.fetchall()
+			return families_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir les families de la base de dades"
 			)
 
 
@@ -959,6 +1035,38 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir els moviments de pagament de rifa"
+			)
+
+
+	def select_payment_movements_by_date(self, date, description):
+		'''
+		Llig tots els moviments de pagament de la data
+		passada per paràmetre.
+
+		Paràmetres:
+		-----------
+		date : string
+			Data.
+		description : string
+			Dexcripció de pagat per caixa o banc.
+
+		Retorna:
+		--------
+		movements_list : list
+			Llistat de moviments.
+		'''
+		query = "SELECT * FROM movement \
+			INNER JOIN member ON movement.memberFk = member.id \
+			WHERE transactionDate = %s and idType = 2 \
+				and description = %s"
+		try:
+			self.mysqlCursor.execute(query, (date, description))
+			movements_list = self.mysqlCursor.fetchall()
+			return movements_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir els moviments del dia"
 			)
 
 

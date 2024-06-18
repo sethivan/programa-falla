@@ -15,7 +15,7 @@ from falla import Falla
 from member import Member
 from family import Family
 from category import Category
-from informe import Informe
+from report import Report
 from modify_member_window import ModifyMemberWindow
 
 
@@ -65,16 +65,16 @@ class ManageMemberWindow(tk.Toplevel):
 
 		self.family_members = tk.IntVar()
 
-		self.assigned_fee = tk.DoubleVar()
-		self.payed_fee = tk.DoubleVar()
+		self.assigned_fee = tk.StringVar()
+		self.payed_fee = tk.StringVar()
 		self.debt_fee = tk.DoubleVar()
 		self.pay_fee = tk.DoubleVar()
-		self.assigned_lottery = tk.DoubleVar()
-		self.payed_lottery = tk.DoubleVar()
+		self.assigned_lottery = tk.StringVar()
+		self.payed_lottery = tk.StringVar()
 		self.debt_lottery = tk.DoubleVar()
 		self.pay_lottery = tk.DoubleVar()
-		self.assigned_raffle = tk.DoubleVar()
-		self.payed_raffle = tk.DoubleVar()
+		self.assigned_raffle = tk.StringVar()
+		self.payed_raffle = tk.StringVar()
 		self.debt_raffle = tk.DoubleVar()
 		self.pay_raffle = tk.DoubleVar()
 		self.total_assigned = tk.DoubleVar()
@@ -83,16 +83,16 @@ class ManageMemberWindow(tk.Toplevel):
 		self.pay_total = tk.DoubleVar()
 		self.way_to_pay = tk.IntVar()
 		
-		self.family_assigned_fee = tk.DoubleVar()
-		self.family_payed_fee = tk.DoubleVar()
+		self.family_assigned_fee = tk.StringVar()
+		self.family_payed_fee = tk.StringVar()
 		self.family_debt_fee = tk.DoubleVar()
 		self.family_pay_fee = tk.DoubleVar()
-		self.family_assigned_lottery = tk.DoubleVar()
-		self.family_payed_lottery = tk.DoubleVar()
+		self.family_assigned_lottery = tk.StringVar()
+		self.family_payed_lottery = tk.StringVar()
 		self.family_debt_lottery = tk.DoubleVar()
 		self.family_pay_lottery = tk.DoubleVar()
-		self.family_assigned_raffle = tk.DoubleVar()
-		self.family_payed_raffle = tk.DoubleVar()
+		self.family_assigned_raffle = tk.StringVar()
+		self.family_payed_raffle = tk.StringVar()
 		self.family_debt_raffle = tk.DoubleVar()
 		self.family_pay_raffle = tk.DoubleVar()
 		self.family_total_assigned = tk.DoubleVar()
@@ -1775,6 +1775,7 @@ class ManageMemberWindow(tk.Toplevel):
 		es crea un moviment que es guarda a la base de dades i es crea un rebut
 		en cas de que aquest moviment s'efectue per caixa.
 		'''
+		falla = Falla
 		fee_payment = 0
 		lottery_payment = 0
 		raffle_payment = 0
@@ -1805,9 +1806,9 @@ class ManageMemberWindow(tk.Toplevel):
 				)
 			else:
 				receipt_number = 0
-				if option == "1":
-					receipt = Informe()
-					receipt_number = receipt.assignar_numero_rebut()
+				receipt = Report()
+				if option == 1:
+					receipt_number = receipt.assign_receipt_number()
 				result = Member.get_member(self.id.get())
 				member = Member(
 					result[0],
@@ -1822,7 +1823,7 @@ class ManageMemberWindow(tk.Toplevel):
 					result[11]
 				)
 				if float(self.pay_fee.get()) != 0:
-					member.pay_fee(
+					falla.pay_fee(
 						None,
 						float(self.pay_fee.get()),
 						None,
@@ -1831,7 +1832,7 @@ class ManageMemberWindow(tk.Toplevel):
 						member.id
 					)
 				if float(self.pay_lottery.get()) != 0:
-					member.pay_lottery(
+					falla.pay_lottery(
 						None,
 						float(self.pay_lottery.get()),
 						None,
@@ -1840,7 +1841,7 @@ class ManageMemberWindow(tk.Toplevel):
 						member.id
 					)
 				if float(self.pay_raffle.get()) != 0:
-					member.pay_raffle(
+					falla.pay_raffle(
 						None,
 						float(self.pay_raffle.get()),
 						None,
@@ -1850,7 +1851,7 @@ class ManageMemberWindow(tk.Toplevel):
 					)
 				self.entry_id.focus()
 				self.search_by_id('<Return>')
-				if option == "1":
+				if option == 1:
 					receipt.crear_rebut(
 						0,
 						self.combo_box_member.get(),
@@ -1874,6 +1875,7 @@ class ManageMemberWindow(tk.Toplevel):
 		Aquest moviment es guarda a la base de dades i es crea un rebut en cas
 		de que aquest moviment s'efectue per caixa.
 		'''
+		falla = Falla()
 		family_fee_payment = 0
 		family_lottery_payment = 0
 		family_raffle_payment = 0
@@ -1954,7 +1956,6 @@ class ManageMemberWindow(tk.Toplevel):
 					result[11],
 					family
 				)
-				falla = Falla()
 				result = family.get_members(family.id)
 				for values in result:
 					family_member = Member(
@@ -1988,9 +1989,9 @@ class ManageMemberWindow(tk.Toplevel):
 				lottery_payment = float(self.family_pay_lottery.get())
 				raffle_payment = float(self.family_pay_raffle.get())
 				receipt_number = 0
+				receipt = Report()
 				if option == "1":
-					receipt = Informe()
-					receipt_number = receipt.assignar_numero_rebut()
+					receipt_number = receipt.assign_receipt_number()
 				falla.get_current_falla_year()
 				for member in registered_members_list:
 					assigned_fee = assigned_fee + falla.calculate_assigned_fee(
@@ -2017,7 +2018,7 @@ class ManageMemberWindow(tk.Toplevel):
 
 					pending_fee = assigned_fee - payed_fee
 					if fee_payment != 0 and total_registered_members == 1:
-						member.pay_fee(
+						falla.pay_fee(
 							None,
 							fee_payment,
 							None,
@@ -2028,7 +2029,7 @@ class ManageMemberWindow(tk.Toplevel):
 					if fee_payment != 0 and \
 						fee_payment <= pending_fee and \
 							total_registered_members != 1:
-						member.pay_fee(
+						falla.pay_fee(
 							None,
 							fee_payment,
 							None, description,
@@ -2040,7 +2041,7 @@ class ManageMemberWindow(tk.Toplevel):
 						fee_payment > pending_fee \
 							and total_registered_members != 1:
 						if pending_fee != 0:
-							member.pay_fee(
+							falla.pay_fee(
 								None,
 								pending_fee,
 								None,
@@ -2052,7 +2053,7 @@ class ManageMemberWindow(tk.Toplevel):
 
 					pending_lottery = assigned_lottery - payed_lottery
 					if lottery_payment != 0 and total_registered_members == 1:
-						member.pay_lottery(
+						falla.pay_lottery(
 							None,
 							lottery_payment,
 							None,
@@ -2063,7 +2064,7 @@ class ManageMemberWindow(tk.Toplevel):
 					if lottery_payment != 0 and \
 						lottery_payment <= pending_lottery and \
 							total_registered_members != 1:
-						member.pay_lottery(
+						falla.pay_lottery(
 							None,
 							lottery_payment,
 							None,
@@ -2077,7 +2078,7 @@ class ManageMemberWindow(tk.Toplevel):
 							total_registered_members != 1:
 						if pending_lottery != 0:
 							lottery_payment = 0
-							member.pay_lottery(
+							falla.pay_lottery(
 								None,
 								pending_lottery,
 								None,
@@ -2089,7 +2090,7 @@ class ManageMemberWindow(tk.Toplevel):
 					
 					pending_raffle = assigned_raffle-payed_raffle
 					if raffle_payment != 0 and total_registered_members == 1:
-						member.pay_raffle(
+						falla.pay_raffle(
 							None,
 							raffle_payment,
 							None,
@@ -2100,7 +2101,7 @@ class ManageMemberWindow(tk.Toplevel):
 					if raffle_payment != 0 and \
 						raffle_payment <= pending_raffle and \
 							total_registered_members != 1:
-						member.pay_raffle(
+						falla.pay_raffle(
 							None,
 							raffle_payment,
 							None,
@@ -2113,7 +2114,7 @@ class ManageMemberWindow(tk.Toplevel):
 						raffle_payment > pending_raffle and \
 							total_registered_members != 1:
 						if pending_raffle != 0:
-							member.pay_raffle(
+							falla.pay_raffle(
 								None,
 								pending_raffle,
 								None,
@@ -2127,9 +2128,9 @@ class ManageMemberWindow(tk.Toplevel):
 
 				self.entry_id.focus()
 				self.search_by_id('<Return>')
-				if option == "1":
+				if option == 1:
 					receipt.crear_rebut(
-						0,
+						1,
 						self.combo_box_member.get(),
 						family_fee_payment,
 						family_lottery_payment,
