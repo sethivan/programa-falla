@@ -7,7 +7,6 @@ from database import Database
 
 from family import Family
 from category import Category
-from movement import Movement
 
 class Member():
 	'''
@@ -285,8 +284,7 @@ class Member():
 			self.membership_history[value[1]] = [value[2], value[3]]
 
 
-	@classmethod
-	def calculate_age(cls, birthdate, falla_year):
+	def calculate_age(self, birthdate, falla_year):
 		'''
 		A partir de la data de naixement i l'exercici actual
 		calculem l'edat del faller a data 19 de març del present exercici.
@@ -303,16 +301,13 @@ class Member():
         age : int
             L'edat del faller a data 19 de març del present exercici.
 		'''
-		birthdate=datetime.strptime(birthdate, '%d-%m-%Y')
 		year = date.strftime(birthdate, '%Y')
 		month = date.strftime(birthdate, '%m')
 		day = date.strftime(birthdate, '%d')
-		falla_year = datetime.strptime(str(falla_year), '%Y')
-		falla_year = date.strftime(falla_year, '%Y')
 		if int(month) > 3 or (int(month) == 3 and int(day) > 19):
-			age = int(falla_year) - int(year) - 1
+			age = falla_year - int(year) - 1
 		else:
-			age = int(falla_year) - int(year)
+			age = falla_year - int(year)
 		return age
 	
 
@@ -363,120 +358,3 @@ class Member():
 		else:
 			first_falla_year = int(year)
 		return first_falla_year
-	
-
-	def pay_fee(
-		self,
-		transaction_date,
-		amount,
-		falla_year,
-		description,
-		receipt_number,
-		id_member
-	):
-		'''
-		Crea el moviment de pagar quota.
-
-		Paràmetres:
-		-----------
-		transaction_date : date
-			Data del moviment.
-		amount : float
-			Quantitat de diners.
-		falla_year : int
-			Exercici al que pertany el moviment.
-		description : string
-			Descripció del moviment.
-		receipt_number : int
-			Número de rebut.
-		id_member : int
-			Identificador del faller que fa el pagament.
-		'''
-		Movement.set_movement(
-			transaction_date,
-			amount,
-			2,
-			1,
-			falla_year,
-			description,
-			receipt_number,
-			id_member
-		)
-
-
-	def pay_lottery(
-		self,
-		transaction_date,
-		amount,
-		falla_year,
-		description,
-		receipt_number,
-		id_member
-	):
-		'''
-		Crea el moviment de pagar loteria.
-
-		Paràmetres:
-		-----------
-		transaction_date : date
-			Data del moviment.
-		amount : float
-			Quantitat de diners.
-		falla_year : int
-			Exercici al que pertany el moviment.
-		description : string
-			Descripció del moviment.
-		receipt_number : int
-			Número de rebut.
-		id_member : int
-			Identificador del faller que fa el pagament.
-		'''
-		Movement.set_movement(
-			transaction_date,
-			amount,
-			2,
-			2,
-			falla_year,
-			description,
-			receipt_number,
-			id_member
-		)
-
-
-	def pay_raffle(
-		self,
-		transaction_date,
-		amount,
-		falla_year,
-		description,
-		receipt_number,
-		id_member
-	):
-		'''
-		Crea el moviment de pagar rifa.
-
-		Paràmetres:
-		-----------
-		transaction_date : date
-			Data del moviment.
-		amount : float
-			Quantitat de diners.
-		falla_year : int
-			Exercici al que pertany el moviment.
-		description : string
-			Descripció del moviment.
-		receipt_number : int
-			Número de rebut.
-		id_member : int
-			Identificador del faller que fa el pagament.
-		'''
-		Movement.set_movement(
-			transaction_date,
-			amount,
-			2,
-			3,
-			falla_year,
-			description,
-			receipt_number,
-			id_member
-		)

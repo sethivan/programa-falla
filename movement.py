@@ -4,6 +4,8 @@ Proporciona la classe "Movement".
 from database import Database
 from datetime import date
 
+from member import Member
+
 class Movement():
 	'''
 	Aquesta classe controla els atributs
@@ -27,6 +29,8 @@ class Movement():
 		Descripció del moviment.
 	receipt_number : int
 		Número de rebut.
+	member : Member
+		Faller que ha fet el moviment.
 
 	Mètodes:
 	--------
@@ -42,7 +46,8 @@ class Movement():
 		id_concept: int,
 		falla_year: int,
 		description: str,
-		receipt_number: int
+		receipt_number: int,
+		member: Member = None
 	):
 		'''
 		Inicialitza una nova instància de la classe Movement.
@@ -65,6 +70,8 @@ class Movement():
 			Descripció del moviment.
 		receipt_number : int
 			Número de rebut.
+		member : Member
+			Faller que ha fet el moviment.
 		'''
 		self.id = id
 		self.transaction_date = transaction_date
@@ -74,6 +81,7 @@ class Movement():
 		self.falla_year = falla_year
 		self.description = description
 		self.receipt_number = receipt_number
+		self.member = member
 
 
 	@classmethod

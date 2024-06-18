@@ -134,13 +134,13 @@ class Family():
 
 		Retorna:
 		--------
-		members_list: list
-			Llistat de membres de la familia.
+		result: list
+			Llistat de característiques de membres de la familia.
 		'''
 		db = Database('sp')
-		members_list = db.select_members_by_family(id)
+		result = db.select_members_by_family(id)
 		db.close_connection()
-		return members_list
+		return result
 
 
 	def calculate_discount(self, members_list):

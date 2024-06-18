@@ -14,7 +14,7 @@ from category import Category
 class Falla():
 	'''
 	Aquesta classe pot controlar llistats de les classes "Member", "Movement"
-	i "Category" i operar amb elles.
+	"Family" i "Category" i operar amb elles.
 
 	Atributs:
 	---------
@@ -24,6 +24,8 @@ class Falla():
 		Llistat d'objectes de la classe "Movement".
 	categories_list: list
 		Llistat d'objectes de la classe "Category".
+	families_list : list
+		Llistat d'objectes de la classe "Family".
 
 	Mètodes:
 	--------
@@ -41,6 +43,12 @@ class Falla():
 	calculate_payed_lottery(id_member, falla_year): float
 	calculate_assigned_raffle(id_member, falla_year): float
 	calculate_payed_raffle(id_member, falla_year): float
+	pay_fee(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
+	pay_lottery(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
+	pay_raffle(transaction_date, amount, falla_year, description,
+		receipt_number, id_member)
 	'''
 	
 
@@ -51,6 +59,7 @@ class Falla():
 		self.members_list = []
 		self.movements_list = []
 		self.categories_list = []
+		self.families_list = []
 		self.falla_year = 0
 
 
@@ -70,6 +79,10 @@ class Falla():
 			result = db.select_members_by_surname(args[1])
 		elif args[0] == "adult":
 			result = db.select_adult_members()
+		elif args[0] == "is_registered":
+			result = db.select_registered_members(args[1])
+		elif args[0] == "category":
+			result = db.select_members_by_category(args[1])
 		db.close_connection()
 		for values in result:
 			family = Family(values[12], values[13], values[14])
@@ -130,6 +143,18 @@ class Falla():
 		for values in result:
 			category = Category(values[0], values[1], values[2], values[3])
 			self.categories_list.append(category)
+
+	
+	def get_families(self):
+		'''
+		Recupera i guarda en self.families_list el llistat de families.
+		'''
+		db = Database('sp')
+		result = db.select_families()
+		db.close_connection()
+		for values in result:
+			family = Family(values[0], values[1], values[2])
+			self.families_list.append(family)
 
 
 	def get_current_falla_year(self):
@@ -430,6 +455,163 @@ class Falla():
 		for value in result:
 			raffle = raffle + value[0]
 		return raffle
+	
+
+	def get_daily_payments(self, date, description):
+		'''
+		Recupera i guarda en self.movements_list el llistat de moviments
+		de pagament del dia indicat.
+
+		Paràmetres:
+		-----------
+		date : string
+			Data de la que volem els moviments.
+		'''
+		db = Database('sp')
+		result = db.select_payment_movements_by_date(date, description)
+		db.close_connection()
+		for values in result:
+			member = Member(
+				values[9],
+				values[10],
+				values[11],
+				values[12],
+				values[13],
+				values[14],
+				values[15],
+				values[16],
+				values[17],
+				values[18]
+			)
+			movement = Movement(
+				values[0],
+				values[1],
+				values[2],
+				values[3],
+				values[4],
+				values[5],
+				values[7],
+				values[8],
+				member
+			)
+			self.movements_list.append(movement)
+
+
+	def pay_fee(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar quota.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			1,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
+
+
+	def pay_lottery(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar loteria.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			2,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
+
+
+	def pay_raffle(
+		self,
+		transaction_date,
+		amount,
+		falla_year,
+		description,
+		receipt_number,
+		id_member
+	):
+		'''
+		Crea el moviment de pagar rifa.
+
+		Paràmetres:
+		-----------
+		transaction_date : date
+			Data del moviment.
+		amount : float
+			Quantitat de diners.
+		falla_year : int
+			Exercici al que pertany el moviment.
+		description : string
+			Descripció del moviment.
+		receipt_number : int
+			Número de rebut.
+		id_member : int
+			Identificador del faller que fa el pagament.
+		'''
+		Movement.set_movement(
+			transaction_date,
+			amount,
+			2,
+			3,
+			falla_year,
+			description,
+			receipt_number,
+			id_member
+		)
 	
 	
 	'''

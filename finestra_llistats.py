@@ -5,7 +5,7 @@ import platform
 
 from utils import Utils
 from export_sqlite_to_mariadb import BaseDeDades
-from informe import Informe
+from report import Report
 
 
 class FinestraLlistats(tk.Toplevel):
@@ -18,7 +18,7 @@ class FinestraLlistats(tk.Toplevel):
 		La instància principal de l'aplicació o de la finestra que crea esta nova finestra.
 	'''
 
-    def __init__(self, master=None):
+    def __init__(self, master = None):
         '''
 		Inicialitza una nova instància de la classe FinestraHistorial.
 
@@ -29,14 +29,14 @@ class FinestraLlistats(tk.Toplevel):
 			Si no es proporciona, es creará una nueva instancia de tk.Tk().
 		'''
         super().__init__(master)
-        self.master=master
-        self.sistema_operatiu=platform.system()
-        if self.sistema_operatiu=='Windows':
+        self.master = master
+        self.sistema_operatiu = platform.system()
+        if self.sistema_operatiu == 'Windows':
             self.iconbitmap("escut.ico")
         self.resizable(0,0)
         self.title("Llistats")
-        utils=Utils()
-        utils.definir_estil_global()
+        utils = Utils()
+        utils.define_global_style()
         self.configure(bg="#ffffff", pady=5, padx=5)
 
         self.data_moviments_dia=tk.StringVar()
@@ -54,8 +54,8 @@ class FinestraLlistats(tk.Toplevel):
         self.infantil=tk.IntVar()
         self.bebe=tk.IntVar()
         self.opcio=tk.IntVar()
-        self.edat_inicial=tk.StringVar()
-        self.edat_final=tk.StringVar()
+        self.edat_inicial=tk.IntVar()
+        self.edat_final=tk.IntVar()
 
         # Frames en els que dividim la finestra.
         label_estil_moviments_dia=ttk.Label(self, text="Moviments dia", style="Titol.TLabel")
@@ -170,7 +170,7 @@ class FinestraLlistats(tk.Toplevel):
         Inicia la nova finestra.
         '''
         utils=Utils()
-        data_actual=utils.calcular_data_actual()
+        data_actual=utils.calculate_current_date()
         self.data_moviments_dia.set(data_actual[0]+"-"+data_actual[1]+"-"+data_actual[2])
         self.efectiu.set(1)
         self.banc.set(1)
@@ -217,31 +217,31 @@ class FinestraLlistats(tk.Toplevel):
 
     
     def crear_llistat_moviments(self):
-        informe=Informe()
+        informe=Report()
         if self.efectiu.get()==0 and self.banc.get()==0:
             messagebox.showwarning("Error", "Has de marcar com a mínim una de les opcions per a fer el llistat")
         else:
-            informe.llistat_moviments(self.data_moviments_dia.get(), self.efectiu.get(), self.banc.get())
+            informe.movements_list(self.data_moviments_dia.get(), self.efectiu.get(), self.banc.get())
 
 
     def crear_llistat_general(self):
-        informe=Informe()
-        informe.llistat_general()
+        informe=Report()
+        informe.general_list()
 
 
     def crear_llistat_general_families(self):
-        informe=Informe()
-        informe.llistat_general_per_families()
+        informe=Report()
+        informe.general_list_by_families()
 
 
     def crear_llistat_quotes_no_fallers(self):
-        informe=Informe()
-        informe.llistat_quotes_no_fallers()
+        informe=Report()
+        informe.inactive_members_fees_list()
 
 
     def crear_llistat_fallers(self):
         bd=BaseDeDades('falla.db')
-        informe=Informe()
+        informe=Report()
         # Guardem en un llistat les dades marcades a mostrar.
         llistat_dades=[]
         if self.nom_complet.get()==1:
@@ -262,9 +262,9 @@ class FinestraLlistats(tk.Toplevel):
             # Cridem a la funció corresponent segons l'opció marcada.
             if self.opcio.get()==1:
                 if len(llistat_dades)<4:
-                    informe.llistat_fallers_vertical(llistat_dades)
+                    informe.reduced_members_list(llistat_dades)
                 else:
-                    informe.llistat_fallers(llistat_dades)
+                    informe.members_list(llistat_dades)
             elif self.opcio.get()==2:
                 llistat_categories=[]
                 if self.adult.get()==1:
@@ -278,24 +278,26 @@ class FinestraLlistats(tk.Toplevel):
                 if self.bebe.get()==1:
                     llistat_categories.append(5)
                 if len(llistat_dades)<4:
-                    informe.llistat_fallers_per_categories_vertical(llistat_categories, llistat_dades)
+                    informe.reduced_members_list_by_categories(llistat_categories, llistat_dades)
                 else:
-                    informe.llistat_fallers_per_categories(llistat_categories, llistat_dades)
+                    informe.members_list_by_categories(llistat_categories, llistat_dades)
             elif self.opcio.get()==3:
                 try:
                     if len(llistat_dades)<4:
-                        informe.llistat_fallers_per_edat_vertical(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
+                        #fer conprovacio de que edat_inicial siga menor o igual que la final
+
+                        informe.reduced_members_list_by_age(self.edat_inicial.get(), self.edat_final.get(), llistat_dades)
                     else:
-                        informe.llistat_fallers_per_edat(int(self.edat_inicial.get()), int(self.edat_final.get()), llistat_dades)
+                        informe.members_list_by_age(self.edat_inicial.get(), self.edat_final.get(), llistat_dades)
                 except ValueError:
                     messagebox.showwarning("Error", "Has d'escriure un valor vàlid com a edats inicial i final")
 
 
     def crear_llistat_altes_baixes(self):
-        informe=Informe()
-        informe.llistat_altes_baixes()
+        informe=Report()
+        informe.registrations_cancellations_list()
         
 
     def crear_llistat_rifes(self):
-        informe=Informe()
-        informe.llistat_fallers_amb_rifa()
+        informe=Report()
+        informe.members_with_raffle_list()
