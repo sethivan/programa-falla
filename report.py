@@ -45,7 +45,7 @@ class Report():
 		return(index)
 
 
-	def crear_rebut(
+	def create_receipt(
 			self,
 			individualized,
 			name,
@@ -190,7 +190,7 @@ class Report():
 		os.chdir(path)
 
 
-	def movements_list(self, date, cash, bank):
+	def movements_report(self, date, cash, bank):
 		'''
 		Crea un .pdf amb un llistat de tots els moviments
 		de la data indicada segons el tipus de pagament.
@@ -281,7 +281,7 @@ class Report():
 		os.chdir(path)
 
 
-	def general_list(self):
+	def general_report(self):
 		'''
 		Crea un .pdf amb un llistat amb l'estat actual de comptes
 		de tots els fallers actius i, en conseqüència, de la falla al complet.
@@ -494,7 +494,7 @@ class Report():
 		os.chdir(path)
 
 
-	def general_list_by_families(self):
+	def general_report_by_families(self):
 		'''
 		Crea un .pdf amb un llistat amb l'estat actual de comptes
 		de tots els fallers actius organitzats per famílies.
@@ -659,7 +659,7 @@ class Report():
 		os.chdir(path)
 
 
-	def inactive_members_fees_list(self):
+	def inactive_members_fees_report(self):
 		'''
 		Crea un .pdf amb un llistat dels fallers que s'han donat de baixa
 		però han aportat quotes mentre han segut fallers.
