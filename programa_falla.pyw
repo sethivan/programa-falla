@@ -20,7 +20,7 @@ from insert_member_window import InsertMemberWindow
 from manage_member_window import ManageMemberWindow
 from finestra_historial import FinestraHistorial
 from modify_categories_window import ModifyCategoriesWindow
-from finestra_llistats import FinestraLlistats
+from show_report_window import ShowReportWindow
 from finestra_loteria import FinestraLoteria
 
 from arxiu import Arxiu
@@ -285,8 +285,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraLlistats
 		que obri la finestra "Llistats" del menú "Imprimir".
 		'''
-		llistat = FinestraLlistats(self)
-		llistat.iniciar()
+		ShowReportWindow(self)
 		
 
 	def nou_exercici(self): #funció per a crear un nou exercici faller

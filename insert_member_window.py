@@ -258,7 +258,6 @@ class InsertMemberWindow(tk.Toplevel):
 		self.family.set(2)
 		self.grab_set()
 		self.transient(self.master)
-		self.mainloop()
 
 
 	def enable_family(self):

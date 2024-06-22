@@ -1009,7 +1009,7 @@ class ManageMemberWindow(tk.Toplevel):
 		# el foco al tancar la finestra "modificar".
 		self.bind("<FocusIn>", self.handle_focus)
 
-		# Inici de la finestra.
+		# Paràmetres d'inici de la finestra.
 		falla = Falla()
 		falla.get_current_falla_year()
 		self.falla_year.set(
@@ -1852,7 +1852,7 @@ class ManageMemberWindow(tk.Toplevel):
 				self.entry_id.focus()
 				self.search_by_id('<Return>')
 				if option == 1:
-					receipt.crear_rebut(
+					receipt.create_receipt(
 						0,
 						self.combo_box_member.get(),
 						fee_payment,
@@ -2129,7 +2129,7 @@ class ManageMemberWindow(tk.Toplevel):
 				self.entry_id.focus()
 				self.search_by_id('<Return>')
 				if option == 1:
-					receipt.crear_rebut(
+					receipt.create_receipt(
 						1,
 						self.combo_box_member.get(),
 						family_fee_payment,
