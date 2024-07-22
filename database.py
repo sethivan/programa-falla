@@ -196,7 +196,7 @@ class Database:
 			amount DECIMAL(10, 2) NOT NULL,
 			idType INT NOT NULL,
 			idConcept INT NOT NULL,
-			fallaYear INT NOT NULL,
+			fallaYearFk INT NOT NULL,
 			memberFk INT,
 			description VARCHAR(100),
 			receiptNumber INT
@@ -209,6 +209,8 @@ class Database:
 				"Error",
 				"No s'ha pogut crear la taula movement"
 			)
+
+		# al crear la resta de taules pendents recordar la columna virtual difference en summaryMembersFallaYear
 
 		query = """
 		ALTER TABLE member
@@ -324,7 +326,7 @@ class Database:
 		'''
 		utils=Utils()
 		query="INSERT INTO movement \
-			(id, transactionDate, amount, idType, idConcept, fallaYear, \
+			(id, transactionDate, amount, idType, idConcept, fallaYearFk, \
 				memberFk, description, receiptNumber) \
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 		try:
@@ -511,6 +513,34 @@ class Database:
 			)
 
 
+	def select_underage_members(self):
+		'''
+		Llig de la taula "member" tots aquells fallers amb menys de 18 anys
+		(categories 3, 4 i 5) i els afegeix a una llista de fallers.
+
+		Retorna:
+		--------
+		members_list : list
+			Llistat de fallers.
+		'''
+		query = "SELECT * FROM member INNER JOIN family \
+			ON member.familyFk = family.id INNER JOIN category \
+				ON member.categoryFk = category.id \
+					WHERE member.isRegistered and \
+						(member.categoryFk = 3 or member.categoryFk = 4 \
+							or member.categoryFk = 5) \
+								ORDER BY member.surname"
+		try:
+			self.mysqlCursor.execute(query)
+			members_list = self.mysqlCursor.fetchall()
+			return members_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir els membres menors d'edat de la base de dades"
+			)
+
+
 	def select_registered_members(self, is_registered):
 		'''
 		Llig de la taula "member" tots aquells fallers actius
@@ -596,7 +626,7 @@ class Database:
 
 
 	def select_membership_history(self, id):
-		query = "SELECT * FROM membership_history WHERE id = %s"
+		query = "SELECT * FROM membershipHistory WHERE id = %s"
 		try:
 			self.mysqlCursor.execute(query, (id,))
 			membership_history = self.mysqlCursor.fetchall()
@@ -860,7 +890,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 1 \
-				and idConcept = 1 and fallaYear = %s"
+				and idConcept = 1 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -895,7 +925,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 1 and \
-				idConcept = 2 and fallaYear = %s"
+				idConcept = 2 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -930,7 +960,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 1 \
-				and idConcept = 3 and fallaYear = %s"
+				and idConcept = 3 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -961,7 +991,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 2 \
-				and idConcept = 1 and fallaYear = %s"
+				and idConcept = 1 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -995,7 +1025,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 2 \
-				and idConcept = 2 and fallaYear = %s"
+				and idConcept = 2 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -1026,7 +1056,7 @@ class Database:
 		'''
 		query = "SELECT amount FROM movement \
 			WHERE memberFk = %s and idType = 2 \
-				and idConcept = 3 and fallaYear = %s"
+				and idConcept = 3 and fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -1105,7 +1135,7 @@ class Database:
 			Número de rebut.
 		'''
 		query = "INSERT INTO movement \
-			(transactionDate, amount, idType, idConcept, fallaYear, \
+			(transactionDate, amount, idType, idConcept, fallaYearFk, \
 				memberFk, description, receiptNumber) \
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 		data = transaction_date, amount, id_type, id_concept, \
@@ -1137,7 +1167,7 @@ class Database:
 		movements_list : list
 			Llistat de moviments.
 		'''
-		query = "SELECT * FROM movement WHERE memberFk = %s AND fallaYear = %s"
+		query = "SELECT * FROM movement WHERE memberFk = %s AND fallaYearFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_member, falla_year))
 			movements_list = self.mysqlCursor.fetchall()
@@ -1264,7 +1294,7 @@ class Database:
 		falla_year : int
 			Exercici actual.
 		'''
-		query = "SELECT code FROM falla_year ORDER BY code DESC LIMIT 1"
+		query = "SELECT code FROM fallaYear ORDER BY code DESC LIMIT 1"
 		try:
 			self.mysqlCursor.execute(query)
 			falla_year = self.mysqlCursor.fetchone()
@@ -1273,4 +1303,120 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir l'exercici a la base de dades"
+			)
+
+
+	# Mètodes per a operacions CRUD en la taula summaryMembersFallaYear.
+	def insert_summary(
+			self,
+			id_member,
+			assignedFee,
+			assignedLottery,
+			assignedRaffle,
+			payedFee,
+			payedLottery,
+			payedRaffle
+		):
+		'''
+		Escriu a la base de dades les dades del resum de l'exercici del faller
+		que se li passen com a paràmetre a la taula "summaryMembersFallaYear".
+
+		Paràmetres:
+		-----------
+		id_member : int
+			Id del faller.
+		assignedFee : float
+			Quota assignada.
+		assignedLottery : float
+			Loteria assignada.
+		assignedRaffle : float
+			Rifa assignada.
+		payedFee : float
+			Quota pagada.
+		payedLottery : float
+			Loteria pagada.
+		payedRaffle : float
+			Rifa pagada.
+		'''
+		falla_year= None
+		query = "INSERT INTO summaryMembersFallaYear \
+			(memberFk, fallaYearFk, assignedFee, assignedLottery, assignedRaffle, payedFee, \
+				payedLottery, payedRaffle) \
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+		data = id_member, falla_year, assignedFee, assignedLottery, assignedRaffle, payedFee, payedLottery, payedRaffle
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar el resum anual del faller"
+			)
+
+
+	def select_summary_by_falla_year(self, falla_year):
+		'''
+		Llig de la taula "summaryMembersFallaYear" els ids de faller i els resultats finals
+		d'aquells fallers amb resultat diferent de 0 corresponents a l'exercici passat per paràmetre.
+
+		Paràmetres:
+		-----------
+		falla_year : int
+			Exercici per al qual es volen recuperar les dades.
+
+		Retorna:
+		--------
+		summary_list : list
+			Llistat resum de fallers de l'exercici anterior.
+		'''
+		query = "SELECT memberFk, difference FROM summaryMembersFallaYear WHERE fallaYearFk = %s AND difference <> 0"
+		try:
+			self.mysqlCursor.execute(query, (falla_year,))
+			summary_list = self.mysqlCursor.fetchall()
+			return summary_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir els resultats de l'exercici anterior"
+			)
+
+
+	# Mètodes per a operacions CRUD en la taula fallaYear.
+	def insert_falla_year(self):
+		'''
+		Escriu a la base de dades un nou exercici.
+		'''
+		code = None
+		created = None
+		query = "INSERT INTO fallaYear (code, created) VALUES (%s, %s)"
+		data = code, created
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar el nou exercici"
+			)
+
+
+	def update_falla_year_end(self, code):
+		'''
+		Escriu a la base de dades la data del final d'exercici a la taula "fallaYear".
+		
+		Paràmetres:
+		-----------
+		code : int
+			Any de l'exercici.
+		'''
+		finished = None
+		query = "UPDATE fallaYear SET finished = %s WHERE code = %s"
+		data = finished, code
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar la data de final d'exercici"
 			)
