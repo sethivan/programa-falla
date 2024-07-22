@@ -79,6 +79,8 @@ class Falla():
 			result = db.select_members_by_surname(args[1])
 		elif args[0] == "adult":
 			result = db.select_adult_members()
+		elif args[0] == "underage":
+			result = db.select_underage_members()
 		elif args[0] == "is_registered":
 			result = db.select_registered_members(args[1])
 		elif args[0] == "category":
@@ -613,7 +615,94 @@ class Falla():
 			id_member
 		)
 	
-	
+	def new_falla_year(self):
+		'''
+		Crea un nou exercici seguint els següents passos:
+		Guardem a la base de dades tots els membres actius amb les seues dades
+		d'assignacions i pagaments.
+		S'inserta el nou exercici a la taula "fallaYear".
+		Es repasen les categories de tots els fallers no adults per vore si canvien de categoria.
+		'''
+		
+		db = Database('sp')
+		self.get_current_falla_year()
+		self.get_members("is_registered", 1)
+		for member in self.members_list:
+			assigned_fee = 0
+			payed_fee = 0
+			assigned_lottery = 0
+			payed_lottery = 0
+			assigned_raffle = 0
+			payed_raffle = 0
+			assigned_fee = assigned_fee + self.calculate_assigned_fee(
+				member.id, self.falla_year
+			)
+			payed_fee = payed_fee + self.calculate_payed_fee(
+				member.id, self.falla_year
+			)
+			assigned_lottery = assigned_lottery + \
+				self.calculate_assigned_lottery(
+					member.id, self.falla_year
+				)
+			payed_lottery = payed_lottery + \
+				self.calculate_payed_lottery(
+					member.id, self.falla_year
+				)
+			assigned_raffle = assigned_raffle + \
+				self.calculate_assigned_raffle(
+					member.id, self.falla_year
+				)
+			payed_raffle = payed_raffle + self.calculate_payed_raffle(
+				member.id, self.falla_year
+			)
+			db.insert_summary(member.id, assigned_fee, assigned_lottery, assigned_raffle, payed_fee, payed_lottery, payed_raffle)
+		messagebox.showinfo("Exercici nou", "Resum de l'any anterior guardat correctament")
+		
+		db.update_falla_year_end(self.falla_year)
+		db.insert_falla_year()
+		messagebox.showinfo("Exercici nou", "Nou any assignat correctament")
+
+		self.get_members("underage")
+		for member in self.members_list:
+			member.modify_member(
+				member.id,
+				member.name,
+				member.surname,
+				member.birthdate,
+				member.gender,
+				member.dni,
+				member.address,
+				member.phone_number,
+				member.is_registered,
+				member.email,
+				member.family.id,
+				member.category.id
+			)
+		messagebox.showinfo("Exercici nou", "Categories de fallers actualitzades")
+
+		summary_list = db.select_summary_by_falla_year(self.falla_year)
+		self.get_current_falla_year()
+		for value in summary_list:
+			Movement.set_movement(
+				None,
+				value[1],
+				1,
+				1,
+				self.falla_year,
+				"diferència any anterior",
+				0,
+				value[0]
+			)
+		messagebox.showinfo("Exercici nou", "Deutes i sobrants de l'exercici anterior actualitzats")
+
+		# Afegim a cada faller l'historial de l'exercici nou.
+		# Per fer la part de l'historial
+		
+		messagebox.showinfo("Exercici nou", "Historial faller actualitzat com a vocals. La resta de punts s'han d'assignar manualment")
+		messagebox.showinfo("Exercici nou", "El canvi d'exercici s'ha realitzat correctament")
+		
+		db.close_connection()
+
 	'''
 	def nou_exercici(self):
 		
@@ -626,6 +715,7 @@ class Falla():
 		al nou exercici per a cada faller que no haja acabat l'exercici anterior a 0.
 		Finalment afegim l'estat de l'historial per a cada faller en el nou exercici depenent de
 		si va acabar l'exercici anterior donat d'alta o no.
+		
 		
 		# Creem una cópia en fitxer binari del resultat de l'exercici.
 		bd=BaseDeDades("falla.db")

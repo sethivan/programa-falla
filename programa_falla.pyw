@@ -293,7 +293,7 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe Falla per a que cree un exercici nou.
 		'''
 		falla=Falla()
-		falla.nou_exercici()
+		falla.new_falla_year()
 
 	
 	def eixir(self):
