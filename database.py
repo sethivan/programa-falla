@@ -2,6 +2,7 @@ import mysql.connector
 from tkinter import messagebox
 
 from utils import Utils
+from create_database import CreateDatabase
 
 
 class Database:
@@ -81,8 +82,10 @@ class Database:
 					"Error",
 					"La base de dades no existeix. Es crearà automàticament."
 				)
-				self.create_database(db_name)
-				self.create_tables(db_name)
+				new_database = CreateDatabase()
+				new_database.create_database()
+				#self.create_database(db_name)
+				#self.create_tables(db_name)
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",
