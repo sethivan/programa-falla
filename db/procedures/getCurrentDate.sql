@@ -1,7 +1,5 @@
 DROP PROCEDURE IF EXISTS sp.getCurrentDate;
 
-DELIMITER $$
-$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`getCurrentDate`(INOUT vDate DATETIME)
 /*
 * Si la data d'entrada es NULL, fica com a data l'actual.
@@ -13,5 +11,3 @@ BEGIN
         SET vDate = NOW();
     END IF;
 END
-$$
-DELIMITER ;

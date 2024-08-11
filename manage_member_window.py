@@ -1176,7 +1176,7 @@ class ManageMemberWindow(tk.Toplevel):
 				self.fill_in_fields(id)
 		except:
 			messagebox.showinfo(
-				"Info", "Encara no tens fallers a la base de dades"
+				"Info", "No hi ha fallers amb id = 0"
 			)
 		
 
