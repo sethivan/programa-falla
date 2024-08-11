@@ -25,20 +25,21 @@ class Database:
 		db_name : string
 			Nom de la base de dades.
 		'''
-		self.verify_existence_db(db_name)
-		self.mysqlConnection = mysql.connector.connect(
-			host = "localhost",
-			user = "root",
-			password = "hamuclaulo07",
-			database = db_name
-		)
-		if self.mysqlConnection.is_connected():
-			self.mysqlCursor = self.mysqlConnection.cursor()
-		else:
+		try:
+			self.mysqlConnection = mysql.connector.connect(
+				host = "localhost",
+				user = "root",
+				password = "hamuclaulo07",
+				database = db_name
+			)
+			if self.mysqlConnection.is_connected():
+				self.mysqlCursor = self.mysqlConnection.cursor()
+		except:
 			messagebox.showerror(
 				"Error",
 				"No s'ha pogut establir la conexió amb la base de dades."
 			)
+			self.verify_existence_db(db_name)
 
 	
 	def close_connection(self):
@@ -83,178 +84,37 @@ class Database:
 					"La base de dades no existeix. Es crearà automàticament."
 				)
 				new_database = CreateDatabase()
-				new_database.create_database()
-				#self.create_database(db_name)
-				#self.create_tables(db_name)
+				self.insert_initial_data('sp')
+
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",
 				"No s'ha pogut verificar l'existència de la base de dades."
 			)
 
+	
+	def insert_initial_data(self, db_name):
 
-	def create_database(self, db_name):
-		'''
-		Crea la BBDD
-		'''
-		self.mysqlConnection = mysql.connector.connect(
+		try:
+			self.mysqlConnection = mysql.connector.connect(
 				host = "localhost",
 				user = "root",
-				password = "hamuclaulo07"
+				password = "hamuclaulo07",
+				database = db_name
 			)
-		if self.mysqlConnection.is_connected():
-			self.mysqlCursor = self.mysqlConnection.cursor()
-		else:
+			if self.mysqlConnection.is_connected():
+				self.mysqlCursor = self.mysqlConnection.cursor()
+		except:
 			messagebox.showerror(
 				"Error",
 				"No s'ha pogut establir la conexió amb la base de dades."
 			)
-		query = f"CREATE DATABASE IF NOT EXISTS {db_name}"
-		try:
-			self.mysqlCursor.execute(query)
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut crear la base de dades"
-			)
-
-
-	def create_tables(self, db_name):
-		'''
-		Crea les diferents taules
-		'''
-		self.mysqlConnection = mysql.connector.connect(
-					host = "localhost",
-					user = "root",
-					password = "hamuclaulo07",
-					database = db_name
-				)
-		if self.mysqlConnection.is_connected():
-			self.mysqlCursor = self.mysqlConnection.cursor()
-		else:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut establir la conexió amb la base de dades."
-			)
-
-		query="""
-		CREATE TABLE IF NOT EXISTS member(
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			name VARCHAR(50) NOT NULL,
-			surname VARCHAR(100) NOT NULL,
-			birthdate DATE NOT NULL,
-			gender ENUM('M', 'F'),
-			dni VARCHAR(10),
-			address VARCHAR(100),
-			phoneNumber VARCHAR(15),
-			isRegistered BOOLEAN,
-			familyFk INT,
-			categoryFk INT,
-			email VARCHAR(50)
-		)
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut crear la taula member"
-			)
-		
-		query = """
-		CREATE TABLE IF NOT EXISTS category(
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			fee DECIMAL(10, 2) NOT NULL,
-			name VARCHAR(10),
-			description VARCHAR(50)
-		)
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut crear la taula category"
-			)
-
-		query = """
-		CREATE TABLE IF NOT EXISTS family(
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			discount DECIMAL(10, 2) NOT NULL,
-			isDirectDebited BOOLEAN
-		)
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut crear la taula family"
-			)
-		
-		query = """
-		CREATE TABLE IF NOT EXISTS movement(
-			id INT AUTO_INCREMENT PRIMARY KEY,
-			transactionDate DATE NOT NULL,
-			amount DECIMAL(10, 2) NOT NULL,
-			idType INT NOT NULL,
-			idConcept INT NOT NULL,
-			fallaYearFk INT NOT NULL,
-			memberFk INT,
-			description VARCHAR(100),
-			receiptNumber INT
-		)
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"No s'ha pogut crear la taula movement"
-			)
-
-		# al crear la resta de taules pendents recordar la columna virtual difference en summaryMembersFallaYear
-
-		query = """
-		ALTER TABLE member
-			ADD CONSTRAINT member_family_FK
-			FOREIGN KEY(familyFk)
-			REFERENCES family(id)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE,
-			ADD CONSTRAINT member_category_FK
-			FOREIGN KEY(categoryFk)
-			REFERENCES category(id)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"Ha fallat la creació de les FK de la taula member."
-			)
-
-		query = """
-		ALTER TABLE movement
-			ADD CONSTRAINT movement_member_FK
-			FOREIGN KEY(memberFk)
-			REFERENCES member(id)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE
-		"""
-		try:
-			self.mysqlCursor.execute(query)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"Ha fallat la creació de la FK de la taula moviment."
-			)
-		finally:
-			self.close_connection()
+		self.insert_falla_year()
+		self.insert_category(360, "adult", "major de 18 anys")
+		self.insert_category(225, "cadet", "entre 14 i 17 anys")
+		self.insert_category(150, "jovenil", "entre 10 i 13 anys")
+		self.insert_category(95, "infantil", "entre 5 i 9 anys")
+		self.insert_category(40, "bebe", "menor de 5 anys")
 
 
 	def export_category_to_mysql(self, result):
@@ -406,6 +266,27 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al insertar faller a la base de dades"
+			)
+
+
+	def count_members(self):
+		'''
+		Compta en la taula "member" la quantitat de fallers totals.
+
+		Retorna:
+		--------
+		members_count : int
+			Quantitat de fallers a la taula.
+		'''
+		query = "SELECT COUNT(*) FROM member"
+		try:
+			self.mysqlCursor.execute(query)
+			total_members = self.mysqlCursor.fetchone()
+			return total_members[0]
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir la quantitat de fallers de la base de dades"
 			)
 
 
@@ -1183,6 +1064,32 @@ class Database:
 
 
 	# Mètodes per a operacions CRUD en la taula category.
+	def insert_category(self, fee, name, description):
+		'''
+		Escriu a la base de dades la categoria que se li passa
+		com a paràmetre a la taula "category".
+
+		Paràmetres:
+		-----------
+		fee : float
+			Quota.
+		name : string
+			Nom de la categoria.
+		description : string
+			Descripció de la categoria.
+		'''
+		query = "INSERT INTO category (fee, name, description) VALUES (%s, %s, %s)"
+		data = fee, name, description
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar una categoria a la base de dades"
+			)
+
+
 	def select_category(self, id):
 		'''
 		Llig de la taula "category" aquella categoria 
@@ -1396,10 +1303,10 @@ class Database:
 		try:
 			self.mysqlCursor.execute(query, data)
 			self.mysqlConnection.commit()
-		except mysql.connector.Error:
+		except mysql.connector.Error as e:
 			messagebox.showerror(
 				"Error",
-				"Error al insertar el nou exercici"
+				f"Error al insertar el nou exercici: {e}"
 			)
 
 

@@ -1,5 +1,5 @@
 import mysql.connector
-
+from pathlib import Path
 from tkinter import messagebox
 
 
@@ -17,21 +17,23 @@ class CreateDatabase:
 		Inicialitza una nova instància de la classe CreateDatabase.
 		Conexió MariaDb.
 		'''
-		self.create_database('/db/database_creation.sql')
+		base_path = Path(__file__).parent.resolve()
 
-		self.create_procedure_trigger('/db/procedures/calculateFallaYear.sql')
-		self.create_procedure_trigger('/db/procedures/calculateMemberCategory.sql')
-		self.create_procedure_trigger('/db/procedures/calculateMemberFallaAge.sql')
-		self.create_procedure_trigger('/db/procedures/getCurrentDate.sql')
-		self.create_procedure_trigger('/db/procedures/getCurrentFallaYear.sql')
-		self.create_procedure_trigger('/db/procedures/modifyMembershipHistory.sql')
+		self.create_database(base_path / 'db' / 'database_creation.sql')
 
-		self.create_procedure_trigger('/db/triggers/fallaYear_beforeInsert.sql')
-		self.create_procedure_trigger('/db/triggers/fallaYear_beforeUpdate.sql')
-		self.create_procedure_trigger('/db/triggers/member_beforeInsert.sql')
-		self.create_procedure_trigger('/db/triggers/member_beforeUpdate.sql')
-		self.create_procedure_trigger('/db/triggers/movement_beforeInsert.sql')
-		self.create_procedure_trigger('/db/triggers/summaryMembersFallaYear_beforeInsert.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateFallaYear.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateMemberCategory.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateMemberFallaAge.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'getCurrentDate.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'getCurrentFallaYear.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'modifyMembershipHistory.sql')
+
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'fallaYear_beforeInsert.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'fallaYear_beforeUpdate.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'member_beforeInsert.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'member_beforeUpdate.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'movement_beforeInsert.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'summaryMembersFallaYear_beforeInsert.sql')
 
 
 	def close_connection(self):
@@ -60,9 +62,13 @@ class CreateDatabase:
 					"No s'ha pogut establir la conexió amb la base de dades."
 				)
 			with open(sql_file, 'r') as file:
-				sql_script = file.read
-			self.mysqlCursor.execute(sql_script, multi = True)
+				sql_script = file.read()
+
+			for result in self.mysqlCursor.execute(sql_script, multi = True):
+				pass
+
 			self.mysqlConnection.commit()
+
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",
@@ -83,7 +89,7 @@ class CreateDatabase:
 				host = "localhost",
 				user = "root",
 				password = "hamuclaulo07",
-				database = "sp"
+				database = 'sp'
 			)
 			if self.mysqlConnection.is_connected():
 				self.mysqlCursor = self.mysqlConnection.cursor()
@@ -93,9 +99,13 @@ class CreateDatabase:
 					"No s'ha pogut establir la conexió amb la base de dades."
 				)
 			with open(sql_file, 'r') as file:
-				sql_script = file.read
-			self.mysqlCursor.execute(sql_script, multi = True)
+				sql_script = file.read()
+
+			for result in self.mysqlCursor.execute(sql_script, multi = True):
+				pass
+
 			self.mysqlConnection.commit()
+
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",

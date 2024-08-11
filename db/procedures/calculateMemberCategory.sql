@@ -1,7 +1,5 @@
 DROP PROCEDURE IF EXISTS sp.calculateMemberCategory;
 
-DELIMITER $$
-$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`calculateMemberCategory`(
 	IN vBirthdate DATETIME, OUT vCategoryFk INT
 )
@@ -28,5 +26,3 @@ BEGIN
 			SET vCategoryFk = 1;
 	END CASE;
 END
-$$
-DELIMITER ;
