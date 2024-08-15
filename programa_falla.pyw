@@ -26,6 +26,7 @@ from finestra_loteria import FinestraLoteria
 from arxiu import Arxiu
 from utils import Utils
 from database import Database
+from export_sqlite_to_mariadb import ExportSqliteToMariaDb
 
 from falla import Falla
 from category import Category
@@ -211,6 +212,23 @@ class Aplicacio(tk.Frame):
 			llista.append(any_exercici)
 			arxiu.modificar_exercici_actual(llista)
 			messagebox.showwarning("Avís", "No hi havia cap arxiu amb l'informació de l'exercici i s'ha creat un nou")
+		if not os.path.exists("falla.db"):
+			bd=BaseDeDades("falla.db")
+			bd.crear_taules()
+			categoria=Category(0, 475, "adult", "major de 18 anys")
+			bd.crear_categoria(categoria)
+			categoria=Category(0, 300, "cadet", "entre 14 i 17 anys")
+			bd.crear_categoria(categoria)
+			categoria=Category(0, 200, "juvenil", "entre 10 i 13 anys")
+			bd.crear_categoria(categoria)
+			categoria=Category(0, 125, "infantil", "entre 5 i 9 anys")
+			bd.crear_categoria(categoria)
+			categoria=Category(0, 50, "bebè", "menor de 5 anys")
+			bd.crear_categoria(categoria)
+			bd.tancar_conexio()
+			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
+		ExportSqliteToMariaDb('sp')
+=======
 		'''
 	
 	

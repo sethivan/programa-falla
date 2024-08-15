@@ -8,7 +8,6 @@ import subprocess
 import platform
 import pickle
 
-from export_sqlite_to_mariadb import BaseDeDades
 from utils import Utils
 from arxiu import Arxiu
 from falla import Falla
@@ -738,11 +737,11 @@ class Report():
 		os.chdir(path)
 
 
-	def registrations_cancellations_list(self):
-		'''
+	'''def registrations_cancellations_list(self):
+		
 		Crea un .pdf amb un llistat de les altes i les baixes de la falla
 		al comparar els actuals fallers amb el resum de l'any anterior.
-		'''
+		
 		file=Arxiu('exercici')
 		exercici_actual=file.llegir_exercici_actual()
 		any_anterior=exercici_actual-1
@@ -857,7 +856,7 @@ class Report():
 			path=os.getcwd()
 			os.chdir("altes i baixes")
 			os.startfile(str(current_date)+".pdf")
-			os.chdir(path)
+			os.chdir(path)'''
 
 
 	def members_with_raffle_list(self):
