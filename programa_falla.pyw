@@ -228,8 +228,6 @@ class Aplicacio(tk.Frame):
 			bd.tancar_conexio()
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
 		ExportSqliteToMariaDb('sp')
-=======
-		'''
 	
 	
 	def modificar_categories(self):
