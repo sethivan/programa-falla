@@ -1,7 +1,5 @@
-DROP PROCEDURE IF EXISTS sp.getCurrentFallaYear;
+DROP PROCEDURE IF EXISTS sp.modifyMembershipHistory;
 
-DELIMITER $$
-$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`modifyMembershipHistory`(
 	IN vId INT, IN vIsRegistered BOOLEAN
 )
@@ -31,5 +29,3 @@ BEGIN
 			WHERE memberFk = vId AND fallaYear = vFallaYear;
 		END IF;
 END
-$$
-DELIMITER ;

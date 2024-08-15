@@ -1,7 +1,5 @@
 USE sp;
 
-DELIMITER $$
-$$
 CREATE DEFINER=`root`@`localhost` TRIGGER fallaYear_beforeInsert
 BEFORE INSERT
 ON fallaYear FOR EACH ROW
@@ -13,5 +11,3 @@ BEGIN
 		CALL calculateFallaYear(NEW.code);
 	END IF;
 END
-$$
-DELIMITER ;

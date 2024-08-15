@@ -188,8 +188,10 @@ class Aplicacio(tk.Frame):
 		'''
 		Comprova si existeixen els arxius necessaris per a que funcione el programa i en cas de que falten, els crea.
 		Si es crea algún arxiu, avisa a l'usuari de que ho ha fet per a que prenga les mesures necessàries.
-		
-		db=Database("sp")
+		'''
+		db = Database('sp')
+		db.close_connection()
+		'''
 		bd=BaseDeDades("falla.db")
 		if not os.path.exists("exercici"):
 			llista=[]
@@ -226,6 +228,8 @@ class Aplicacio(tk.Frame):
 			bd.tancar_conexio()
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
 		ExportSqliteToMariaDb('sp')
+=======
+		'''
 	
 	
 	def modificar_categories(self):
@@ -241,7 +245,12 @@ class Aplicacio(tk.Frame):
 		Crea una nova instància de la classe FinestraGestionar
 		que obri la finestra "Gestionar" del menú "Faller".
 		'''
-		ManageMemberWindow(self)
+		db = Database('sp')
+		total_members = db.count_members()
+		if total_members > 0:
+			ManageMemberWindow(self)
+		else:
+			messagebox.showwarning("Avís", "Primer has de donar d'alta algun faller")
 
 
 	def introduir_faller(self):

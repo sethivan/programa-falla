@@ -1,7 +1,5 @@
 DROP PROCEDURE IF EXISTS sp.calculateFallaYear;
 
-DELIMITER $$
-$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`calculateFallaYear`(OUT vSelf INT)
 BEGIN
 	DECLARE vDate DATETIME;
@@ -25,5 +23,3 @@ BEGIN
 	   		SET vSelf = vYear;
 	END CASE;
 END
-$$
-DELIMITER ;
