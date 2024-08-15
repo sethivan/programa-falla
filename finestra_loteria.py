@@ -4,7 +4,6 @@ from tkinter import messagebox
 import platform
 
 from utils import Utils
-from export_sqlite_to_mariadb import BaseDeDades
 from arxiu import Arxiu
 
 from falla import Falla
@@ -326,11 +325,11 @@ class FinestraLoteria(tk.Toplevel):
 		#self.omplir_dades(self.id.get())
 
 
-	def omplir_nom(self, id):
-		bd=BaseDeDades('falla.db')
-		faller=bd.llegir_faller(id)
-		self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
-		bd.tancar_conexio()
+	#def omplir_nom(self, id):
+		#bd=BaseDeDades('falla.db')
+		#faller=bd.llegir_faller(id)
+		#self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
+		#bd.tancar_conexio()
 
 
 	def calcular_totals(self, event):
@@ -388,7 +387,7 @@ class FinestraLoteria(tk.Toplevel):
 
 
 	def modificar_fila(self):
-		bd=BaseDeDades('falla.db')
+		#bd=BaseDeDades('falla.db')
 		utils=Utils()
 		data=utils.calcular_data_actual()
 		self.calcular_totals('<FocusOut>') # Calculem els totals per si no s'ha fet abans.
@@ -425,13 +424,13 @@ class FinestraLoteria(tk.Toplevel):
 			self.total_benefici.set(self.total_benefici.get()+self.benefici.get())
 			self.total_suma.set(self.total_suma.get()+self.total.get())
 			# Mirem si el registre està en la base de dades i en cas de ser així el modifiquem.
-			ultim_id=bd.llegir_ultim_id_loteria()
-			if ultim_id<=id:
-				messagebox.showinfo("Info", "El registre encara no està a la base de dades. Es guardarà al fer clic en Guardar junt amb la resta de registres")
-			else:
-				loteria=Loteria(id, sorteig, data, self.paperetes_masculina.get(), self.paperetes_femenina.get(), self.paperetes_infantil.get(),
-					self.decims_masculina.get(), self.decims_femenina.get(), self.decims_infantil.get(), 0)
-				bd.actualitzar_loteria(loteria)
+			#ultim_id=bd.llegir_ultim_id_loteria()
+			#if ultim_id<=id:
+				#messagebox.showinfo("Info", "El registre encara no està a la base de dades. Es guardarà al fer clic en Guardar junt amb la resta de registres")
+			#else:
+				#loteria=Loteria(id, sorteig, data, self.paperetes_masculina.get(), self.paperetes_femenina.get(), self.paperetes_infantil.get(),
+					#self.decims_masculina.get(), self.decims_femenina.get(), self.decims_infantil.get(), 0)
+				#bd.actualitzar_loteria(loteria)
 		# Resetegem camps.
 		self.id.set("")
 		self.combo_box_faller.set("")
@@ -439,11 +438,11 @@ class FinestraLoteria(tk.Toplevel):
 		self.button_modificar.config(state="disabled")
 		self.button_eliminar.config(state="disabled")
 		self.resetejar_camps()
-		bd.tancar_conexio()
+		#bd.tancar_conexio()
 
 
 	def eliminar_fila(self):
-		bd=BaseDeDades('falla.db')
+		#bd=BaseDeDades('falla.db')
 		fila=self.tree_loteria.selection()
 		id=self.tree_loteria.item(fila, option="text")
 		llista_dades=self.tree_loteria.item(fila, option="values")
@@ -464,21 +463,21 @@ class FinestraLoteria(tk.Toplevel):
 			# Eliminem la fila a l'arbre.
 			self.tree_loteria.delete(fila)
 			# Eliminem el registre de la fila a la base de dades en cas de que ja estiga guardat.
-			ultim_id=bd.llegir_ultim_id_loteria()
-			if ultim_id>id:
-				bd.eliminar_loteria(id)
+			#ultim_id=bd.llegir_ultim_id_loteria()
+			#if ultim_id>id:
+				#bd.eliminar_loteria(id)
 		# Canviem la configuració dels botons.
 		self.combo_box_faller.config(state="normal")
 		self.button_modificar.config(state="disabled")
 		self.button_eliminar.config(state="disabled")
-		bd.tancar_conexio()
+		#bd.tancar_conexio()
 
 
-	def desplegar_sortejos(self):
-		bd=BaseDeDades('falla.db')
-		llistat_sortejos=bd.llegir_sortejos()
-		self.combo_box_sorteig["values"]=llistat_sortejos
-		bd.tancar_conexio()
+	#def desplegar_sortejos(self):
+		#bd=BaseDeDades('falla.db')
+		#llistat_sortejos=bd.llegir_sortejos()
+		#self.combo_box_sorteig["values"]=llistat_sortejos
+		#bd.tancar_conexio()
 
 
 	def obrir(self):
@@ -499,8 +498,8 @@ class FinestraLoteria(tk.Toplevel):
 		self.total_benefici.set("0")
 		self.total_suma.set("0")
 		# Traguem el llistat de loteries corresponent al sorteig triat.
-		bd=BaseDeDades('falla.db')
-		llistat_loteries=bd.llegir_loteries_per_sorteig(sorteig)
+		#bd=BaseDeDades('falla.db')
+		#llistat_loteries=bd.llegir_loteries_per_sorteig(sorteig)
 		total_paperetes_masculina=0
 		total_paperetes_femenina=0
 		total_paperetes_infantil=0
@@ -509,39 +508,39 @@ class FinestraLoteria(tk.Toplevel):
 		total_decims_infantil=0
 		total_diners=0
 		total_benefici=0
-		for loteria in llistat_loteries:
-			total_paperetes_masculina=total_paperetes_masculina + loteria.paperetes_masculina
-			total_paperetes_femenina=total_paperetes_femenina + loteria.paperetes_femenina
-			total_paperetes_infantil=total_paperetes_infantil + loteria.paperetes_infantil
-			total_decims_masculina=total_decims_masculina + loteria.decims_masculina
-			total_decims_femenina=total_decims_femenina + loteria.decims_femenina
-			total_decims_infantil=total_decims_infantil + loteria.decims_infantil
-			diners=loteria.calcular_diners()
-			total_diners=total_diners + diners
-			benefici=loteria.calcular_benefici()
-			total_benefici=total_benefici + benefici
-			total=diners+benefici
-			nom=loteria.faller.cognoms + ", " + loteria.faller.nom
-			llista_dades=[nom, loteria.paperetes_masculina, loteria.paperetes_femenina, loteria.paperetes_infantil, loteria.decims_masculina, loteria.decims_femenina, loteria.decims_infantil, diners, benefici, total, loteria.assignada]
-			self.tree_loteria.insert("", "end", text=loteria.id, values=llista_dades)
-		bd.tancar_conexio()
+		#for loteria in llistat_loteries:
+			#total_paperetes_masculina=total_paperetes_masculina + loteria.paperetes_masculina
+			#total_paperetes_femenina=total_paperetes_femenina + loteria.paperetes_femenina
+			#total_paperetes_infantil=total_paperetes_infantil + loteria.paperetes_infantil
+			#total_decims_masculina=total_decims_masculina + loteria.decims_masculina
+			#total_decims_femenina=total_decims_femenina + loteria.decims_femenina
+			#total_decims_infantil=total_decims_infantil + loteria.decims_infantil
+			#diners=loteria.calcular_diners()
+			#total_diners=total_diners + diners
+			#benefici=loteria.calcular_benefici()
+			#total_benefici=total_benefici + benefici
+			#total=diners+benefici
+			#nom=loteria.faller.cognoms + ", " + loteria.faller.nom
+			#llista_dades=[nom, loteria.paperetes_masculina, loteria.paperetes_femenina, loteria.paperetes_infantil, loteria.decims_masculina, loteria.decims_femenina, loteria.decims_infantil, diners, benefici, total, loteria.assignada]
+			#self.tree_loteria.insert("", "end", text=loteria.id, values=llista_dades)
+		#bd.tancar_conexio()
 
 
 	def guardar(self):
 		utils=Utils()
 		data=utils.calcular_data_actual
-		bd=BaseDeDades('falla.db')
+		#bd=BaseDeDades('falla.db')
 		sorteig=self.combo_box_sorteig.get()
-		ultim_id=bd.llegir_ultim_id_loteria()
+		#ultim_id=bd.llegir_ultim_id_loteria()
 		llistat_files=self.tree_loteria.get_children()
 		for fila in llistat_files:
 			id=self.tree_loteria.item(fila, option="text")
 			llistat_dades=self.tree_loteria.item(fila, option="values")
-			faller=bd.llegir_faller(llistat_dades[12])
-			loteria=Loteria(id, sorteig, data, llistat_dades[1], llistat_dades[2], llistat_dades[3], llistat_dades[4], llistat_dades[5], llistat_dades[6], faller)
-			if id>ultim_id:
-				bd.crear_loteria(loteria)
-		bd.tancar_conexio()
+			#faller=bd.llegir_faller(llistat_dades[12])
+			#loteria=Loteria(id, sorteig, data, llistat_dades[1], llistat_dades[2], llistat_dades[3], llistat_dades[4], llistat_dades[5], llistat_dades[6], faller)
+			#if id>ultim_id:
+				#bd.crear_loteria(loteria)
+		#bd.tancar_conexio()
 
 
 	def assignar(self):
@@ -553,16 +552,16 @@ class FinestraLoteria(tk.Toplevel):
 			exercici_actual=arxiu.llegir_exercici_actual()
 			self.guardar()
 			llistat_files=self.tree_loteria.get_children()
-			bd=BaseDeDades('falles.db')
+			#bd=BaseDeDades('falles.db')
 			for fila in llistat_files:
 				id=self.tree_loteria.item(fila, option="text")
 				llistat_dades=self.tree_loteria.item(fila, option="values")
 				moviment=Movement(0, data, llistat_dades[8], 1, 2, exercici_actual, self.combo_box_sorteig.get())
-				bd.crear_moviment(moviment)
+				#bd.crear_moviment(moviment)
 				moviment=Movement(0, data, llistat_dades[9], 2, 1, exercici_actual, self.combo_box_sorteig.get())
-				bd.crear_moviment(moviment)
+				#bd.crear_moviment(moviment)
 				# Actualització de tots els registres a estat assignat.
-				bd.actualitzar_assignada_loteria(id)
+				#bd.actualitzar_assignada_loteria(id)
 			self.button_assignar.config(state="disabled")
 
 

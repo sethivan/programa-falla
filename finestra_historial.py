@@ -3,7 +3,6 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
 
-from export_sqlite_to_mariadb import BaseDeDades
 from arxiu import Arxiu
 from utils import Utils
 
@@ -161,11 +160,11 @@ class FinestraHistorial(tk.Toplevel):
 		self.mainloop()
 	
 	
-	def desplegar_historial(self):
-		'''
+	'''def desplegar_historial(self):
+		
 		Controla el combobox comparant la cadena escrita amb la base de dades i mostrant els resultats en el combobox.
 		Utilitza l'atribut "self.identificadors" per a passar el identificador de faller a la funció "seleccionar_historial".
-		'''
+		
 		bd=BaseDeDades("falla.db")
 		cadena=self.combo_box_faller.get()
 		llistat_fallers=bd.llegir_fallers_per_cognom(cadena)
@@ -179,9 +178,9 @@ class FinestraHistorial(tk.Toplevel):
 
 
 	def seleccionar_historial(self, event):
-		'''
+		
 		Controla la selecció del combobox per a guardar el identificador del faller i omplir l'historial a partir d'aquest.
-		'''
+		
 		index=self.combo_box_faller.current()
 		self.id.set(self.identificadors[index])
 		cadena=self.id.get()
@@ -190,9 +189,9 @@ class FinestraHistorial(tk.Toplevel):
 
 
 	def omplir_historial(self, id):
-		'''
+		
 		Ompli l'historial del faller a partir de l'id.
-		'''
+		
 		bd=BaseDeDades("falla.db")
 		faller=bd.llegir_faller(id)
 		self.combo_box_faller.set(faller.cognoms + ", " + faller.nom)
@@ -269,9 +268,9 @@ class FinestraHistorial(tk.Toplevel):
 
 
 	def modificar(self):
-		'''
+		
 		Modifica l'historial del faller amb les dades del formulari.
-		'''
+		
 		nom_arxiu="historials"+"/"+self.id.get()
 		arxiu=Arxiu(nom_arxiu)
 		try:
@@ -292,4 +291,4 @@ class FinestraHistorial(tk.Toplevel):
 			arxiu.modificar_historial(historial)
 			cadena=self.id.get()
 			self.omplir_historial(cadena)
-		
+		'''

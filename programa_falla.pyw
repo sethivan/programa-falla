@@ -26,6 +26,7 @@ from finestra_loteria import FinestraLoteria
 from arxiu import Arxiu
 from utils import Utils
 from database import Database
+from export_sqlite_to_mariadb import ExportSqliteToMariaDb
 
 from falla import Falla
 from category import Category
@@ -224,6 +225,7 @@ class Aplicacio(tk.Frame):
 			bd.crear_categoria(categoria)
 			bd.tancar_conexio()
 			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
+		ExportSqliteToMariaDb('sp')
 	
 	
 	def modificar_categories(self):
