@@ -10,6 +10,8 @@ from family import Family
 from movement import Movement
 from category import Category
 from loteria import Loteria
+from arxiu import Arxiu
+from utils import Utils
 
 class ExportSqliteToMariaDb:
 	
@@ -23,17 +25,23 @@ class ExportSqliteToMariaDb:
 			password = "hamuclaulo07",
 			database = nom_db
 		)
+
 		if self.mysqlConnection.is_connected():
 			self.mysqlCursor = self.mysqlConnection.cursor()
 
-			#self.import_categoria_from_sqlite()
-			#self.import_familia_from_sqlite()
-			#self.import_faller_from_sqlite()
-			self.insert_fallaYear(2019, "2021-03-20", "2022-03-19")
-			#self.insert_fallaYear(2022, "2021-03-20", "2022-03-19")
-			#self.insert_fallaYear(2023, "2022-03-20", "2023-03-19")
-			#self.insert_fallaYear(2024, "2023-03-20", "2024-06-26")
-			#self.import_moviment_from_sqlite()
+			self.insert_fallaYear(2022, "2021-03-20", "2022-03-19")
+			self.insert_fallaYear(2023, "2022-03-20", "2023-03-19")
+			self.insert_fallaYear(2024, "2023-03-20", "2024-06-26")
+			self.import_categoria_from_sqlite()
+			self.import_familia_from_sqlite()
+			self.import_faller_from_sqlite()
+			self.import_moviment_from_sqlite()
+			self.import_summary_from_file("resum 2022", 2022)
+			self.import_summary_from_file("resum 2023", 2023)
+			self.import_summary_from_file("resum 2024", 2024)
+			self.import_lottery_from_file('nadal 2023-24', 'nadal', 2024)
+			self.import_lottery_from_file('loteria xiquet 23-24', 'xiquet', 2024)
+
 		else:
 			messagebox.showerror(
 				"Error",
@@ -54,23 +62,27 @@ class ExportSqliteToMariaDb:
 		self.cursor.execute("SELECT * FROM familia")
 		result = self.cursor.fetchall()
 		for value in result:
-			self.insert_family(value[0], value[1], value[2], value[3])
+			self.insert_family(value[0], value[1], value[2])
 	
 
 	def import_faller_from_sqlite(self):
 
 		self.cursor.execute("SELECT * FROM faller")
 		result = self.cursor.fetchall()
+		utils = Utils()
 		for value in result:
-			self.insert_member(value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9], value[10], value[11])
+			mariadbDate = utils.convert_to_mariadb_date(value[3])
+			self.insert_member(value[0], value[1], value[2], mariadbDate, value[4], value[5], value[6], value[7], value[8], value[9], value[10], value[11])
 	
 
 	def import_moviment_from_sqlite(self):
 
 		self.cursor.execute("SELECT * FROM moviment")
 		result = self.cursor.fetchall()
+		utils = Utils()
 		for value in result:
-			self.insert_member(value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8])
+			mariadbDate = utils.convert_to_mariadb_date(value[1])
+			self.insert_movement(value[0], mariadbDate, value[2], value[3], value[4], value[5], value[6], value[7], value[8])
 	
 
 	def tancar_conexio(self):
@@ -78,6 +90,26 @@ class ExportSqliteToMariaDb:
 		self.conexio.close()
 		self.mysqlCursor.close()
 		self.mysqlConnection.close()
+
+
+	def import_summary_from_file(self, file, falla_year):
+		arxiu = Arxiu(file)
+		result = arxiu.llegir_resum()
+		for value in result:
+			self.insert_summary(value[0], falla_year, value[1], value[2], value[3], value[5], value[6], value[7])
+
+
+	def import_lottery_from_file(self, file, lottery_name, falla_year):
+		arxiu = Arxiu(file)
+		result = arxiu.llegir_loteria()
+		i=0
+		for val in result:
+			if len(result)>i:
+				memberFk = result[i]
+				value=result[i+1]
+				i=i+2
+				self.insert_lottery(lottery_name, falla_year, memberFk, value[1], value[2], value[3], value[4], value[5], value[6], 1)
+			
 
 
 	def update_category(self, id, fee):
@@ -108,12 +140,12 @@ class ExportSqliteToMariaDb:
 			)
 
 
-	def insert_member(self, id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category):
+	def insert_member(self, id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, id_family, id_category, email):
 		query = "INSERT INTO member \
 			(id, name, surname, birthdate, gender, dni, address, phoneNumber, \
-				isRegistered, email, familyFk, categoryFk) \
+				isRegistered, familyFk, categoryFk, email) \
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-		data = id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, email, id_family, id_category
+		data = id, name, surname, birthdate, gender, dni, address, phone_number, is_registered, id_family, id_category, email
 		try:
 			self.mysqlCursor.execute(query, data)
 			self.mysqlConnection.commit()
@@ -165,6 +197,61 @@ class ExportSqliteToMariaDb:
 				"Error al insertar un exercici a la base de dades"
 			)
 			print({err})
+
+
+	def insert_summary(
+			self,
+			id_member,
+			falla_year,
+			assignedFee,
+			assignedLottery,
+			assignedRaffle,
+			payedFee,
+			payedLottery,
+			payedRaffle
+		):
+		query = "INSERT INTO summaryMembersFallaYear \
+			(memberFk, fallaYearFk, assignedFee, assignedLottery, assignedRaffle, payedFee, \
+				payedLottery, payedRaffle) \
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+		data = id_member, falla_year, assignedFee, assignedLottery, assignedRaffle, payedFee, payedLottery, payedRaffle
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar el resum anual del faller"
+			)
+
+
+	def insert_lottery(
+			self,
+			lottery_name,
+			falla_year,
+			member,
+			tickets_male,
+			tickets_female,
+			tickets_childish,
+			tenths_male,
+			tenths_female,
+			tenths_childish,
+			is_assigned
+		):
+		assigned = None
+		query = "INSERT INTO lottery \
+			(lotteryName, assigned, fallaYearFk, memberFk, ticketsMale, ticketsFemale, ticketsChildish, tenthsMale, tenthsFemale, tenthsChildish, isAssigned) \
+				VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+		data = lottery_name, assigned, falla_year, member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, is_assigned
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error as e:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar el arxiu de loteria"
+			)
+			print({e})
 
 
 	# Mètodes per a operacions CRUD en la taula faller.

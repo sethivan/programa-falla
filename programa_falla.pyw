@@ -191,43 +191,8 @@ class Aplicacio(tk.Frame):
 		'''
 		db = Database('sp')
 		db.close_connection()
-		'''
-		bd=BaseDeDades("falla.db")
-		if not os.path.exists("exercici"):
-			llista=[]
-			arxiu=Arxiu("exercici")
-			utils=Utils()
-			data_actual=utils.calcular_data_actual()
-			dia_actual=int(data_actual[0])
-			mes_actual=int(data_actual[1])
-			any_actual=int(data_actual[2])
-			if mes_actual>3:
-				any_exercici=any_actual+1
-			elif mes_actual<2:
-				any_exercici=any_actual
-			elif mes_actual==3 and dia_actual>19:
-				any_exercici=any_actual+1
-			elif mes_actual==3 and dia_actual<=19:
-				any_exercici=any_actual
-			llista.append(any_exercici)
-			arxiu.modificar_exercici_actual(llista)
-			messagebox.showwarning("Avís", "No hi havia cap arxiu amb l'informació de l'exercici i s'ha creat un nou")
-		if not os.path.exists("falla.db"):
-			bd=BaseDeDades("falla.db")
-			bd.crear_taules()
-			categoria=Category(0, 475, "adult", "major de 18 anys")
-			bd.crear_categoria(categoria)
-			categoria=Category(0, 300, "cadet", "entre 14 i 17 anys")
-			bd.crear_categoria(categoria)
-			categoria=Category(0, 200, "juvenil", "entre 10 i 13 anys")
-			bd.crear_categoria(categoria)
-			categoria=Category(0, 125, "infantil", "entre 5 i 9 anys")
-			bd.crear_categoria(categoria)
-			categoria=Category(0, 50, "bebè", "menor de 5 anys")
-			bd.crear_categoria(categoria)
-			bd.tancar_conexio()
-			messagebox.showwarning("Avís", "No hi havia cap base de dades del programa i s'ha creat una nova")'''
-		ExportSqliteToMariaDb('sp')
+		# Descomentar linea de baix per a fer cópia de sqLite a mariaDb
+		#ExportSqliteToMariaDb('sp')
 	
 	
 	def modificar_categories(self):

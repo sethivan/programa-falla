@@ -159,3 +159,12 @@ class Arxiu():
         pickle.dump(historial, fitxer)
         fitxer.close()
         del(fitxer)
+
+
+    def llegir_loteria(self):
+
+        fitxer=open(self.nom_arxiu,"rb")
+        loteria=pickle.load(fitxer)
+        fitxer.close()
+        del(fitxer)
+        return loteria

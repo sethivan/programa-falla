@@ -96,14 +96,48 @@ CREATE TABLE IF NOT EXISTS summaryMembersFallaYear(
 	payedLottery DECIMAL(10, 2) NOT NULL,
 	payedRaffle DECIMAL(10, 2) NOT NULL,
 	difference DECIMAL(10, 2) AS (
-    assignedFee + assignedLottery + assignedRaffle - 
-    (payedFee + payedLottery + payedRaffle)) VIRTUAL,
+		assignedFee + assignedLottery + assignedRaffle - 
+		(payedFee + payedLottery + payedRaffle)
+	) VIRTUAL,
 	CONSTRAINT summaryMembersFallaYear_fallaYear_FK
 	FOREIGN KEY(fallaYearFk)
 	REFERENCES fallaYear(code)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
 	CONSTRAINT summaryMembersFallaYear_member_FK
+	FOREIGN KEY(memberFk)
+	REFERENCES member(id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS lottery(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	lotteryName VARCHAR (30) NOT NULL,
+	assigned DATE NOT NULL,
+	fallaYearFk INT NOT NULL,
+	memberFk INT NOT NULL,
+	ticketsMale INT,
+	ticketsFemale INT,
+	ticketsChildish INT,
+	tenthsMale INT,
+	tenthsFemale INT,
+	tenthsChildish INT,
+	isAssigned BOOLEAN,
+	price DECIMAL(10, 2) AS (
+		(ticketsMale * 4) + (ticketsFemale * 4) + (ticketsChildish * 4) +
+		(tenthsMale * 20) + (tenthsFemale * 20) + (tenthsChildish * 20)
+	) VIRTUAL,
+	benefit DECIMAL(10, 2) AS (
+		ticketsMale + ticketsFemale + ticketsChildish +
+		(tenthsMale * 3) + (tenthsFemale * 3) + (tenthsChildish * 3)
+	) VIRTUAL,
+	CONSTRAINT lottery_fallaYear_FK
+	FOREIGN KEY(fallaYearFk)
+	REFERENCES fallaYear(code)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+	CONSTRAINT lottery_member_FK
 	FOREIGN KEY(memberFk)
 	REFERENCES member(id)
 	ON DELETE CASCADE
