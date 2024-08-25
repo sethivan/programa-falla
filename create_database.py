@@ -34,6 +34,7 @@ class CreateDatabase:
 		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'member_beforeUpdate.sql')
 		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'movement_beforeInsert.sql')
 		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'summaryMembersFallaYear_beforeInsert.sql')
+		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'lottery_beforeInsert.sql')
 
 
 	def close_connection(self):
