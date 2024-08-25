@@ -1,5 +1,7 @@
 import mysql.connector
 from tkinter import messagebox
+import subprocess
+from pathlib import Path
 
 from utils import Utils
 from create_database import CreateDatabase
@@ -83,7 +85,7 @@ class Database:
 					"Error",
 					"La base de dades no existeix. Es crearà automàticament."
 				)
-				new_database = CreateDatabase()
+				CreateDatabase()
 				self.insert_initial_data('sp')
 
 		except mysql.connector.Error:
@@ -117,96 +119,19 @@ class Database:
 		self.insert_category(40, "bebe", "menor de 5 anys")
 
 
-	def export_category_to_mysql(self, result):
-		'''
-		Exportació taula categoria a sp.category
-		'''
-		query = "INSERT INTO category (id, fee, name, description) \
-			VALUES (%s, %s, %s, %s)"
+	def backup_database(self, user, password, db_name):
 		try:
-			for row in result:
-				self.mysqlCursor.execute(query, row)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			self.mysqlConnection.rollback()
-			messagebox.showerror(
-				"Error",
-				"No s'han pogut insertar les dades a la taula category"
-			)
-		finally:
-			self.close_connection()
+			base_path = Path(__file__).parent.resolve()
 
+			backup_file = (base_path / 'db' / 'dump' / 'backup.sql')
+			command = f"mysqldump -u {user} -p{password} {db_name} > {backup_file}"
+			process = subprocess.run(command, shell = True, check = True)
 
-	def export_family_to_mysql(self, result):
-		'''
-		Exportació taula familia a sp.family
-		'''
-		query = "INSERT INTO family (id, discount, isDirectDebited) \
-			VALUES (%s, %s, %s)"
-		try:
-			for row in result:
-				self.mysqlCursor.execute(query, row)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			self.mysqlConnection.rollback()
-			messagebox.showerror(
-				"Error",
-				"No s'han pogut insertar les dades a la taula family"
-			)
-		finally:
-			self.close_connection()
+			if process.returncode == 0:
+				messagebox.showinfo("Backup", "La còpia de seguretat s'ha creat a backup.sql")
 
-
-	def export_member_to_mysql(self, result):
-		'''
-		Exportació taula faller a sp.member
-		'''
-		utils = Utils()
-		query = "INSERT INTO member \
-			(id, name, surname, birthdate, gender, dni, address, phoneNumber, \
-				isRegistered, familyFk, categoryFk, email) \
-					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-		try:
-			for row in result:
-				as_list = list(row)
-				date = utils.convert_to_mariadb_date(as_list[3])
-				as_list[3] = date
-				self.mysqlCursor.execute(query, as_list)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			self.mysqlConnection.rollback()
-			messagebox.showerror(
-				"Error",
-				"No s'han pogut insertar les dades a la taula member"
-			)
-		finally:
-			self.close_connection()
-
-
-	def export_movements_to_mysql(self, result):
-		'''
-		Exportació taula moviment a sp.movement
-		'''
-		utils=Utils()
-		query="INSERT INTO movement \
-			(id, transactionDate, amount, idType, idConcept, fallaYearFk, \
-				memberFk, description, receiptNumber) \
-					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-		try:
-			for row in result:
-				as_list = list(row)
-				date = utils.convert_to_mariadb_date(as_list[1])
-				as_list[1] = date
-				self.mysqlCursor.execute(query, as_list)
-			self.mysqlConnection.commit()
-		except mysql.connector.Error:
-			self.mysqlConnection.rollback()
-			messagebox.showerror(
-				"Error",
-				"No s'han pogut insertar les dades a la taula movement"
-			)
-		finally:
-			self.close_connection()
+		except subprocess.CalledProcessError:
+			messagebox.showerror("Backup", "Error en la creació del backup")
 
 
 	# Mètodes per a operacions CRUD en la taula member.
