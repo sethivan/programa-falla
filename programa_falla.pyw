@@ -277,7 +277,7 @@ class Aplicacio(tk.Frame):
 		valor=messagebox.askquestion("Eixir","Vols eixir de l'aplicació?")
 		if valor=="yes":
 			database = Database('sp')
-			database.backup_database("root", "hamuclaulo07", "sp")
+			database.create_backup_database("root", "hamuclaulo07", "sp")
 			self.master.destroy()
 
 

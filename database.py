@@ -83,11 +83,15 @@ class Database:
 			else:
 				messagebox.showerror(
 					"Error",
-					"La base de dades no existeix. Es crearà automàticament."
+					"La base de dades no existeix"
 				)
 				CreateDatabase()
-				self.insert_initial_data('sp')
-
+				value = messagebox.askquestion("Restaurar","Vols restaurar la base de dades?")
+				if value == "yes":
+					self.restore_backup_database("root", "hamuclaulo07", "sp")
+				else:
+					messagebox.showinfo("Info", "La base de dades es crearà automàticament")
+					self.insert_initial_data('sp')
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",
@@ -119,7 +123,7 @@ class Database:
 		self.insert_category(40, "bebe", "menor de 5 anys")
 
 
-	def backup_database(self, user, password, db_name):
+	def create_backup_database(self, user, password, db_name):
 		try:
 			base_path = Path(__file__).parent.resolve()
 
@@ -132,6 +136,22 @@ class Database:
 
 		except subprocess.CalledProcessError:
 			messagebox.showerror("Backup", "Error en la creació del backup")
+
+
+	def restore_backup_database(self, user, password, db_name):
+		base_path = Path(__file__).parent.resolve()
+		backup_file = (base_path / 'db' / 'dump' / 'backup.sql')
+		host = "localhost"
+		port = 3306
+		command = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {backup_file}"
+		try:
+			process = subprocess.run(command, shell = True, check = True)
+
+			if process.returncode == 0:
+				messagebox.showinfo("Backup", "La còpia de seguretat s'ha restaurat correctament")
+
+		except subprocess.CalledProcessError:
+			messagebox.showerror("Backup", "Error en la restauració del backup")
 
 
 	# Mètodes per a operacions CRUD en la taula member.
