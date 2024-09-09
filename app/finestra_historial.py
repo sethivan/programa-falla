@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
+from pathlib import Path
 
 from arxiu import Arxiu
 from utils import Utils
@@ -31,8 +32,9 @@ class FinestraHistorial(tk.Toplevel):
 		super().__init__(master)
 		self.master=master
 		sistema_operatiu=platform.system()
+		base_path = Path(__file__).parent.resolve()
 		if sistema_operatiu=='Windows':
-			self.iconbitmap("escut.ico")
+			self.iconbitmap(base_path / 'images' / 'escut.ico')
 		self.resizable(0,0)
 		self.title("Introduir Faller")
 		utils=Utils()

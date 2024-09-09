@@ -7,6 +7,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import platform
 from tkinter import messagebox
+from pathlib import Path
 
 from utils import Utils
 
@@ -40,8 +41,9 @@ class ModifyCategoriesWindow(tk.Toplevel):
 		super().__init__(master)
 		self.master = master
 		self.sistema_operatiu = platform.system()
+		base_path = Path(__file__).parent.resolve()
 		if self.sistema_operatiu == 'Windows':
-			self.iconbitmap("escut.ico")
+			self.iconbitmap(base_path / 'images' / 'escut.ico')
 		self.resizable(0,0)
 		self.title("Modificar Categories")
 		utils = Utils()

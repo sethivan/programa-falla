@@ -127,7 +127,7 @@ class Database:
 		try:
 			base_path = Path(__file__).parent.resolve()
 
-			backup_file = (base_path / 'db' / 'dump' / 'backup.sql')
+			backup_file = (base_path.parent / 'db' / 'dump' / 'backup.sql')
 			command = f"mysqldump -u {user} -p{password} {db_name} > {backup_file}"
 			process = subprocess.run(command, shell = True, check = True)
 
@@ -140,7 +140,7 @@ class Database:
 
 	def restore_backup_database(self, user, password, db_name):
 		base_path = Path(__file__).parent.resolve()
-		backup_file = (base_path / 'db' / 'dump' / 'backup.sql')
+		backup_file = (base_path.parent / 'db' / 'dump' / 'backup.sql')
 		host = "localhost"
 		port = 3306
 		command = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {backup_file}"

@@ -19,22 +19,22 @@ class CreateDatabase:
 		'''
 		base_path = Path(__file__).parent.resolve()
 
-		self.create_database(base_path / 'db' / 'database_creation.sql')
+		self.create_database(base_path.parent / 'db' / 'database_creation.sql')
 
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateFallaYear.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateMemberCategory.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'calculateMemberFallaAge.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'getCurrentDate.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'getCurrentFallaYear.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'procedures' / 'modifyMembershipHistory.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'calculateFallaYear.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'calculateMemberCategory.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'calculateMemberFallaAge.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'getCurrentDate.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'getCurrentFallaYear.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'procedures' / 'modifyMembershipHistory.sql')
 
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'fallaYear_beforeInsert.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'fallaYear_beforeUpdate.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'member_beforeInsert.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'member_beforeUpdate.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'movement_beforeInsert.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'summaryMembersFallaYear_beforeInsert.sql')
-		self.create_procedure_trigger(base_path / 'db' / 'triggers' / 'lottery_beforeInsert.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'fallaYear_beforeInsert.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'fallaYear_beforeUpdate.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'member_beforeInsert.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'member_beforeUpdate.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'movement_beforeInsert.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'summaryMembersFallaYear_beforeInsert.sql')
+		self.create_procedure_trigger(base_path.parent / 'db' / 'triggers' / 'lottery_beforeInsert.sql')
 
 
 	def close_connection(self):

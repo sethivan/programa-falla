@@ -15,6 +15,7 @@ from tkinter import messagebox
 import os
 import platform
 from PIL import Image, ImageTk
+from pathlib import Path
 
 from insert_member_window import InsertMemberWindow
 from manage_member_window import ManageMemberWindow
@@ -56,9 +57,10 @@ class Aplicacio(tk.Frame):
 		super().__init__(master) # Heretem de la classe Frame.
 		self.master = master
 		self.sistema_operatiu = platform.system()
+		base_path = Path(__file__).parent.resolve()
 		if self.sistema_operatiu == 'Windows':
 			self.master.state('zoomed') # La finestra s'obri maximitzada.
-			self.master.iconbitmap("escut.ico")
+			self.master.iconbitmap(base_path / 'images' / 'escut.ico')
 		elif self.sistema_operatiu == 'Linux':
 			self.master.attributes('-zoomed', True)
 		self.master.title("Falla Sants Patrons")
@@ -143,7 +145,7 @@ class Aplicacio(tk.Frame):
 		self.label_patrons=ttk.Label(label_frame_portada, text="Patrons", style="Portada.TLabel")
 		self.label_patrons.grid(row=2, column=0, padx=2)
 
-		logo=Image.open("escut.jpg")
+		logo=Image.open(base_path / 'images' / 'escut.jpg')
 		self.image=ImageTk.PhotoImage(logo)
 		self.label_image=tk.Label(label_frame_portada, image=self.image, borderwidth=0)
 		self.label_image.grid(row=3, column=0)
@@ -192,7 +194,7 @@ class Aplicacio(tk.Frame):
 		db = Database('sp')
 		db.close_connection()
 		# Descomentar linea de baix per a fer cópia de sqLite a mariaDb
-		#ExportSqliteToMariaDb('sp')
+		ExportSqliteToMariaDb('sp')
 	
 	
 	def modificar_categories(self):

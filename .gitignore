@@ -1,24 +1,6 @@
-escut.ico
-escut.jpg
-falla.db
-exercici
-env_falla
-historials
 __pycache__
-programa-falla.code-workspace
-resums
-rebuts
-moviments dia
-altes i baixes
-llistat fallers
-llistat general
-llistat rifes
-per edat
-resum 2022
-resum 2023
-resum 2024
-llistat general familiar
-llistat quotes no fallers
-loteria xiquet 23-24
-nadal 2023-24
-db/dump
+.venv
+images
+previous version
+reports
+dump

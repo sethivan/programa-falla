@@ -7,6 +7,7 @@ import os.path as path
 import subprocess
 import platform
 import pickle
+from pathlib import Path
 
 from utils import Utils
 from arxiu import Arxiu
@@ -30,17 +31,18 @@ class Report():
 		index : int
 			Número de rebut disponible per a ser assignat.
 		'''
+		base_path = Path(__file__).parent.resolve()
 		try:
-			os.mkdir("rebuts")
+			os.mkdir(base_path / 'reports' / 'rebuts')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
 
 		index = 1
-		file = "rebuts" + "/" + str(index)
-		while path.exists(file + ".pdf"):
+		file = base_path / 'reports' / 'rebuts' / (str(index) + ".pdf")
+		while path.exists(file):
 			index = index + 1
-			file = "rebuts" + "/" + str(index)
+			file = base_path / 'reports' / 'rebuts' / (str(index) + ".pdf")
 		return(index)
 
 
@@ -89,6 +91,7 @@ class Report():
 		payed_raffle : float
 			Quantitat total pagada pel faller en concepte de rifa.
 		'''
+		base_path = Path(__file__).parent.resolve()
 		utils = Utils()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
@@ -106,16 +109,16 @@ class Report():
 		total_debt = fee_debt + lottery_debt + raffle_debt
 
 		try:
-			os.mkdir("rebuts")
+			os.mkdir(base_path / 'reports' / 'rebuts')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
 
 		index = self.assign_receipt_number()
-		file = "rebuts" + "/" + str(index)
+		file = base_path / 'reports' / 'rebuts' / (str(index) + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 
 		c.line(0, h - (h / 3), w, h - (h / 3))
 		c.line(0, h / 3, w, h / 3)
@@ -173,20 +176,15 @@ class Report():
 		c.drawString(130, h - 260, "{0:.2f}".format(total_assigned) + " €")
 		c.drawString(200, h - 260, "{0:.2f}".format(total_payed) + " €")
 		c.drawString(270, h - 260, "{0:.2f}".format(total_debt) + " €")
-		c.drawImage("escut.jpg", 360, h - 260, height = 150, width = 200)
+		c.drawImage(base_path / 'images' / 'escut.jpg', 360, h - 260, height = 150, width = 200)
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("rebuts")
-		file = str(index) + ".pdf"
 		operating_system = platform.system()
 		if operating_system == 'Windows':
 			os.startfile(file)
 		elif operating_system == 'Linux':
-			complete_path = os.path.join(os.path.dirname(__file__), file)
-			subprocess.run(["xdg-open", complete_path])
-		os.chdir(path)
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def movements_report(self, date, cash, bank):
@@ -205,18 +203,18 @@ class Report():
 		'''
 		falla = Falla()
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		mariadb_date = utils.convert_to_mariadb_date(date)
-		page = 0
-
+		page = 0		
 		try:
-			os.mkdir("moviments dia")
+			os.mkdir(base_path / 'reports' / 'moviments dia')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "moviments dia" + "/" + str(date)
+		file = base_path / 'reports' / 'moviments dia' / (date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize=A4)
 		if cash == 1 and bank == 1:
 			falla.get_daily_payments(mariadb_date, "pagat en caixa")
 			falla.get_daily_payments(mariadb_date, "pagat pel banc")
@@ -268,16 +266,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("moviments dia")
-		file = str(date) + ".pdf"
 		operating_system = platform.system()
 		if operating_system == 'Windows':
 			os.startfile(file)
 		elif operating_system == 'Linux':
-			complete_path = os.path.join(os.path.dirname(__file__), file)
-			subprocess.run(["xdg-open", complete_path])
-		os.chdir(path)
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def general_report(self):
@@ -286,6 +279,7 @@ class Report():
 		de tots els fallers actius i, en conseqüència, de la falla al complet.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -300,14 +294,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat general")
+			os.mkdir(base_path / 'reports' / 'llistat general')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat general" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat general' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = landscape(A4))
+		c = canvas.Canvas(str(file), pagesize = landscape(A4))
 		c.setFont("Helvetica", 11)
 		i = 0
 		total_members = 0
@@ -487,10 +481,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat general")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def general_report_by_families(self):
@@ -499,6 +494,7 @@ class Report():
 		de tots els fallers actius organitzats per famílies.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -509,14 +505,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat general familiar")
+			os.mkdir(base_path / 'reports' / 'llistat general familiar')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat general familiar" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat general familiar' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = landscape(A4))
+		c = canvas.Canvas(str(file), pagesize = landscape(A4))
 		c.setFont("Helvetica", 11)
 		i = 0
 		total_families = 0
@@ -652,10 +648,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat general familiar")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def inactive_members_fees_report(self):
@@ -664,6 +661,7 @@ class Report():
 		però han aportat quotes mentre han segut fallers.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -673,14 +671,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat quotes no fallers")
+			os.mkdir(base_path / 'reports' / 'llistat quotes no fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat quotes no fallers" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat quotes no fallers' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 		c.setFont("Helvetica", 11)
 		i = 0
 		total_members = 0
@@ -731,10 +729,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat quotes no fallers")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	'''def registrations_cancellations_list(self):
@@ -864,6 +863,7 @@ class Report():
 		Crea un .pdf amb un llistat dels fallers amb obligació de rifa.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -871,14 +871,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat rifes")
+			os.mkdir(base_path / 'reports' / 'llistat rifes')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat rifes" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat rifes' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 		c.drawString(20, h - 30, "ID")
 		c.drawString(50, h - 30, "FALLER")
 		c.drawString(300, h - 30, "ID")
@@ -926,10 +926,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat rifes")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 		
 
 	def members_list(self, data_list):
@@ -942,6 +943,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -950,14 +952,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat fallers" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = landscape(A4))
+		c = canvas.Canvas(str(file), pagesize = landscape(A4))
 		i = 0
 		j = 20
 		c.drawString(j, w - 30, "ID")
@@ -1045,10 +1047,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def reduced_members_list(self, data_list):
@@ -1061,6 +1064,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -1069,14 +1073,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat fallers" + "/" + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / (current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 		i = 0
 		j = 20
 		c.drawString(j, h - 30, "ID")
@@ -1164,10 +1168,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile(str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def members_list_by_categories(self, categories_list, data_list):
@@ -1183,6 +1188,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -1196,14 +1202,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat fallers" + "/" + "categories " + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / ("categories " + current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = landscape(A4))
+		c = canvas.Canvas(str(file), pagesize = landscape(A4))
 		i = 0
 		j = 20
 		c.drawString(j, w - 30, "ID")
@@ -1291,10 +1297,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile("categories " + str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def reduced_members_list_by_categories(self, categories_list, data_list):
@@ -1310,6 +1317,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -1323,13 +1331,13 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat fallers" + "/" + "categories " + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / ("categories " + current_date + ".pdf")
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 		i = 0
 		j = 20
 		c.drawString(j, h - 30, "ID")
@@ -1417,10 +1425,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile("categories " + str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def members_list_by_age(self, initial_age, final_age, data_list):
@@ -1438,6 +1447,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -1451,14 +1461,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file = "llistat fallers" + "/" + "edat " + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / ("edat " + current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = landscape(A4))
+		c = canvas.Canvas(str(file), pagesize = landscape(A4))
 		i = 0
 		j = 20
 		c.drawString(j, w - 30, "ID")
@@ -1546,10 +1556,11 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile("edat " + str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
 
 
 	def reduced_members_list_by_age(self, initial_age, final_age, data_list):
@@ -1567,6 +1578,7 @@ class Report():
 			Llistat de dades a mostrar a l'informe.
 		'''
 		utils = Utils()
+		base_path = Path(__file__).parent.resolve()
 		date = utils.calculate_current_date()
 		current_date = date[0] + "-" + date[1] + "-" + date[2]
 		falla = Falla()
@@ -1580,14 +1592,14 @@ class Report():
 		page = 0
 
 		try:
-			os.mkdir("llistat fallers")
+			os.mkdir(base_path / 'reports' / 'llistat fallers')
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file ="llistat fallers" + "/" + "edat " + str(current_date)
+		file = base_path / 'reports' / 'llistat fallers' / ("edat " + current_date + ".pdf")
 
 		w, h = A4
-		c = canvas.Canvas(file + ".pdf", pagesize = A4)
+		c = canvas.Canvas(str(file), pagesize = A4)
 		i = 0
 		j = 20
 		c.drawString(j, h - 30, "ID")
@@ -1675,7 +1687,8 @@ class Report():
 		c.showPage()
 		c.save()
 
-		path = os.getcwd()
-		os.chdir("llistat fallers")
-		os.startfile("edat " + str(current_date) + ".pdf")
-		os.chdir(path)
+		operating_system = platform.system()
+		if operating_system == 'Windows':
+			os.startfile(file)
+		elif operating_system == 'Linux':
+			subprocess.run(["xdg-open", str(file)])
