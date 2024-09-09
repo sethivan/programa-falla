@@ -8,6 +8,7 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
 from reportlab.lib.pagesizes import A4
+from pathlib import Path
 
 from utils import Utils
 
@@ -46,8 +47,9 @@ class ManageMemberWindow(tk.Toplevel):
 		super().__init__(master)
 		self.master = master
 		operating_system = platform.system()
+		base_path = Path(__file__).parent.resolve()
 		if operating_system == 'Windows':
-			self.iconbitmap("escut.ico")
+			self.iconbitmap(base_path / 'images' / 'escut.ico')
 		self.resizable(0, 0)
 		self.title("Gestionar Faller")
 		utils = Utils()
@@ -1775,7 +1777,7 @@ class ManageMemberWindow(tk.Toplevel):
 		es crea un moviment que es guarda a la base de dades i es crea un rebut
 		en cas de que aquest moviment s'efectue per caixa.
 		'''
-		falla = Falla
+		falla = Falla()
 		fee_payment = 0
 		lottery_payment = 0
 		raffle_payment = 0

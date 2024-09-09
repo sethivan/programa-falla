@@ -1,22 +1,16 @@
 import sqlite3
 from tkinter import messagebox
-import traceback
 import mysql.connector
+from pathlib import Path
 
-
-from database import Database
-from member import Member
-from family import Family
-from movement import Movement
-from category import Category
-from loteria import Loteria
 from arxiu import Arxiu
 from utils import Utils
 
 class ExportSqliteToMariaDb:
 	
 	def __init__(self, nom_db):
-		self.conexio = sqlite3.connect("falla.db")
+		base_path = Path(__file__).parent.resolve()
+		self.conexio = sqlite3.connect(base_path / 'previous version' / 'falla.db')
 		self.cursor = self.conexio.cursor()
 
 		self.mysqlConnection = mysql.connector.connect(
@@ -36,11 +30,11 @@ class ExportSqliteToMariaDb:
 			self.import_familia_from_sqlite()
 			self.import_faller_from_sqlite()
 			self.import_moviment_from_sqlite()
-			self.import_summary_from_file("resum 2022", 2022)
-			self.import_summary_from_file("resum 2023", 2023)
-			self.import_summary_from_file("resum 2024", 2024)
-			self.import_lottery_from_file('nadal 2023-24', 'nadal', 2024)
-			self.import_lottery_from_file('loteria xiquet 23-24', 'xiquet', 2024)
+			self.import_summary_from_file(base_path / 'previous version' / 'resum 2022', 2022)
+			self.import_summary_from_file(base_path / 'previous version' / 'resum 2023', 2023)
+			self.import_summary_from_file(base_path / 'previous version' / 'resum 2024', 2024)
+			self.import_lottery_from_file(base_path / 'previous version' / 'nadal 2023-24', 'nadal', 2024)
+			self.import_lottery_from_file(base_path / 'previous version' / 'loteria xiquet 23-24', 'xiquet', 2024)
 
 		else:
 			messagebox.showerror(

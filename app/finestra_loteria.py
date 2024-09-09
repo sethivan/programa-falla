@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
 import platform
+from pathlib import Path
 
 from utils import Utils
 from arxiu import Arxiu
@@ -34,8 +35,9 @@ class FinestraLoteria(tk.Toplevel):
 		super().__init__(master)
 		self.master=master
 		self.sistema_operatiu=platform.system()
+		base_path = Path(__file__).parent.resolve()
 		if self.sistema_operatiu=='Windows':
-			self.iconbitmap("escut.ico")
+			self.iconbitmap(base_path / 'images' / 'escut.ico')
 		self.resizable(0,0)
 		self.title("Loteria")
 		utils=Utils()
