@@ -194,7 +194,7 @@ class Aplicacio(tk.Frame):
 		db = Database('sp')
 		db.close_connection()
 		# Descomentar linea de baix per a fer cópia de sqLite a mariaDb
-		ExportSqliteToMariaDb('sp')
+		#ExportSqliteToMariaDb('sp')
 	
 	
 	def modificar_categories(self):
