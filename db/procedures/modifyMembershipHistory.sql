@@ -5,7 +5,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp`.`modifyMembershipHistory`(
 )
 /*
 * A partir de l'id del faller i si està en actiu, modifica la taula
-* amb l'historial "membership_history".
+* amb l'historial "membershipHistory".
 *
 * @params vId: int
 * @params vIsRegistered: boolean
@@ -19,13 +19,13 @@ BEGIN
 	SELECT isRegistered INTO vIsCurrentlyRegistered FROM member WHERE id = vId;
 
 		IF vIsCurrentlyRegistered = 0 AND vIsRegistered = 1 THEN
-			INSERT INTO membership_history (
-				fallaYear, position, falla, memberFk
+			INSERT INTO membershipHistory (
+				fallaYearFk, position, falla, memberFk
 			) VALUES (vFallaYear, 'vocal', 'Sants Patrons', vId);
 		END IF;
 	
 		IF vIsCurrentlyRegistered = 1 AND vIsRegistered = 0 THEN
-			DELETE FROM membership_history
-			WHERE memberFk = vId AND fallaYear = vFallaYear;
+			DELETE FROM membershipHistory
+			WHERE memberFk = vId AND fallaYearFk = vFallaYear;
 		END IF;
 END
