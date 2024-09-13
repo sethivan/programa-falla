@@ -887,7 +887,7 @@ class Report():
 		row = 0
 		column = 0
 		for member in falla.members_list:
-			if row < 35 and column == 0:
+			if row < 34 and column == 0:
 				c.drawString(20, h - (row * 20) - 60, str(member.id))
 				c.drawString(
 					50,
@@ -895,18 +895,30 @@ class Report():
 					member.surname + ", " + member.name
 				)
 				row = row + 1
-			elif row == 35 and column == 0:
+			elif row == 34 and column == 0:
+				c.drawString(20, h - (row * 20) - 60, str(member.id))
+				c.drawString(
+					50,
+					h - (row * 20) - 60,
+					member.surname + ", " + member.name
+				)
 				column = 1
 				row = 0
-			elif row < 35 and column == 1:
+			elif row < 34 and column == 1:
 				c.drawString(300, h - (row * 20) - 60, str(member.id))
 				c.drawString(
 					330,
-					h - (row*20) - 60,
+					h - (row * 20) - 60,
 					member.surname + ", " + member.name
 				)
 				row = row + 1
-			elif row == 35 and column == 1:
+			elif row == 34 and column == 1:
+				c.drawString(300, h - (row * 20) - 60, str(member.id))
+				c.drawString(
+					330,
+					h - (row * 20) - 60,
+					member.surname + ", " + member.name
+				)
 				page = page + 1
 				c.drawString(20, 20, "llistat rifes")
 				c.drawString((w / 2) - 30, 20, "pàgina " + str(page))

@@ -442,7 +442,7 @@ class Database:
 		'''
 		query = "SELECT * FROM member INNER JOIN family \
 			ON member.familyFk = family.id INNER JOIN category \
-				ON member.categoryFk = category.id WHERE member.categoryFk = %s"
+				ON member.categoryFk = category.id WHERE member.isRegistered = 1 AND member.categoryFk = %s"
 		try:
 			self.mysqlCursor.execute(query, (id_category,))
 			members_list = self.mysqlCursor.fetchall()
