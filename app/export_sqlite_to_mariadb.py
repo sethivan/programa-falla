@@ -35,6 +35,7 @@ class ExportSqliteToMariaDb:
 			self.import_summary_from_file(base_path / 'previous version' / 'resum 2024', 2024)
 			self.import_lottery_from_file(base_path / 'previous version' / 'nadal 2023-24', 'nadal', 2024)
 			self.import_lottery_from_file(base_path / 'previous version' / 'loteria xiquet 23-24', 'xiquet', 2024)
+			self.import_faller_actiu_from_sqlite()
 
 		else:
 			messagebox.showerror(
@@ -67,6 +68,13 @@ class ExportSqliteToMariaDb:
 		for value in result:
 			mariadbDate = utils.convert_to_mariadb_date(value[3])
 			self.insert_member(value[0], value[1], value[2], mariadbDate, value[4], value[5], value[6], value[7], value[8], value[9], value[10], value[11])
+
+
+	def import_faller_actiu_from_sqlite(self):
+		self.cursor.execute("SELECT id FROM faller WHERE alta = 1")
+		result = self.cursor.fetchall()
+		for value in result:
+			self.insert_membership_history(2025, value[0])
 	
 
 	def import_moviment_from_sqlite(self):
