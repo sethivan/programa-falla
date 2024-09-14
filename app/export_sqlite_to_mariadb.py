@@ -91,6 +91,7 @@ class ExportSqliteToMariaDb:
 		result = arxiu.llegir_resum()
 		for value in result:
 			self.insert_summary(value[0], falla_year, value[1], value[2], value[3], value[5], value[6], value[7])
+			self.insert_membership_history(falla_year, value[0])
 
 
 	def import_lottery_from_file(self, file, lottery_name, falla_year):
@@ -204,6 +205,21 @@ class ExportSqliteToMariaDb:
 			messagebox.showerror(
 				"Error",
 				"Error al insertar el resum anual del faller"
+			)
+
+
+	def insert_membership_history(self, falla_year, id_member):
+		position = "vocal"
+		falla = "Sants Patrons"
+		query = "INSERT INTO membershipHistory (fallaYearFk, position, falla, memberFk) VALUES (%s, %s, %s, %s)"
+		data = falla_year, position, falla, id_member
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar el historial del faller"
 			)
 
 
