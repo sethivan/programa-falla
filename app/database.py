@@ -127,12 +127,18 @@ class Database:
 		try:
 			base_path = Path(__file__).parent.resolve()
 
-			backup_file = (base_path.parent / 'db' / 'dump' / 'backup.sql')
-			command = f"mysqldump -u {user} -p{password} {db_name} > {backup_file}"
-			process = subprocess.run(command, shell = True, check = True)
+			structure_file = (base_path.parent / 'db' / 'dump' / '01_backup_structure.sql')
+			data_file = (base_path.parent / 'db' / 'dump' / '02_backup_data.sql')
+			routines_triggers_file = (base_path.parent / 'db' / 'dump' / '03_backup_routines_triggers.sql')
+			command_structure = f"mysqldump -u {user} -p{password} --no-data {db_name} > {structure_file}"
+			process = subprocess.run(command_structure, shell = True, check = True)
+			command_data = f"mysqldump -u {user} -p{password} --no-create-info {db_name} > {data_file}"
+			process = subprocess.run(command_data, shell = True, check = True)
+			command_routines_triggers = f"mysqldump -u {user} -p{password} --no-create-info --no-data --routines --triggers {db_name} > {routines_triggers_file}"
+			process = subprocess.run(command_routines_triggers, shell = True, check = True)
 
 			if process.returncode == 0:
-				messagebox.showinfo("Backup", "La còpia de seguretat s'ha creat a backup.sql")
+				messagebox.showinfo("Backup", "S'ha creat la copia de seguretat correctament")
 
 		except subprocess.CalledProcessError:
 			messagebox.showerror("Backup", "Error en la creació del backup")
@@ -140,15 +146,29 @@ class Database:
 
 	def restore_backup_database(self, user, password, db_name):
 		base_path = Path(__file__).parent.resolve()
-		backup_file = (base_path.parent / 'db' / 'dump' / 'backup.sql')
+		structure_file = (base_path.parent / 'db' / 'dump' / '01_backup_structure.sql')
+		data_file = (base_path.parent / 'db' / 'dump' / '02_backup_data.sql')
+		routines_triggers_file = (base_path.parent / 'db' / 'dump' / '03_backup_routines_triggers.sql')
 		host = "localhost"
 		port = 3306
-		command = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {backup_file}"
+		command_structure = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {structure_file}"
+		command_data = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {data_file}"
+		command_routines_triggers = f"mysql -u {user} -p{password} -h{host} -P{port} {db_name} < {routines_triggers_file}"
 		try:
-			process = subprocess.run(command, shell = True, check = True)
+			process = subprocess.run(command_structure, shell = True, check = True)
 
 			if process.returncode == 0:
-				messagebox.showinfo("Backup", "La còpia de seguretat s'ha restaurat correctament")
+				messagebox.showinfo("Backup", "L'estructura de la còpia de seguretat s'ha restaurat correctament")
+
+			process = subprocess.run(command_data, shell = True, check = True)
+
+			if process.returncode == 0:
+				messagebox.showinfo("Backup", "Les dades de la còpia de seguretat s'han restaurat correctament")
+
+			process = subprocess.run(command_routines_triggers, shell = True, check = True)
+
+			if process.returncode == 0:
+				messagebox.showinfo("Backup", "Els triggers i procediments de la còpia de seguretat s'han restaurat correctament")
 
 		except subprocess.CalledProcessError:
 			messagebox.showerror("Backup", "Error en la restauració del backup")
