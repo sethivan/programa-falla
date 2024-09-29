@@ -130,9 +130,9 @@ class Database:
 			structure_file = (base_path.parent / 'db' / 'dump' / '01_backup_structure.sql')
 			data_file = (base_path.parent / 'db' / 'dump' / '02_backup_data.sql')
 			routines_triggers_file = (base_path.parent / 'db' / 'dump' / '03_backup_routines_triggers.sql')
-			command_structure = f"mysqldump -u {user} -p{password} --no-data {db_name} > {structure_file}"
+			command_structure = f"mysqldump -u {user} -p{password} --no-data --skip-triggers {db_name} > {structure_file}"
 			process = subprocess.run(command_structure, shell = True, check = True)
-			command_data = f"mysqldump -u {user} -p{password} --no-create-info {db_name} > {data_file}"
+			command_data = f"mysqldump -u {user} -p{password} --no-create-info --skip-triggers {db_name} > {data_file}"
 			process = subprocess.run(command_data, shell = True, check = True)
 			command_routines_triggers = f"mysqldump -u {user} -p{password} --no-create-info --no-data --routines --triggers {db_name} > {routines_triggers_file}"
 			process = subprocess.run(command_routines_triggers, shell = True, check = True)
