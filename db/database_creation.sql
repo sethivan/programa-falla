@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS summaryMembersFallaYear(
 
 CREATE TABLE IF NOT EXISTS lottery(
 	id INT AUTO_INCREMENT PRIMARY KEY,
+	lotteryId INT NOT NULL,
 	lotteryName VARCHAR (30) NOT NULL,
 	assigned DATE NOT NULL,
 	fallaYearFk INT NOT NULL,
