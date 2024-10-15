@@ -37,18 +37,17 @@ class ManageLotteryWindow(tk.Toplevel):
 		'''
 		super().__init__(master)
 		self.master = master
-		self.sistema_operatiu = platform.system()
+		operating_system = platform.system()
 		base_path = Path(__file__).parent.resolve()
-		if self.sistema_operatiu == 'Windows':
+		if operating_system == 'Windows':
 			self.iconbitmap(base_path / 'images' / 'escut.ico')
 		self.resizable(0,0)
 		self.title("Loteria")
 		utils = Utils()
 		utils.define_global_style()
 		self.configure(bg = "#ffffff", pady = 5, padx = 5)
-	
-		self.blockade = 0
 
+		self.lottery_id = tk.IntVar()
 		self.member_id = tk.IntVar()
 		self.tickets_male = tk.IntVar()
 		self.tickets_female = tk.IntVar()
@@ -86,59 +85,65 @@ class ManageLotteryWindow(tk.Toplevel):
 		# Widgets per a cada frame.
 
 		# Frame "Introduir".
+		self.label_lottery_id = ttk.Label(label_frame_introduce, text = "Id sorteig")
+		self.label_lottery_id.grid(row = 0, column = 0, padx = 2)
+
 		self.label_name = ttk.Label(label_frame_introduce, text = "Nom")
-		self.label_name.grid(row = 0, column = 0, padx = 2)
+		self.label_name.grid(row = 0, column = 1, padx = 2)
 
 		self.label_member_id = ttk.Label(label_frame_introduce, text = "Id")
-		self.label_member_id.grid(row = 0, column = 1, padx = 2)
+		self.label_member_id.grid(row = 0, column = 2, padx = 2)
 
 		self.label_tickets_male = ttk.Label(label_frame_introduce, text = "Paperetes Masc")
-		self.label_tickets_male.grid(row = 0, column = 2, padx = 2)
+		self.label_tickets_male.grid(row = 0, column = 3, padx = 2)
 
 		self.label_tickets_female = ttk.Label(label_frame_introduce, text = "Paperetes Fem")
-		self.label_tickets_female.grid(row = 0, column = 3, padx = 2)
+		self.label_tickets_female.grid(row = 0, column = 4, padx = 2)
 
 		self.label_tickets_childish = ttk.Label(label_frame_introduce, text = "Paperetes Inf")
-		self.label_tickets_childish.grid(row = 0, column = 4, padx = 2)
+		self.label_tickets_childish.grid(row = 0, column = 5, padx = 2)
 
 		self.label_tenths_male = ttk.Label(label_frame_introduce, text = "Dècims Masc")
-		self.label_tenths_male.grid(row = 0, column = 5, padx = 2)
+		self.label_tenths_male.grid(row = 0, column = 6, padx = 2)
 
 		self.label_tenths_female = ttk.Label(label_frame_introduce, text = "Dècims Fem")
-		self.label_tenths_female.grid(row = 0, column = 6, padx = 2)
+		self.label_tenths_female.grid(row = 0, column = 7, padx = 2)
 
 		self.label_tenths_childish = ttk.Label(label_frame_introduce, text = "Dècims Inf")
-		self.label_tenths_childish.grid(row = 0, column = 7, padx = 2)
+		self.label_tenths_childish.grid(row = 0, column = 8, padx = 2)
+
+		self.entry_lottery_id = ttk.Entry(label_frame_introduce, textvariable = self.lottery_id)
+		self.entry_lottery_id.grid(row = 1, column = 0, padx = 2)
 
 		self.combo_box_member = ttk.Combobox(label_frame_introduce, width = 30, postcommand = self.display_member)
-		self.combo_box_member.grid(row = 1, column = 0)
+		self.combo_box_member.grid(row = 1, column = 1)
 		self.combo_box_member.bind("<<ComboboxSelected>>", self.select_member)
 
 		self.entry_member_id = ttk.Entry(label_frame_introduce, state = "disabled", textvariable = self.member_id)
-		self.entry_member_id.grid(row = 1, column = 1, padx = 2)
+		self.entry_member_id.grid(row = 1, column = 2, padx = 2)
 
 		self.entry_tickets_male = ttk.Entry(label_frame_introduce, textvariable = self.tickets_male)
-		self.entry_tickets_male.grid(row = 1, column = 2, padx = 2)
+		self.entry_tickets_male.grid(row = 1, column = 3, padx = 2)
 		self.entry_tickets_male.bind('<FocusOut>', self.calculate_totals)
 
 		self.entry_tickets_female = ttk.Entry(label_frame_introduce, textvariable = self.tickets_female)
-		self.entry_tickets_female.grid(row = 1, column = 3, padx = 2)
+		self.entry_tickets_female.grid(row = 1, column = 4, padx = 2)
 		self.entry_tickets_female.bind('<FocusOut>', self.calculate_totals)
 
 		self.entry_tickets_childish = ttk.Entry(label_frame_introduce, textvariable = self.tickets_childish)
-		self.entry_tickets_childish.grid(row = 1, column = 4, padx = 2)
+		self.entry_tickets_childish.grid(row = 1, column = 5, padx = 2)
 		self.entry_tickets_childish.bind('<FocusOut>', self.calculate_totals)
 
 		self.entry_tenths_male = ttk.Entry(label_frame_introduce, textvariable = self.tenths_male)
-		self.entry_tenths_male.grid(row = 1, column = 5, padx = 2)
+		self.entry_tenths_male.grid(row = 1, column = 6, padx = 2)
 		self.entry_tenths_male.bind('<FocusOut>', self.calculate_totals)
 
 		self.entry_tenths_female = ttk.Entry(label_frame_introduce, textvariable = self.tenths_female)
-		self.entry_tenths_female.grid(row = 1, column = 6, padx = 2)
+		self.entry_tenths_female.grid(row = 1, column = 7, padx = 2)
 		self.entry_tenths_female.bind('<FocusOut>', self.calculate_totals)
 
 		self.entry_tenths_childish = ttk.Entry(label_frame_introduce, textvariable = self.tenths_childish)
-		self.entry_tenths_childish.grid(row = 1, column = 7, padx = 2)
+		self.entry_tenths_childish.grid(row = 1, column = 8, padx = 2)
 		self.entry_tenths_childish.bind('<FocusOut>', self.calculate_totals)
 
 		self.label_price = ttk.Label(label_frame_introduce, text = "diners")
@@ -269,20 +274,20 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.total_sum.set("0")
 
 		# Frame "Sorteig".
-		self.combo_box_lottery_name = ttk.Combobox(label_frame_lottery_name, width = 30, postcommand = self.desplegar_sortejos)
+		self.combo_box_lottery_name = ttk.Combobox(label_frame_lottery_name, width = 30, postcommand = self.display_lotteries)
 		self.combo_box_lottery_name.grid(row = 0, column = 0)
 
-		self.button_obrir=ttk.Button(label_frame_lottery_name, text="Obrir", command=self.obrir)
-		self.button_obrir.grid(row=0, column=2, padx=2)
+		self.button_open=ttk.Button(label_frame_lottery_name, text="Obrir", command=self.open)
+		self.button_open.grid(row=0, column=2, padx=2)
 
-		self.button_guardar=ttk.Button(label_frame_lottery_name, text="Guardar", command=self.guardar)
-		self.button_guardar.grid(row=0, column=3, padx=2)
+		self.button_save=ttk.Button(label_frame_lottery_name, text="Guardar", command=self.save)
+		self.button_save.grid(row=0, column=3, padx=2)
 
 		self.button_assignar=ttk.Button(label_frame_lottery_name, text="Assignar", command=self.assignar)
 		self.button_assignar.grid(row=0, column=4, padx=2)
 
-		self.button_netejar=ttk.Button(label_frame_lottery_name, text="Netejar", command=self.netejar)
-		self.button_netejar.grid(row=0, column=5, padx=2)
+		self.button_clean_form=ttk.Button(label_frame_lottery_name, text="Netejar", command=self.clean_form)
+		self.button_clean_form.grid(row=0, column=5, padx=2)
 
 		self.reset_fields()
 
@@ -290,7 +295,7 @@ class ManageLotteryWindow(tk.Toplevel):
 
 	def reset_fields(self):
 
-		self.combo_box_member.focus()
+		self.entry_lottery_id.focus()
 		self.tickets_male.set("0")
 		self.tickets_female.set("0")
 		self.tickets_childish.set("0")
@@ -299,7 +304,7 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.tenths_childish.set("0")
 		self.price.set("0")
 		self.benefit.set("0")
-		self.total_sum.set("0")
+		self.total.set("0")
 
 	
 	def display_member(self):
@@ -361,10 +366,12 @@ class ManageLotteryWindow(tk.Toplevel):
 
 	def add_field(self):
 		self.calculate_totals('<FocusOut>')
+		if self.lottery_id.get() == "":
+			messagebox.showwarning("Error", "El id del sorteig ha de contindre un valor vàlid")
 		if self.member_id.get() == "":
 			messagebox.showwarning("Error", "El camp nom ha de contindre un nom de faller vàlid")
 		else:
-			self.tree_lottery.insert("", "end", text=self.member_id.get(),
+			self.tree_lottery.insert("", "end", text = self.lottery_id.get(),
 				values = (self.combo_box_member.get(), self.tickets_male.get(), self.tickets_female.get(), self.tickets_childish.get(),
 			   	self.tenths_male.get(), self.tenths_female.get(), self.tenths_childish.get(),
 				self.price.get(), self.benefit.get(), self.total.get(), 0, self.member_id.get()))
@@ -379,6 +386,7 @@ class ManageLotteryWindow(tk.Toplevel):
 			self.total_benefit.set(self.total_benefit.get() + self.benefit.get())
 			self.total_sum.set(self.total_sum.get() + self.total.get())
 
+			self.lottery_id.set("")
 			self.member_id.set("")
 			self.combo_box_member.set("")
 			self.reset_fields()
@@ -492,74 +500,93 @@ class ManageLotteryWindow(tk.Toplevel):
 		bd.tancar_conexio()
 
 
-	def desplegar_sortejos(self):
-		bd=BaseDeDades('falla.db')
-		llistat_sortejos=bd.llegir_sortejos()
-		self.combo_box_lottery_name["values"]=llistat_sortejos
-		bd.tancar_conexio()
+	def display_lotteries(self):
+		falla = Falla()
+		lotteries_list = falla.get_lotteries_list()
+		self.combo_box_lottery_name["values"] = lotteries_list
 
 
-	def obrir(self):
-		sorteig=self.combo_box_lottery_name.get()
-		# Resetegem tot per a obrir sobre formulari en blanc.
-		self.reset_fields()
-		self.tree_lottery.delete(*self.tree_lottery.get_children()) # Borrem les dades de la taula.
-		self.member_id.set("")
-		self.combo_box_member.config(state="normal")
-		self.combo_box_member.set("")
-		self.total_tickets_male.set("0")
-		self.total_tickets_female.set("0")
-		self.total_tickets_childish.set("0")
-		self.total_tenths_male.set("0")
-		self.total_tenths_female.set("0")
-		self.total_tenths_childish.set("0")
-		self.total_price.set("0")
-		self.total_benefit.set("0")
-		self.total_sum.set("0")
-		# Traguem el llistat de loteries corresponent al sorteig triat.
-		bd=BaseDeDades('falla.db')
-		llistat_loteries=bd.llegir_loteries_per_sorteig(sorteig)
-		total_tickets_male=0
-		total_tickets_female=0
-		total_tickets_childish=0
-		total_tenths_male=0
-		total_tenths_female=0
-		total_tenths_childish=0
-		total_price=0
-		total_benefit=0
-		for loteria in llistat_loteries:
-			total_tickets_male=total_tickets_male + loteria.tickets_male
-			total_tickets_female=total_tickets_female + loteria.tickets_female
-			total_tickets_childish=total_tickets_childish + loteria.tickets_childish
-			total_tenths_male=total_tenths_male + loteria.tenths_male
-			total_tenths_female=total_tenths_female + loteria.tenths_female
-			total_tenths_childish=total_tenths_childish + loteria.tenths_childish
-			price=loteria.calcular_price()
-			total_price=total_price + price
-			benefit=loteria.calcular_benefit()
-			total_benefit=total_benefit + benefit
-			total=price+benefit
-			nom=loteria.faller.cognoms + ", " + loteria.faller.nom
-			llista_dades=[nom, loteria.tickets_male, loteria.tickets_female, loteria.tickets_childish, loteria.tenths_male, loteria.tenths_female, loteria.tenths_childish, price, benefit, total, loteria.assignada]
-			self.tree_lottery.insert("", "end", text=loteria.id, values=llista_dades)
-		bd.tancar_conexio()
+	def open(self):
+		lottery_name = self.combo_box_lottery_name.get().split()
+		name = lottery_name[0]
+		falla_year = lottery_name[1]
+		value = messagebox.askquestion(
+			"Obrir","Al obrir un sorteig nou en borrarà tot el panell. Estàs segur?"
+		)
+		if value == "yes":
+			self.reset_fields()
+			self.tree_lottery.delete(*self.tree_lottery.get_children())
+			self.lottery_id.set("")
+			self.member_id.set("")
+			self.combo_box_member.config(state="normal")
+			self.combo_box_member.set("")
+			self.total_tickets_male.set("0")
+			self.total_tickets_female.set("0")
+			self.total_tickets_childish.set("0")
+			self.total_tenths_male.set("0")
+			self.total_tenths_female.set("0")
+			self.total_tenths_childish.set("0")
+			self.total_price.set("0")
+			self.total_benefit.set("0")
+			self.total_sum.set("0")
+			falla = Falla()
+			falla.get_lotteries(name, falla_year)
+			total_tickets_male = 0
+			total_tickets_female = 0
+			total_tickets_childish = 0
+			total_tenths_male = 0
+			total_tenths_female = 0
+			total_tenths_childish = 0
+			total_price = 0.00
+			total_benefit = 0.00
+			total_sum = 0.00
+			for lottery in falla.lotteries_list:
+				total_tickets_male = total_tickets_male + lottery.tickets_male
+				total_tickets_female = total_tickets_female + lottery.tickets_female
+				total_tickets_childish = total_tickets_childish + lottery.tickets_childish
+				total_tenths_male = total_tenths_male + lottery.tenths_male
+				total_tenths_female = total_tenths_female + lottery.tenths_female
+				total_tenths_childish = total_tenths_childish + lottery.tenths_childish
+				total_price = total_price + float(lottery.price[0])
+				total_benefit = total_benefit + float(lottery.benefit[0])
+				total = float(lottery.price[0]) + float(lottery.benefit[0])
+				total_sum = total_sum + total
+				member_name = lottery.member.surname + ", " + lottery.member.name
+				data_list = [member_name, lottery.tickets_male, lottery.tickets_female, lottery.tickets_childish, lottery.tenths_male, lottery.tenths_female, lottery.tenths_childish, lottery.price, lottery.benefit, total, lottery.assigned, lottery.member.id]
+				self.tree_lottery.insert("", "end", text = lottery.lottery_id, values = data_list)
+			self.total_tickets_male.set(total_tickets_male)
+			self.total_tickets_female.set(total_tickets_female)
+			self.total_tickets_childish.set(total_tickets_childish)
+			self.total_tenths_male.set(total_tenths_male)
+			self.total_tenths_female.set(total_tenths_female)
+			self.total_tenths_childish.set(total_tenths_childish)
+			self.total_price.set(total_price)
+			self.total_benefit.set(total_benefit)
+			self.total_sum.set(total_sum)
 
 
-	def guardar(self):
-		utils=Utils()
-		data=utils.calcular_data_actual
-		bd=BaseDeDades('falla.db')
-		sorteig=self.combo_box_lottery_name.get()
-		ultim_id=bd.llegir_ultim_id_loteria()
-		llistat_files=self.tree_lottery.get_children()
-		for fila in llistat_files:
-			id=self.tree_lottery.item(fila, option="text")
-			llistat_dades=self.tree_lottery.item(fila, option="values")
-			faller=bd.llegir_faller(llistat_dades[12])
-			loteria=Lottery(id, sorteig, data, llistat_dades[1], llistat_dades[2], llistat_dades[3], llistat_dades[4], llistat_dades[5], llistat_dades[6], faller)
-			if id>ultim_id:
-				bd.crear_loteria(loteria)
-		bd.tancar_conexio()
+	def save(self):
+		lottery_name_year = self.combo_box_lottery_name.get().split()
+		lottery_name = lottery_name_year[0]
+		falla_year = lottery_name_year[1]
+		row_list = self.tree_lottery.get_children()
+		for row in row_list:
+			lottery_id = self.tree_lottery.item(row, option = "text")
+			data_list = self.tree_lottery.item(row, option = "values")
+			result = Member.get_member(data_list[11])
+			member = Member(
+				result[0],
+				result[1],
+				result[2],
+				result[3],
+				result[4],
+				result[5],
+				result[6],
+				result[7],
+				result[8],
+				result[11]
+				)
+			Lottery.set_lottery(lottery_id, lottery_name, falla_year, data_list[1], data_list[2], data_list[3], data_list[4], data_list[5], data_list[6], data_list[10], member.id)
 
 
 	def assignar(self):
@@ -569,22 +596,22 @@ class ManageLotteryWindow(tk.Toplevel):
 			data=utils.calcular_data_actual()
 			arxiu=Arxiu('exercici')
 			exercici_actual=arxiu.llegir_exercici_actual()
-			self.guardar()
-			llistat_files=self.tree_lottery.get_children()
+			self.save()
+			row_list=self.tree_lottery.get_children()
 			bd=BaseDeDades('falles.db')
-			for fila in llistat_files:
+			for fila in row_list:
 				id=self.tree_lottery.item(fila, option="text")
-				llistat_dades=self.tree_lottery.item(fila, option="values")
-				moviment=Movement(0, data, llistat_dades[8], 1, 2, exercici_actual, self.combo_box_lottery_name.get())
+				data_list=self.tree_lottery.item(fila, option="values")
+				moviment=Movement(0, data, data_list[8], 1, 2, exercici_actual, self.combo_box_lottery_name.get())
 				bd.crear_moviment(moviment)
-				moviment=Movement(0, data, llistat_dades[9], 2, 1, exercici_actual, self.combo_box_lottery_name.get())
+				moviment=Movement(0, data, data_list[9], 2, 1, exercici_actual, self.combo_box_lottery_name.get())
 				bd.crear_moviment(moviment)
 				# Actualització de tots els registres a estat assignat.
 				bd.actualitzar_assignada_loteria(id)
 			self.button_assignar.config(state="disabled")
 
 
-	def netejar(self):
+	def clean_form(self):
 
 		self.reset_fields()
 		self.tree_lottery.delete(*self.tree_lottery.get_children())

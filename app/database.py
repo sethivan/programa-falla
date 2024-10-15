@@ -1180,18 +1180,104 @@ class Database:
 				"Error al llegir l'exercici a la base de dades"
 			)
 
+	# Mètodes per a operacions CRUD en la taula lottery
+	def select_lotteries_list(self):
+		'''
+		Llig el llistat de sortejos guardats
 
-	# Mètodes per a operacions CRUD en la taula summaryMembersFallaYear.
+		Retorna:
+		--------
+		lotteries_list : list
+			Llistat de sortejos guardats.
+		'''
+		query = "SELECT DISTINCT lotteryName, fallaYearFk FROM lottery"
+		try:
+			self.mysqlCursor.execute(query)
+			lotteries_list = self.mysqlCursor.fetchall()
+			return lotteries_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir el llistat de sortejos"
+			)
+
+
+	def select_lotteries_by_lottery_name(self, lottery_name, falla_year):
+		query = "SELECT * FROM lottery INNER JOIN member \
+			ON lottery.memberFk = member.id \
+				WHERE lottery.lotteryName = %s \
+					AND lottery.fallaYearFk = %s"
+		try:
+			data = lottery_name, falla_year
+			self.mysqlCursor.execute(query, data)
+			lottery_list = self.mysqlCursor.fetchall()
+			return lottery_list
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir el llistat del sorteig de la base de dades"
+			)
+
+# borrable si vegem que no es gasta al final
+	def select_last_lottery_id(self, lottery_name, falla_year):
+		query = "SELECT lotteryId FROM lottery WHERE lotteryName = %s AND fallaYearFk = %s ORDER BY lotteryId DESC LIMIT 1"
+		data = lottery_name, falla_year
+		try:
+			self.mysqlCursor.execute(query)
+			lottery_id = self.mysqlCursor.fetchone()
+			return lottery_id
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al llegir l'últim id guardat del sorteig"
+			)
+
+
+	def insert_lottery(
+		self,
+		lottery_id,
+		lottery_name,
+		falla_year,
+		tickets_male,
+		tickets_female,
+		tickets_childish,
+		tenths_male,
+		tenths_female,
+		tenths_childish,
+		assigned,
+		id_member
+	):
+		query = """INSERT INTO lottery 
+			(lotteryId, lotteryName, fallaYearFk, memberFk, 
+			ticketsMale, ticketsFemale, ticketsChildish,
+			tenthsMale, tenthsFemale, tenthsChildish, isAssigned)
+				SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+					WHERE NOT EXISTS (
+						SELECT 1 FROM lottery WHERE lotteryId = %s
+					)"""
+		data = lottery_id, lottery_name, falla_year, id_member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, assigned, lottery_id
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error as e:
+			print({e})
+			messagebox.showerror(
+				"Error",
+				"Error al insertar la loteria"
+			)
+
+
+	# Mètodes per a operacions CRUD en la taula summaryMembersFallaYear
 	def insert_summary(
-			self,
-			id_member,
-			assignedFee,
-			assignedLottery,
-			assignedRaffle,
-			payedFee,
-			payedLottery,
-			payedRaffle
-		):
+		self,
+		id_member,
+		assignedFee,
+		assignedLottery,
+		assignedRaffle,
+		payedFee,
+		payedLottery,
+		payedRaffle
+	):
 		'''
 		Escriu a la base de dades les dades del resum de l'exercici del faller
 		que se li passen com a paràmetre a la taula "summaryMembersFallaYear".
@@ -1213,7 +1299,7 @@ class Database:
 		payedRaffle : float
 			Rifa pagada.
 		'''
-		falla_year= None
+		falla_year = None
 		query = "INSERT INTO summaryMembersFallaYear \
 			(memberFk, fallaYearFk, assignedFee, assignedLottery, assignedRaffle, payedFee, \
 				payedLottery, payedRaffle) \
