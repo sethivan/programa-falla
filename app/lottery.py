@@ -39,13 +39,6 @@ class Lottery():
 		self.price = price,
 		self.benefit = benefit,
 		self.member = member
-
-	#borrable si no es gasta al final
-	@classmethod
-	def get_last_id(cls, lottery_name, falla_year):
-		db = Database('sp')
-		lottery_id = db.select_last_lottery_id(lottery_name, falla_year)
-		return lottery_id
 	
 
 	@classmethod
@@ -77,4 +70,48 @@ class Lottery():
 			assigned,
 			id_member
 		)
+		db.close_connection()
+
+
+	@classmethod
+	def modify_lottery(
+		cls,
+		lottery_id,
+		lottery_name,
+		falla_year,
+		tickets_male,
+		tickets_female,
+		tickets_childish,
+		tenths_male,
+		tenths_female,
+		tenths_childish,
+		id_member
+	):
+		db = Database('sp')
+		db.update_lottery(
+			lottery_id,
+			lottery_name,
+			falla_year,
+			tickets_male,
+			tickets_female,
+			tickets_childish,
+			tenths_male,
+			tenths_female,
+			tenths_childish,
+			id_member
+		)
+		db.close_connection()
+
+
+	@classmethod
+	def delete_lottery(cls, lottery_id, lottery_name, falla_year):
+		db = Database('sp')
+		db.delete_lottery(lottery_id, lottery_name, falla_year)
+		db.close_connection()
+
+
+	@classmethod
+	def assign_lottery(cls, lottery_id, lottery_name, falla_year):
+		db = Database('sp')
+		db.update_lottery_assigned(lottery_id, lottery_name, falla_year)
 		db.close_connection()

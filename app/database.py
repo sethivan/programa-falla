@@ -1218,20 +1218,6 @@ class Database:
 				"Error al llegir el llistat del sorteig de la base de dades"
 			)
 
-# borrable si vegem que no es gasta al final
-	def select_last_lottery_id(self, lottery_name, falla_year):
-		query = "SELECT lotteryId FROM lottery WHERE lotteryName = %s AND fallaYearFk = %s ORDER BY lotteryId DESC LIMIT 1"
-		data = lottery_name, falla_year
-		try:
-			self.mysqlCursor.execute(query)
-			lottery_id = self.mysqlCursor.fetchone()
-			return lottery_id
-		except mysql.connector.Error:
-			messagebox.showerror(
-				"Error",
-				"Error al llegir l'últim id guardat del sorteig"
-			)
-
 
 	def insert_lottery(
 		self,
@@ -1253,9 +1239,9 @@ class Database:
 			tenthsMale, tenthsFemale, tenthsChildish, isAssigned)
 				SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
 					WHERE NOT EXISTS (
-						SELECT 1 FROM lottery WHERE lotteryId = %s
+						SELECT 1 FROM lottery WHERE lotteryId = %s AND lotteryName = %s AND fallaYearFk = %s
 					)"""
-		data = lottery_id, lottery_name, falla_year, id_member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, assigned, lottery_id
+		data = lottery_id, lottery_name, falla_year, id_member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, assigned, lottery_id, lottery_name, falla_year
 		try:
 			self.mysqlCursor.execute(query, data)
 			self.mysqlConnection.commit()
@@ -1264,6 +1250,61 @@ class Database:
 			messagebox.showerror(
 				"Error",
 				"Error al insertar la loteria"
+			)
+
+
+	def update_lottery(
+		self,
+		lottery_id,
+		lottery_name,
+		falla_year,
+		tickets_male,
+		tickets_female,
+		tickets_childish,
+		tenths_male,
+		tenths_female,
+		tenths_childish,
+		id_member
+	):
+		query = """UPDATE lottery SET memberFk = %s,
+			ticketsMale = %s, ticketsFemale = %s, ticketsChildish = %s,
+			tenthsMale = %s, tenthsFemale = %s, tenthsChildish = %s
+			WHERE lotteryId = %s AND lotteryName = %s AND fallaYearFk = %s"""
+		data = id_member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, lottery_id, lottery_name, falla_year
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al actualitzar les dades de la loteria a la base de dades"
+			)
+
+
+	def update_lottery_assigned(self, lottery_id, lottery_name, falla_year):
+		query = """UPDATE lottery SET isAssigned = 1 WHERE lotteryId = %s AND lotteryName = %s AND fallaYearFk = %s"""
+		data = lottery_id, lottery_name, falla_year
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al actualitzar les assignacions de la loteria a la base de dades"
+			)
+
+
+	def delete_lottery(self, lottery_id, lottery_name, falla_year):
+		query = """DELETE FROM lottery WHERE lotteryId = %s AND lotteryName = %s AND fallaYearFk = %s"""
+		data = lottery_id, lottery_name, falla_year
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error as e:
+			print({e})
+			messagebox.showerror(
+				"Error",
+				"Error al eliminar les dades de la loteria a la base de dades"
 			)
 
 

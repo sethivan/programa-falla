@@ -55,18 +55,18 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.tenths_male = tk.IntVar()
 		self.tenths_female = tk.IntVar()
 		self.tenths_childish = tk.IntVar()
-		self.price = tk.IntVar()
-		self.benefit = tk.IntVar()
-		self.total = tk.IntVar()
+		self.price = tk.DoubleVar()
+		self.benefit = tk.DoubleVar()
+		self.total = tk.DoubleVar()
 		self.total_tickets_male = tk.IntVar()
 		self.total_tickets_female = tk.IntVar()
 		self.total_tickets_childish = tk.IntVar()
 		self.total_tenths_male = tk.IntVar()
 		self.total_tenths_female = tk.IntVar()
 		self.total_tenths_childish = tk.IntVar()
-		self.total_price = tk.IntVar()
-		self.total_benefit = tk.IntVar()
-		self.total_sum = tk.IntVar()
+		self.total_price = tk.DoubleVar()
+		self.total_benefit = tk.DoubleVar()
+		self.total_sum = tk.DoubleVar()
 
 		self.member_ids = []
 
@@ -167,10 +167,10 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.button_add = ttk.Button(label_frame_introduce, style = "Boto.TButton", text = "Afegir", command = self.add_field)
 		self.button_add.grid(row = 2, column = 6, padx = 2)
 
-		self.button_modify = ttk.Button(label_frame_introduce, style = "Boto.TButton", state = "disabled", text = "Modificar", command = self.modificar_fila)
+		self.button_modify = ttk.Button(label_frame_introduce, style = "Boto.TButton", state = "disabled", text = "Modificar", command = self.modify_row)
 		self.button_modify.grid(row = 2, column = 7, padx = 2)
 
-		self.button_delete = ttk.Button(label_frame_introduce, style = "Boto.TButton", state = "disabled", text = "Eliminar fila", command = self.eliminar_fila)
+		self.button_delete = ttk.Button(label_frame_introduce, style = "Boto.TButton", state = "disabled", text = "Eliminar fila", command = self.delete_row)
 		self.button_delete.grid(row = 2, column = 8, padx = 2)
 
 		self.tree_lottery = ttk.Treeview(self, height = 20)
@@ -202,7 +202,7 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.tree_lottery.heading("eleven", text = "assignada")
 		self.tree_lottery.heading("twelve", text = "id faller")
 		self.tree_lottery.grid(row = 1, column = 0, padx = 10, pady = 5)
-		self.tree_lottery.bind("<<TreeviewSelect>>", self.fila_seleccionada)
+		self.tree_lottery.bind("<<TreeviewSelect>>", self.select_row)
 
 		self.scroll_lottery_table = ttk.Scrollbar(self, command = self.tree_lottery.yview)
 		self.scroll_lottery_table.grid(row = 1, column = 1, sticky = "nsew")
@@ -263,15 +263,15 @@ class ManageLotteryWindow(tk.Toplevel):
 
 		self.entry_price = ttk.Entry(label_frame_totals, state = "disabled", textvariable = self.total_price)
 		self.entry_price.grid(row = 1, column = 6, padx = 2)
-		self.total_price.set("0")
+		self.total_price.set("0.00")
 
 		self.entry_benefit = ttk.Entry(label_frame_totals, state = "disabled", textvariable = self.total_benefit)
 		self.entry_benefit.grid(row = 1, column = 7, padx = 2)
-		self.total_benefit.set("0")
+		self.total_benefit.set("0.00")
 
 		self.entry_total_sum = ttk.Entry(label_frame_totals, state = "disabled", textvariable = self.total_sum)
 		self.entry_total_sum.grid(row = 1, column = 8, padx = 2)
-		self.total_sum.set("0")
+		self.total_sum.set("0.00")
 
 		# Frame "Sorteig".
 		self.combo_box_lottery_name = ttk.Combobox(label_frame_lottery_name, width = 30, postcommand = self.display_lotteries)
@@ -283,13 +283,14 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.button_save=ttk.Button(label_frame_lottery_name, text="Guardar", command=self.save)
 		self.button_save.grid(row=0, column=3, padx=2)
 
-		self.button_assignar=ttk.Button(label_frame_lottery_name, text="Assignar", command=self.assignar)
-		self.button_assignar.grid(row=0, column=4, padx=2)
+		self.button_assign=ttk.Button(label_frame_lottery_name, text="Assignar", command=self.assign)
+		self.button_assign.grid(row=0, column=4, padx=2)
 
 		self.button_clean_form=ttk.Button(label_frame_lottery_name, text="Netejar", command=self.clean_form)
 		self.button_clean_form.grid(row=0, column=5, padx=2)
 
-		self.reset_fields()
+		self.grab_set()
+		self.transient(self.master)
 
 
 
@@ -302,9 +303,9 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.tenths_male.set("0")
 		self.tenths_female.set("0")
 		self.tenths_childish.set("0")
-		self.price.set("0")
-		self.benefit.set("0")
-		self.total.set("0")
+		self.price.set("0.00")
+		self.benefit.set("0.00")
+		self.total.set("0.00")
 
 	
 	def display_member(self):
@@ -392,112 +393,111 @@ class ManageLotteryWindow(tk.Toplevel):
 			self.reset_fields()
 
 
-	def fila_seleccionada(self, event):
-		fila=self.tree_lottery.selection()
-		self.combo_box_member.config(state="disabled")
-		self.button_modify.config(state="normal")
-		self.button_delete.config(state="normal")
-		id=self.tree_lottery.item(fila, option="text")
-		llista_dades=self.tree_lottery.item(fila, option="values")
-		if llista_dades[10]==1:
+	def select_row(self, event):
+		row = self.tree_lottery.selection()
+		if not row:
+			return
+		self.combo_box_member.config(state = "disabled")
+		self.button_modify.config(state = "normal")
+		self.button_delete.config(state = "normal")
+		lottery_id = self.tree_lottery.item(row, option = "text")
+		data_list = self.tree_lottery.item(row, option = "values")
+		if data_list[10] == "1":
 			messagebox.showwarning("Error", "No es pot seleccionar una fila que ja ha segut assignada")
 		else:
-			self.combo_box_member.set(llista_dades[0])
-			self.member_id.set(llista_dades[11])
-			self.tickets_male.set(llista_dades[1])
-			self.tickets_female.set(llista_dades[2])
-			self.tickets_childish.set(llista_dades[3])
-			self.tenths_male.set(llista_dades[4])
-			self.tenths_female.set(llista_dades[5])
-			self.tenths_childish.set(llista_dades[6])
-			self.calculate_totals('<FocusOut>') # Calculem la resta de camps.
+			self.lottery_id.set(lottery_id)
+			self.combo_box_member.set(data_list[0])
+			self.member_id.set(data_list[11])
+			self.tickets_male.set(data_list[1])
+			self.tickets_female.set(data_list[2])
+			self.tickets_childish.set(data_list[3])
+			self.tenths_male.set(data_list[4])
+			self.tenths_female.set(data_list[5])
+			self.tenths_childish.set(data_list[6])
+			self.calculate_totals('<FocusOut>')
 
 
-	def modificar_fila(self):
-		bd=BaseDeDades('falla.db')
-		utils=Utils()
-		data=utils.calcular_data_actual()
-		self.calculate_totals('<FocusOut>') # Calculem els totals per si no s'ha fet abans.
-		fila=self.tree_lottery.selection()
-		id=self.tree_lottery.item(fila, option="text")
-		llista_dades=self.tree_lottery.item(fila, option="values")
-		sorteig=self.combo_box_lottery_name.get()
-		if llista_dades[10]==1:
+	def modify_row(self):
+		self.calculate_totals('<FocusOut>')
+		row = self.tree_lottery.selection()
+		lottery_id = self.tree_lottery.item(row, option = "text")
+		data_list = self.tree_lottery.item(row, option = "values")
+		lottery_name_year = self.combo_box_lottery_name.get().split()
+		lottery_name = lottery_name_year[0]
+		falla_year = lottery_name_year[1]
+		if data_list[10] == "1":
 			messagebox.showerror("Error", "No es pot modificar una fila de loteria ja assignada")
 		else:
-			# Restem els valors dels camps de la fila que anem a modificar.
-			self.total_tickets_male.set(self.total_tickets_male.get()-llista_dades[1])
-			self.total_tickets_female.set(self.total_tickets_female.get()-llista_dades[2])
-			self.total_tickets_childish.set(self.total_tickets_childish.get()-llista_dades[3])
-			self.total_tenths_male.set(self.total_tenths_male.get()-llista_dades[4])
-			self.total_tenths_female.set(self.total_tenths_female.get()-llista_dades[5])
-			self.total_tenths_childish.set(self.total_tenths_childish.get()-llista_dades[6])
-			self.total_price.set(self.total_price.get()-llista_dades[7])
-			self.total_benefit.set(self.total_benefit.get()-llista_dades[8])
-			self.total_sum.set(self.total_sum.get()-llista_dades[9])
-			# Passem a la taula els valors modificats prèviament.
-			self.tree_lottery.item(fila, text=self.member_id.get(), values=(self.combo_box_member.get(),
+			self.total_tickets_male.set(self.total_tickets_male.get() - int(data_list[1]))
+			self.total_tickets_female.set(self.total_tickets_female.get() - int(data_list[2]))
+			self.total_tickets_childish.set(self.total_tickets_childish.get() - int(data_list[3]))
+			self.total_tenths_male.set(self.total_tenths_male.get() - int(data_list[4]))
+			self.total_tenths_female.set(self.total_tenths_female.get() - int(data_list[5]))
+			self.total_tenths_childish.set(self.total_tenths_childish.get() - int(data_list[6]))
+			self.total_price.set(self.total_price.get() - float(data_list[7]))
+			self.total_benefit.set(self.total_benefit.get() - float(data_list[8]))
+			self.total_sum.set(self.total_sum.get() - float(data_list[9]))
+
+			self.tree_lottery.item(row, text = self.lottery_id.get(), values = (self.combo_box_member.get(),
 				self.tickets_male.get(), self.tickets_female.get(), self.tickets_childish.get(),
 				self.tenths_male.get(), self.tenths_female.get(), self.tenths_childish.get(),
-				self.price.get(), self.benefit.get(), self.total.get()))
-			# Sumem els nous valors dels camps.
-			self.total_tickets_male.set(self.total_tickets_male.get()+self.tickets_male.get())
-			self.total_tickets_female.set(self.total_tickets_female.get()+self.tickets_female.get())
-			self.total_tickets_childish.set(self.total_tickets_childish.get()+self.tickets_childish.get())
-			self.total_tenths_male.set(self.total_tenths_male.get()+self.tenths_male.get())
-			self.total_tenths_female.set(self.total_tenths_female.get()+self.tenths_female.get())
-			self.total_tenths_childish.set(self.total_tenths_childish.get()+self.tenths_childish.get())
-			self.total_price.set(self.total_price.get()+self.price.get())
-			self.total_benefit.set(self.total_benefit.get()+self.benefit.get())
-			self.total_sum.set(self.total_sum.get()+self.total.get())
-			# Mirem si el registre està en la base de dades i en cas de ser així el modifiquem.
-			ultim_id=bd.llegir_ultim_id_loteria()
-			if ultim_id<=id:
-				messagebox.showinfo("Info", "El registre encara no està a la base de dades. Es guardarà al fer clic en Guardar junt amb la resta de registres")
-			else:
-				loteria=Lottery(id, sorteig, data, self.tickets_male.get(), self.tickets_female.get(), self.tickets_childish.get(),
-					self.tenths_male.get(), self.tenths_female.get(), self.tenths_childish.get(), 0)
-				bd.actualitzar_loteria(loteria)
-		# Resetegem camps.
+				self.price.get(), self.benefit.get(), self.total.get(), 0, self.member_id.get()))
+			
+			self.total_tickets_male.set(self.total_tickets_male.get() + self.tickets_male.get())
+			self.total_tickets_female.set(self.total_tickets_female.get() + self.tickets_female.get())
+			self.total_tickets_childish.set(self.total_tickets_childish.get() + self.tickets_childish.get())
+			self.total_tenths_male.set(self.total_tenths_male.get() + self.tenths_male.get())
+			self.total_tenths_female.set(self.total_tenths_female.get() + self.tenths_female.get())
+			self.total_tenths_childish.set(self.total_tenths_childish.get() + self.tenths_childish.get())
+			self.total_price.set(self.total_price.get() + self.price.get())
+			self.total_benefit.set(self.total_benefit.get() + self.benefit.get())
+			self.total_sum.set(self.total_sum.get() + self.total.get())
+
+			Lottery.modify_lottery(lottery_id, lottery_name, falla_year, self.tickets_male.get(), self.tickets_female.get(), self.tickets_childish.get(),
+				self.tenths_male.get(), self.tenths_female.get(), self.tenths_childish.get(), data_list[11])
+			
+		self.lottery_id.set("")
 		self.member_id.set("")
 		self.combo_box_member.set("")
 		self.combo_box_member.config(state="normal")
 		self.button_modify.config(state="disabled")
 		self.button_delete.config(state="disabled")
 		self.reset_fields()
-		bd.tancar_conexio()
+		self.tree_lottery.selection_remove(self.tree_lottery.selection())
 
 
-	def eliminar_fila(self):
-		bd=BaseDeDades('falla.db')
-		fila=self.tree_lottery.selection()
-		id=self.tree_lottery.item(fila, option="text")
-		llista_dades=self.tree_lottery.item(fila, option="values")
-		# Podem borrar en el cas de que la loteria no estiga assignada.
-		if llista_dades[10]==1:
+	def delete_row(self):
+		row = self.tree_lottery.selection()
+		lottery_id = self.tree_lottery.item(row, option = "text")
+		data_list = self.tree_lottery.item(row, option = "values")
+		lottery_name_year = self.combo_box_lottery_name.get().split()
+		lottery_name = lottery_name_year[0]
+		falla_year = lottery_name_year[1]
+		if data_list[10] == "1":
 			messagebox.showerror("Error", "No es pot eliminar una fila de loteria ja assignada")
 		else:
-			# Restem els valors de la fila que anem a borrar.
-			self.total_tickets_male.set(self.total_tickets_male.get()-llista_dades[1])
-			self.total_tickets_female.set(self.total_tickets_female.get()-llista_dades[2])
-			self.total_tickets_childish.set(self.total_tickets_childish.get()-llista_dades[3])
-			self.total_tenths_male.set(self.total_tenths_male.get()-llista_dades[4])
-			self.total_tenths_female.set(self.total_tenths_female.get()-llista_dades[5])
-			self.total_tenths_childish.set(self.total_tenths_childish.get()-llista_dades[6])
-			self.total_price.set(self.total_price.get()-llista_dades[7])
-			self.total_benefit.set(self.total_benefit.get()-llista_dades[8])
-			self.total_sum.set(self.total_sum.get()-llista_dades[9])
-			# Eliminem la fila a l'arbre.
-			self.tree_lottery.delete(fila)
-			# Eliminem el registre de la fila a la base de dades en cas de que ja estiga guardat.
-			ultim_id=bd.llegir_ultim_id_loteria()
-			if ultim_id>id:
-				bd.eliminar_loteria(id)
-		# Canviem la configuració dels botons.
+			self.total_tickets_male.set(self.total_tickets_male.get() - int(data_list[1]))
+			self.total_tickets_female.set(self.total_tickets_female.get() - int(data_list[2]))
+			self.total_tickets_childish.set(self.total_tickets_childish.get() - int(data_list[3]))
+			self.total_tenths_male.set(self.total_tenths_male.get() - int(data_list[4]))
+			self.total_tenths_female.set(self.total_tenths_female.get() - int(data_list[5]))
+			self.total_tenths_childish.set(self.total_tenths_childish.get() - int(data_list[6]))
+			self.total_price.set(self.total_price.get() - float(data_list[7]))
+			self.total_benefit.set(self.total_benefit.get() - float(data_list[8]))
+			self.total_sum.set(self.total_sum.get() - float(data_list[9]))
+
+			self.tree_lottery.delete(row)
+
+			Lottery.delete_lottery(lottery_id, lottery_name, falla_year)
+
+		self.lottery_id.set("")
+		self.member_id.set("")
+		self.combo_box_member.set("")
 		self.combo_box_member.config(state="normal")
 		self.button_modify.config(state="disabled")
 		self.button_delete.config(state="disabled")
-		bd.tancar_conexio()
+		self.reset_fields()
+		self.tree_lottery.selection_remove(self.tree_lottery.selection())
 
 
 	def display_lotteries(self):
@@ -526,9 +526,9 @@ class ManageLotteryWindow(tk.Toplevel):
 			self.total_tenths_male.set("0")
 			self.total_tenths_female.set("0")
 			self.total_tenths_childish.set("0")
-			self.total_price.set("0")
-			self.total_benefit.set("0")
-			self.total_sum.set("0")
+			self.total_price.set("0.00")
+			self.total_benefit.set("0.00")
+			self.total_sum.set("0.00")
 			falla = Falla()
 			falla.get_lotteries(name, falla_year)
 			total_tickets_male = 0
@@ -589,26 +589,23 @@ class ManageLotteryWindow(tk.Toplevel):
 			Lottery.set_lottery(lottery_id, lottery_name, falla_year, data_list[1], data_list[2], data_list[3], data_list[4], data_list[5], data_list[6], data_list[10], member.id)
 
 
-	def assignar(self):
-		valor=messagebox.askquestion("Assignar", "Es guardaran tots els registres pendents i s'assignaran els diners i beneficis. L'operació no es pot desfer")
-		if valor=="yes":
-			utils=Utils()
-			data=utils.calcular_data_actual()
-			arxiu=Arxiu('exercici')
-			exercici_actual=arxiu.llegir_exercici_actual()
+	def assign(self):
+		value = messagebox.askquestion("Assignar", "Es guardaran tots els registres pendents i s'assignaran els diners i beneficis. L'operació no es pot desfer")
+		if value == "yes":
 			self.save()
-			row_list=self.tree_lottery.get_children()
-			bd=BaseDeDades('falles.db')
-			for fila in row_list:
-				id=self.tree_lottery.item(fila, option="text")
-				data_list=self.tree_lottery.item(fila, option="values")
-				moviment=Movement(0, data, data_list[8], 1, 2, exercici_actual, self.combo_box_lottery_name.get())
-				bd.crear_moviment(moviment)
-				moviment=Movement(0, data, data_list[9], 2, 1, exercici_actual, self.combo_box_lottery_name.get())
-				bd.crear_moviment(moviment)
-				# Actualització de tots els registres a estat assignat.
-				bd.actualitzar_assignada_loteria(id)
-			self.button_assignar.config(state="disabled")
+			row_list = self.tree_lottery.get_children()
+			falla = Falla()
+			for row in row_list:
+				lottery_id = self.tree_lottery.item(row, option = "text")
+				data_list = self.tree_lottery.item(row, option = "values")
+				lottery_name_year = self.combo_box_lottery_name.get().split()
+				lottery_name = lottery_name_year[0]
+				falla_year = lottery_name_year[1]
+				if data_list[10] == "0":
+					falla.assign_lottery(None, data_list[9], falla_year, data_list[11], "assignació loteria " + lottery_name + " " + falla_year)
+					falla.pay_fee(None, data_list[8], falla_year, "benefici " + lottery_name + " " + falla_year, None, data_list[11])
+					Lottery.assign_lottery(lottery_id, lottery_name, falla_year)
+			self.button_assign.config(state="disabled")
 
 
 	def clean_form(self):
@@ -629,4 +626,4 @@ class ManageLotteryWindow(tk.Toplevel):
 		self.total_sum.set(0)
 		self.combo_box_lottery_name.set("")
 		self.button_add.config(state="normal")
-		self.button_assignar.config(state="normal")
+		self.button_assign.config(state="normal")
