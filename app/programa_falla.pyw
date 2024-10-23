@@ -22,7 +22,7 @@ from manage_member_window import ManageMemberWindow
 from finestra_historial import FinestraHistorial
 from modify_categories_window import ModifyCategoriesWindow
 from show_report_window import ShowReportWindow
-from finestra_loteria import FinestraLoteria
+from manage_lottery_window import ManageLotteryWindow
 
 from arxiu import Arxiu
 from utils import Utils
@@ -193,8 +193,9 @@ class Aplicacio(tk.Frame):
 		'''
 		db = Database('sp')
 		db.close_connection()
-		# Descomentar linea de baix per a fer cópia de sqLite a mariaDb
+		# Descomentar linies de baix per a fer cópia de sqLite a mariaDb
 		#ExportSqliteToMariaDb('sp')
+		#messagebox.showinfo("Info", "Recuperació desde sqlite completada")
 	
 	
 	def modificar_categories(self):
@@ -228,7 +229,7 @@ class Aplicacio(tk.Frame):
 
 	def assignar_loteria(self): #funció que obre la finestra "Assignar" del menú "Loteria"
 
-		FinestraLoteria(self)
+		ManageLotteryWindow(self)
 
 
 	def assignar_rifa(self):

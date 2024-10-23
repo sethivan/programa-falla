@@ -9,6 +9,7 @@ from movement import Movement
 from family import Family
 from member import Member
 from category import Category
+from lottery import Lottery
 
 
 class Falla():
@@ -26,6 +27,8 @@ class Falla():
 		Llistat d'objectes de la classe "Category".
 	families_list : list
 		Llistat d'objectes de la classe "Family".
+	lotteries_list : list
+		Llistat d'objectes de la classe "Lottery".
 
 	Mètodes:
 	--------
@@ -60,6 +63,7 @@ class Falla():
 		self.movements_list = []
 		self.categories_list = []
 		self.families_list = []
+		self.lotteries_list = []
 		self.falla_year = 0
 
 
@@ -157,6 +161,43 @@ class Falla():
 		for values in result:
 			family = Family(values[0], values[1], values[2])
 			self.families_list.append(family)
+
+
+	def get_lotteries(self, lottery_name, falla_year):
+		db = Database('sp')
+		result = db.select_lotteries_by_lottery_name(lottery_name, falla_year)
+		db.close_connection()
+		for values in result:
+			member = Member(
+				values[15],
+				values[16],
+				values[17],
+				values[18],
+				values[19],
+				values[20],
+				values[21],
+				values[22],
+				values[23],
+				values[26]
+			)
+			lottery = Lottery(
+				values[0],
+				values[1],
+				values[2],
+				values[3],
+				values[4],
+				values[6],
+				values[7],
+				values[8],
+				values[9],
+				values[10],
+				values[11],
+				values[12],
+				values[13],
+				values[14],
+				member
+			)
+			self.lotteries_list.append(lottery)
 
 
 	def get_current_falla_year(self):
@@ -614,6 +655,13 @@ class Falla():
 			receipt_number,
 			id_member
 		)
+
+
+	def get_lotteries_list(self):
+		db = Database('sp')
+		lotteries_list = db.select_lotteries_list()
+		return lotteries_list
+	
 	
 	def new_falla_year(self):
 		'''

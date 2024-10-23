@@ -33,8 +33,8 @@ class ExportSqliteToMariaDb:
 			self.import_summary_from_file(base_path / 'previous version' / 'resum 2022', 2022)
 			self.import_summary_from_file(base_path / 'previous version' / 'resum 2023', 2023)
 			self.import_summary_from_file(base_path / 'previous version' / 'resum 2024', 2024)
-			self.import_lottery_from_file(base_path / 'previous version' / 'nadal 2023-24', 'nadal', 2024)
-			self.import_lottery_from_file(base_path / 'previous version' / 'loteria xiquet 23-24', 'xiquet', 2024)
+			self.import_lottery_from_file(base_path / 'previous version' / 'nadal 2023-24', '2023-12-21', 'nadal', 2024)
+			self.import_lottery_from_file(base_path / 'previous version' / 'loteria xiquet 23-24', '2024-01-05', 'xiquet', 2024)
 			self.import_faller_actiu_from_sqlite()
 
 		else:
@@ -102,16 +102,18 @@ class ExportSqliteToMariaDb:
 			self.insert_membership_history(falla_year, value[0])
 
 
-	def import_lottery_from_file(self, file, lottery_name, falla_year):
+	def import_lottery_from_file(self, file, assigned, lottery_name, falla_year):
 		arxiu = Arxiu(file)
 		result = arxiu.llegir_loteria()
 		i=0
-		for val in result:
+		id_lottery=1
+		for value in result:
 			if len(result)>i:
 				memberFk = result[i]
 				value=result[i+1]
 				i=i+2
-				self.insert_lottery(lottery_name, falla_year, memberFk, value[1], value[2], value[3], value[4], value[5], value[6], 1)
+				self.insert_lottery(id_lottery, lottery_name, assigned, falla_year, memberFk, value[1], value[2], value[3], value[4], value[5], value[6], 1)
+				id_lottery = id_lottery + 1
 			
 
 
@@ -233,7 +235,9 @@ class ExportSqliteToMariaDb:
 
 	def insert_lottery(
 			self,
+			id_lottery,
 			lottery_name,
+			assigned,
 			falla_year,
 			member,
 			tickets_male,
@@ -244,11 +248,10 @@ class ExportSqliteToMariaDb:
 			tenths_childish,
 			is_assigned
 		):
-		assigned = None
 		query = "INSERT INTO lottery \
-			(lotteryName, assigned, fallaYearFk, memberFk, ticketsMale, ticketsFemale, ticketsChildish, tenthsMale, tenthsFemale, tenthsChildish, isAssigned) \
-				VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-		data = lottery_name, assigned, falla_year, member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, is_assigned
+			(lotteryId, lotteryName, assigned, fallaYearFk, memberFk, ticketsMale, ticketsFemale, ticketsChildish, tenthsMale, tenthsFemale, tenthsChildish, isAssigned) \
+				VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+		data = id_lottery, lottery_name, assigned, falla_year, member, tickets_male, tickets_female, tickets_childish, tenths_male, tenths_female, tenths_childish, is_assigned
 		try:
 			self.mysqlCursor.execute(query, data)
 			self.mysqlConnection.commit()
