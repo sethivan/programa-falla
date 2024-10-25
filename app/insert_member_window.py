@@ -331,7 +331,7 @@ class InsertMemberWindow(tk.Toplevel):
 					"El format per a la data ha de ser dd-mm-aaaa i ser vàlida"
 				)
 			else:
-				if self.family.get() == "1":
+				if self.family.get() == 1:
 					result = Family.get_family(self.final_family_id)
 					family = Family(result[0], result[1], result[2])
 					Member.set_member(self.name.get(),
