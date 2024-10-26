@@ -9,6 +9,7 @@ from tkinter import messagebox
 import platform
 from reportlab.lib.pagesizes import A4
 from pathlib import Path
+from decimal import Decimal
 
 from utils import Utils
 
@@ -2051,7 +2052,7 @@ class ManageMemberWindow(tk.Toplevel):
 								receipt_number,
 								member.id
 							)
-						fee_payment = fee_payment - pending_fee
+						fee_payment = Decimal(fee_payment) - pending_fee
 
 					pending_lottery = assigned_lottery - payed_lottery
 					if lottery_payment != 0 and total_registered_members == 1:
@@ -2088,9 +2089,9 @@ class ManageMemberWindow(tk.Toplevel):
 								receipt_number,
 								member.id
 							)
-						lottery_payment = lottery_payment - pending_lottery
-					
-					pending_raffle = assigned_raffle-payed_raffle
+						lottery_payment = Decimal(lottery_payment) - pending_lottery
+
+					pending_raffle = assigned_raffle - payed_raffle
 					if raffle_payment != 0 and total_registered_members == 1:
 						falla.pay_raffle(
 							None,
@@ -2124,7 +2125,7 @@ class ManageMemberWindow(tk.Toplevel):
 								receipt_number,
 								member.id
 							)
-						raffle_payment = raffle_payment - pending_raffle
+						raffle_payment = Decimal(raffle_payment) - pending_raffle
 
 					total_registered_members = total_registered_members - 1
 
