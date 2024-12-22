@@ -384,19 +384,36 @@ class InsertMemberWindow(tk.Toplevel):
 							self.email.get(),
 							family.id,
 							None)
-			'''
+			
 			# Creem un historial nou i l'omplim
-			member=bd.llegir_ultim_faller()
-			exercici=member.calcular_primer_exercici(member.birthdate)
-			historial={}
-			while exercici < exercici_actual:
-				historial[exercici]=["baixa", ""]
-				exercici=exercici+1
-			historial[exercici_actual]=["vocal", "Sants Patrons"]
-			nom_arxiu="historials"+"/"+str(member.id)
-			arxiu=Arxiu(nom_arxiu)
-			arxiu.crear_historial(historial)
-			bd.tancar_conexio()'''
+
+			result = Member.get_last_member()
+			member = Member(
+			result[0],
+			result[1],
+			result[2],
+			result[3],
+			result[4],
+			result[5],
+			result[6],
+			result[7],
+			result[8],
+			result[11]
+			)
+			falla = Falla()
+			falla.get_current_falla_year()
+			member.set_membership_history(member.id, "vocal", "Sants Patrons", falla.falla_year)
+			#member=bd.llegir_ultim_faller()
+			#exercici=member.calcular_primer_exercici(member.birthdate)
+			#historial={}
+			#while exercici < exercici_actual:
+			#	historial[exercici]=["baixa", ""]
+			#	exercici=exercici+1
+			#historial[exercici_actual]=["vocal", "Sants Patrons"]
+			#nom_arxiu="historials"+"/"+str(member.id)
+			#arxiu=Arxiu(nom_arxiu)
+			#arxiu.crear_historial(historial)
+			#bd.tancar_conexio()
 
 			self.name.set("")
 			self.surname.set("")

@@ -1075,13 +1075,14 @@ class ManageMemberWindow(tk.Toplevel):
 			family,
 			category
 		)
-		member.get_membership_history(member.id)
+
 		if member.is_registered == 1:
 			value = messagebox.askquestion(
 				"Baixa","Estàs segur que vols donar de baixa al faller?"
 			)
 			if value == "yes":
 				member.is_registered = 0
+				member.modify_membership_history(member.id, "baixa", "Sants Patrons", falla.falla_year)
 				member.modify_member(
 					member.id,
 					member.name,
@@ -1102,6 +1103,11 @@ class ManageMemberWindow(tk.Toplevel):
 			)
 			if value == "yes":
 				member.is_registered = 1
+				result = member.get_membership_history(member.id)
+				if len(result) == 0:
+					member.set_membership_history(member.id, "vocal", "Sants Patrons", falla.falla_year)
+				else:
+					member.modify_membership_history(member.id, "vocal", "Sants Patrons", falla.falla_year)
 				member.modify_member(
 					member.id,
 					member.name,

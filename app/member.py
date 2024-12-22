@@ -205,6 +205,14 @@ class Member():
 		db.close_connection()
 
 
+	@classmethod
+	def get_last_member():
+		db = Database('sp')
+		member = db.select_last_member()
+		db.close_connection()
+		return member
+
+
 	def modify_member(
 		self,
 		id,
@@ -268,7 +276,7 @@ class Member():
 		db.close_connection()
 
 
-	def get_membership_history(self, id):
+	def get_membership_history(self, id_member):
 		'''
 		Recupera l'historial del faller.
 
@@ -278,10 +286,23 @@ class Member():
 			Identificador del faller.
 		'''
 		db = Database('sp')
-		result = db.select_membership_history(id)
+		result = db.select_membership_history(id_member)
 		db.close_connection()
-		for value in result:
-			self.membership_history[value[1]] = [value[2], value[3]]
+		return result
+		#for value in result:
+			#self.membership_history[value[1]] = [value[2], value[3]]
+
+
+	def set_membership_history(self, id_member, position, falla, falla_year):
+		db = Database('sp')
+		db.insert_membership_history(falla_year, position, falla, id_member)
+		db.close_connection()
+
+
+	def modify_membership_history(self, id_member, position, falla, falla_year):
+		db = Database('sp')
+		db.update_membership_history(falla_year, position, falla, id_member)
+		db.close_connection()
 
 
 	def calculate_age(self, birthdate, falla_year):
