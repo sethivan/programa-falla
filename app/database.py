@@ -474,16 +474,44 @@ class Database:
 			)
 
 
-	def select_membership_history(self, id):
-		query = "SELECT * FROM membershipHistory WHERE id = %s"
+	def select_membership_history(self, id_member):
+		query = "SELECT * FROM membershipHistory WHERE memberFk = %s"
 		try:
-			self.mysqlCursor.execute(query, (id,))
+			self.mysqlCursor.execute(query, (id_member,))
 			membership_history = self.mysqlCursor.fetchall()
 			return membership_history
 		except mysql.connector.Error:
 			messagebox.showerror(
 				"Error",
 				"Error al llegir l'historial del faller de la base de dades"
+			)
+
+
+	def insert_membership_history(self, fallaYearFk, position, falla, memberFk):
+		query = "INSERT INTO membershipHistory (fallaYearFk, position, falla, memberFk) \
+			VALUES (%s, %s, %s, %s)"
+		data = fallaYearFk, position, falla, memberFk
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al insertar un nou historial de faller a la base de dades"
+			)
+
+
+	def update_membership_history(self, falla_year, position, falla, id_member):
+		query = """UPDATE membershipHistory SET falla = %s, position = %s, 
+			WHERE memberFk = %s AND fallaYearFk = %s"""
+		data = falla, position, id_member, falla_year
+		try:
+			self.mysqlCursor.execute(query, data)
+			self.mysqlConnection.commit()
+		except mysql.connector.Error:
+			messagebox.showerror(
+				"Error",
+				"Error al actualitzar les dades del historial del faller a la base de dades"
 			)
 
 
