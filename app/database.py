@@ -502,7 +502,7 @@ class Database:
 
 
 	def update_membership_history(self, falla_year, position, falla, id_member):
-		query = """UPDATE membershipHistory SET falla = %s, position = %s, 
+		query = """UPDATE membershipHistory SET falla = %s, position = %s 
 			WHERE memberFk = %s AND fallaYearFk = %s"""
 		data = falla, position, id_member, falla_year
 		try:

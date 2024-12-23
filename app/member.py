@@ -289,8 +289,6 @@ class Member():
 		result = db.select_membership_history(id_member)
 		db.close_connection()
 		return result
-		#for value in result:
-			#self.membership_history[value[1]] = [value[2], value[3]]
 
 
 	def set_membership_history(self, id_member, position, falla, falla_year):
