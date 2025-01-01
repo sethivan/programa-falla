@@ -2,6 +2,8 @@ import mysql.connector
 from tkinter import messagebox
 import subprocess
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 from utils import Utils
 from create_database import CreateDatabase
@@ -27,11 +29,14 @@ class Database:
 		db_name : string
 			Nom de la base de dades.
 		'''
+		dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+		load_dotenv(dotenv_path)
+		
 		try:
 			self.mysqlConnection = mysql.connector.connect(
-				host = "localhost",
-				user = "root",
-				password = "hamuclaulo07",
+				host = os.getenv("MYSQL_HOST"),
+				user = os.getenv("MYSQL_USER"),
+				password = os.getenv("MYSQL_PASSWORD"),
 				database = db_name
 			)
 			if self.mysqlConnection.is_connected():
